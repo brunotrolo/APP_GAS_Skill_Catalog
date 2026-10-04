@@ -1,0 +1,109 @@
+<style>
+  /* De docs/themes/DESIGN-mastercard.md. Brand = Ink Black #141413 (literal
+       bg do botao primario "Ink Pill"); o arquivo probe explicitamente o
+       vermelho/amarelo do logo como cor de UI ("used only in the brand
+       logo, never as a UI color") - por isso cat-1..6 usa so os acentos
+       legitimos (Signal Orange/Light Signal Orange/Clay Brown/Link Blue) +
+       2 neutros (Slate Gray/Dust Taupe), nunca o vermelho/amarelo do mark.
+       --gold inverte por modo mas sempre fica "quente": Canvas Cream no
+       escuro (nunca branco puro) e Ink Black no claro (nunca preto puro) -
+       o proprio arquivo exige isso ("Don't use pure white...never jet
+       black"). O texto sobre o botao preenchido e literalmente Canvas
+       Cream, nao branco puro ("Text: Canvas Cream - not pure white").
+       --purple reusa Link Blue (fica bem como "conteudo externo em
+       destaque"). --terminal-green reusa Slate Gray (sem verde literal).
+       --warn reusa Signal Orange (literalmente um "signal/consent" color,
+       papel semantico compativel). Forma: 20px (radius assinatura dos
+       botoes) em --radius-s, 40px (hero media frame, "most iconic
+       gesture") em --radius-m, 9999px (pill/nav) em --radius-pill. Sombra
+       suave de espalhamento largo e opacidade baixa (nunca "sem sombra"
+       nem sombra dura). Fonte: MarkForMC e proprietaria; o proprio arquivo
+       ja lista Sofia Sans na sua propria pilha de fallback. */
+  :root[data-theme-family="mastercard"][data-theme="dark"] {
+    --cat-1: #CF4500;
+    --cat-2: #F37338;
+    --cat-3: #9A3A0A;
+    --cat-4: #3860BE;
+    --cat-5: #696969;
+    --cat-6: #D1CDC7;
+    --on-cat: #ffffff;
+    --bg-deep: #141413;
+    --bg-panel: #262627;
+    --bg-card: #262627;
+    --bg-card-hover: #555555;
+    --border-ink: #565656;
+    --text-main: #ffffff;
+    --gold: #F3F0EE;
+    --gold-glow: #FCFBFA;
+    --purple: #3860BE;
+    --terminal-green: #696969;
+    --danger: #9A3A0A;
+    --muted: #696969;
+    --info: #3860BE;
+    --warn: #CF4500;
+    --gold-glow-rgb: 252, 251, 250;
+    --terminal-green-rgb: 105, 105, 105;
+    --font-heading: 'Sofia Sans', Arial, sans-serif;
+    --font-body: 'Sofia Sans', Arial, sans-serif;
+    --font-display: 'Sofia Sans', Arial, sans-serif;
+    --radius-s: 20px;
+    --radius-m: 40px;
+    --radius-pill: 9999px;
+    --border-width: 1.5px;
+    --shadow-chunky: 0 24px 48px rgba(0, 0, 0, 0.35);
+    --letter-spacing-heading: -0.48px;
+    --heading-transform: none;
+    --on-accent: #141413;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="mastercard"][data-theme="light"] {
+    --cat-1: #CF4500;
+    --cat-2: #F37338;
+    --cat-3: #9A3A0A;
+    --cat-4: #3860BE;
+    --cat-5: #696969;
+    --cat-6: #D1CDC7;
+    --on-cat: #ffffff;
+    --bg-deep: #F3F0EE;
+    --bg-panel: #FCFBFA;
+    --bg-card: #ffffff;
+    --bg-card-hover: #F4F4F4;
+    --border-ink: #D1CDC7;
+    --text-main: #141413;
+    --gold: #141413;
+    --gold-glow: #262627;
+    --purple: #3860BE;
+    --terminal-green: #696969;
+    --danger: #9A3A0A;
+    --muted: #696969;
+    --info: #3860BE;
+    --warn: #CF4500;
+    --gold-glow-rgb: 38, 38, 39;
+    --terminal-green-rgb: 105, 105, 105;
+    --font-heading: 'Sofia Sans', Arial, sans-serif;
+    --font-body: 'Sofia Sans', Arial, sans-serif;
+    --font-display: 'Sofia Sans', Arial, sans-serif;
+    --radius-s: 20px;
+    --radius-m: 40px;
+    --radius-pill: 9999px;
+    --border-width: 1.5px;
+    --shadow-chunky: 0 24px 48px rgba(0, 0, 0, 0.08);
+    --letter-spacing-heading: -0.48px;
+    --heading-transform: none;
+    --on-accent: #F3F0EE;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>

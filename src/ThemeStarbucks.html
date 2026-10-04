@@ -1,0 +1,110 @@
+<style>
+  /* De docs/themes/DESIGN-starbucks.md. Brand = Green Accent #00754A
+       (literal bg do "Primary Filled" CTA). O modo escuro usa House Green
+       #1E3932 como --bg-deep - nao e extrapolado, e um fundo escuro
+       literal e real do site (feature bands, footer, Rewards). Sobre esse
+       fundo escuro o arquivo documenta literalmente o padrao "Green-on-
+       Green Inverted": o botao vira branco com texto verde em vez de
+       verde solido - por isso --gold/--on-accent invertem por modo (claro:
+       gold=Green Accent/on-accent=branco; escuro: gold=branco/on-accent=
+       Green Accent), igual ao principio ja usado no tema Apple. --purple
+       usa Green Uplift #2b5148 (literal, "secondary... decorative
+       accents"). cat-1..6 evita Gold (#cba258) de proposito - o arquivo
+       probe explicitamente "Don't use Gold as a general-purpose accent...
+       it's a Rewards signal only" - usa Starbucks Green/Green Accent/Red/
+       Yellow/Uplift/House Green. --danger=Red e --warn=Yellow sao ambos
+       semanticos literais do arquivo. Forma: 50px (raio universal de
+       botao, tambem o raio literal do "Rewards Cost Pill") em --radius-s/
+       --radius-pill, 12px (--cardBorderRadius literal) em --radius-m.
+       --shadow-chunky usa o shadow de card literal, duas camadas bem
+       suaves ("whisper-soft, layered... never one heavy drop shadow").
+       Fonte: SoDoSans e proprietaria; o proprio arquivo recomenda Inter
+       como substituto. */
+  :root[data-theme-family="starbucks"][data-theme="dark"] {
+    --cat-1: #006241;
+    --cat-2: #00754A;
+    --cat-3: #c82014;
+    --cat-4: #fbbc05;
+    --cat-5: #2b5148;
+    --cat-6: #1E3932;
+    --on-cat: #ffffff;
+    --bg-deep: #1E3932;
+    --bg-panel: #2b5148;
+    --bg-card: #2b5148;
+    --bg-card-hover: #006241;
+    --border-ink: #33433d;
+    --text-main: #ffffff;
+    --gold: #ffffff;
+    --gold-glow: #d4e9e2;
+    --purple: #2b5148;
+    --terminal-green: #006241;
+    --danger: #c82014;
+    --muted: rgba(255, 255, 255, 0.70);
+    --info: #33433d;
+    --warn: #fbbc05;
+    --gold-glow-rgb: 212, 233, 226;
+    --terminal-green-rgb: 0, 98, 65;
+    --font-heading: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-body: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-display: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --radius-s: 50px;
+    --radius-m: 12px;
+    --radius-pill: 50px;
+    --border-width: 1px;
+    --shadow-chunky: 0 0 0.5px rgba(0, 0, 0, 0.3), 0 1px 1px rgba(0, 0, 0, 0.4);
+    --letter-spacing-heading: -0.16px;
+    --heading-transform: none;
+    --on-accent: #00754A;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="starbucks"][data-theme="light"] {
+    --cat-1: #006241;
+    --cat-2: #00754A;
+    --cat-3: #c82014;
+    --cat-4: #fbbc05;
+    --cat-5: #2b5148;
+    --cat-6: #1E3932;
+    --on-cat: #ffffff;
+    --bg-deep: #f2f0eb;
+    --bg-panel: #edebe9;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f9f9f9;
+    --border-ink: #e7e7e7;
+    --text-main: rgba(0, 0, 0, 0.87);
+    --gold: #00754A;
+    --gold-glow: #d4e9e2;
+    --purple: #2b5148;
+    --terminal-green: #006241;
+    --danger: #c82014;
+    --muted: rgba(0, 0, 0, 0.58);
+    --info: #33433d;
+    --warn: #fbbc05;
+    --gold-glow-rgb: 212, 233, 226;
+    --terminal-green-rgb: 0, 98, 65;
+    --font-heading: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-body: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-display: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --radius-s: 50px;
+    --radius-m: 12px;
+    --radius-pill: 50px;
+    --border-width: 1px;
+    --shadow-chunky: 0 0 0.5px rgba(0, 0, 0, 0.14), 0 1px 1px rgba(0, 0, 0, 0.24);
+    --letter-spacing-heading: -0.16px;
+    --heading-transform: none;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>
