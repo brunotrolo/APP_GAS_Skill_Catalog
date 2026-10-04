@@ -1,0 +1,81 @@
+<style>
+  /* De docs/themes/DESIGN-bmw-m.md. Brand = m-red #e22718 / m-blue-light
+       #0066b1 / electric-blue #0653b6 / warning #f4b400 / success #0fa336 -
+       100% literais do arquivo, iguais nos dois modos. O arquivo so descreve
+       um canvas quase preto; o modo claro abaixo usa Surface/Text neutros
+       inferidos (unica excecao a regra de "so cores do arquivo", e so para
+       Surface/Text, nunca para Brand). Forma: rounded.none (0px) e o raio
+       dominante em botoes/cards/inputs, 1px, sem sombra, titulos em
+       UPPERCASE - identico nos dois modos. */
+  :root[data-theme-family="bmw"][data-theme="dark"] {
+    --bg-deep: #000000;
+    --bg-panel: #0d0d0d;
+    --bg-card: #1a1a1a;
+    --bg-card-hover: #262626;
+    --border-ink: #3c3c3c;
+    --text-main: #ffffff;
+    --gold: #e22718;
+    --gold-glow: #f4b400;
+    --purple: #0066b1;
+    --terminal-green: #0fa336;
+    --danger: #e22718;
+    --muted: #7e7e7e;
+    --info: #0653b6;
+    --warn: #f4b400;
+    --gold-glow-rgb: 226, 39, 24;
+    --terminal-green-rgb: 15, 163, 54;
+    --font-heading: 'Arial Black', Arial, sans-serif;
+    --font-body: Helvetica, Arial, sans-serif;
+    --font-display: 'Arial Black', Arial, sans-serif;
+    --radius-s: 0px;
+    --radius-m: 0px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0px;
+    --heading-transform: uppercase;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--terminal-green);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="bmw"][data-theme="light"] {
+    --bg-deep: #ffffff;
+    --bg-panel: #f7f7f7;
+    --bg-card: #ffffff;
+    --bg-card-hover: #ececec;
+    --border-ink: #1a1a1a;
+    --text-main: #1a1a1a;
+    --gold: #e22718;
+    --gold-glow: #f4b400;
+    --purple: #0066b1;
+    --terminal-green: #0fa336;
+    --danger: #e22718;
+    --muted: #6e6e6e;
+    --info: #0653b6;
+    --warn: #f4b400;
+    --gold-glow-rgb: 226, 39, 24;
+    --terminal-green-rgb: 15, 163, 54;
+    --font-heading: 'Arial Black', Arial, sans-serif;
+    --font-body: Helvetica, Arial, sans-serif;
+    --font-display: 'Arial Black', Arial, sans-serif;
+    --radius-s: 0px;
+    --radius-m: 0px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0px;
+    --heading-transform: uppercase;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--terminal-green);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>
