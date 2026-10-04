@@ -1,11 +1,13 @@
 <div class="search-bar pixel-panel">
   <h2>BUSCAR NO INVENTARIO</h2>
-  <div class="search-row">
+  <div class="search-row search-row-primary">
     <input type="text" id="searchBox" placeholder="Nome, autor, tag ou resumo..." oninput="applyFilters()">
     <select id="categoryFilter" onchange="applyFilters()">
       <option value="ALL">TODAS AS CLASSES</option>
     </select>
+  </div>
 
+  <div class="search-row search-row-actions">
     <div class="tag-dropdown" id="navDropdown">
       <button type="button" class="pixel-button secondary" onclick="toggleDropdown('navDropdown')" id="navDropdownToggle">📂 NAVEGAR</button>
       <div class="tag-dropdown-panel" id="navDropdownPanel">

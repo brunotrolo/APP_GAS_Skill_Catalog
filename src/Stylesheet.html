@@ -453,6 +453,32 @@
     min-width: 220px;
   }
 
+  .search-row-primary select {
+    flex: 1;
+    min-width: 180px;
+  }
+
+  .search-row-actions {
+    row-gap: 10px;
+  }
+
+  @media (max-width: 480px) {
+    .search-row-primary input[type="text"],
+    .search-row-primary select {
+      flex-basis: 100%;
+      min-width: 0;
+    }
+
+    .search-row-actions .tag-dropdown,
+    .search-row-actions > button {
+      flex: 1 1 calc(50% - 5px);
+    }
+
+    .search-row-actions .pixel-button {
+      width: 100%;
+    }
+  }
+
   .tag-pills {
     display: flex;
     flex-wrap: wrap;
