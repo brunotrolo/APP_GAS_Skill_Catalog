@@ -1,0 +1,110 @@
+<style>
+  /* De docs/themes/DESIGN-meta.md. O arquivo tem DOIS CTAs primarios:
+       button-primary (preto, marketing, onipresente) e button-buy-cta
+       (cobalto #0064e0, exclusivo do fluxo de compra). Don't explicito:
+       "Reserve cobalt for buy-now CTAs only - its visual weight is
+       meaningful precisely because it doesn't appear on marketing pages"
+       + "the hardware brand is deliberately monochromatic outside its
+       product photography" - por isso Brand (--gold) e o preto onipresente
+       (inverte por modo, sem dark mode documentado), NAO o cobalto.
+       Excecao a regra geral do guide: aqui --chrome-gradient-success usa
+       --info (cobalto), nao --gold - porque o botao "BAIXAR .ZIP" do app
+       e uma acao de AQUISICAO ("pegue a skill"), o mesmo papel exato que
+       o arquivo reserva ao cobalto (Add to cart/Configure/Pre-order), nao
+       ao preto generico de navegacao/marketing. cat-1..6 usa os hues reais
+       do arquivo (Oculus Purple/success/attention/critical/fb-blue/
+       cobalto) - paleta rica, quase nada precisou ser reusado. Forma:
+       rounded.full (100px literal, nao 9999px) em botoes/badges,
+       rounded.xxxl (32px, "minimum for any photographic surface") em
+       cards. --shadow-chunky: none (Level 0 e o padrao documentado para
+       a maioria dos cards - sombra e "commerce-flow signal", nao
+       marketing). Fonte: Optimistic VF e proprietaria; o proprio arquivo
+       lista Montserrat primeiro no fallback. */
+  :root[data-theme-family="meta"][data-theme="dark"] {
+    --cat-1: #a121ce;
+    --cat-2: #31a24c;
+    --cat-3: #f2a918;
+    --cat-4: #e41e3f;
+    --cat-5: #1876f2;
+    --cat-6: #0064e0;
+    --on-cat: #ffffff;
+    --bg-deep: #0a1317;
+    --bg-panel: #1c1e21;
+    --bg-card: #444950;
+    --bg-card-hover: #4b4c4f;
+    --border-ink: #5d6c7b;
+    --text-main: #ffffff;
+    --gold: #ffffff;
+    --gold-glow: #4b4c4f;
+    --purple: #a121ce;
+    --terminal-green: #31a24c;
+    --danger: #e41e3f;
+    --muted: #8595a4;
+    --info: #0064e0;
+    --warn: #f7b928;
+    --gold-glow-rgb: 75, 76, 79;
+    --terminal-green-rgb: 49, 162, 76;
+    --font-heading: 'Montserrat', Helvetica, Arial, sans-serif;
+    --font-body: 'Montserrat', Helvetica, Arial, sans-serif;
+    --font-display: 'Montserrat', Helvetica, Arial, sans-serif;
+    --radius-s: 100px;
+    --radius-m: 32px;
+    --radius-pill: 100px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0px;
+    --heading-transform: none;
+    --on-accent: #0a1317;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--info);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="meta"][data-theme="light"] {
+    --cat-1: #a121ce;
+    --cat-2: #31a24c;
+    --cat-3: #f2a918;
+    --cat-4: #e41e3f;
+    --cat-5: #1876f2;
+    --cat-6: #0064e0;
+    --on-cat: #ffffff;
+    --bg-deep: #ffffff;
+    --bg-panel: #f1f4f7;
+    --bg-card: #ffffff;
+    --bg-card-hover: #dee3e9;
+    --border-ink: #ced0d4;
+    --text-main: #0a1317;
+    --gold: #000000;
+    --gold-glow: #444950;
+    --purple: #a121ce;
+    --terminal-green: #31a24c;
+    --danger: #e41e3f;
+    --muted: #5d6c7b;
+    --info: #0064e0;
+    --warn: #f7b928;
+    --gold-glow-rgb: 68, 73, 80;
+    --terminal-green-rgb: 49, 162, 76;
+    --font-heading: 'Montserrat', Helvetica, Arial, sans-serif;
+    --font-body: 'Montserrat', Helvetica, Arial, sans-serif;
+    --font-display: 'Montserrat', Helvetica, Arial, sans-serif;
+    --radius-s: 100px;
+    --radius-m: 32px;
+    --radius-pill: 100px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0px;
+    --heading-transform: none;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--info);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>

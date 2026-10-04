@@ -1,0 +1,109 @@
+<style>
+  /* De docs/themes/DESIGN-ferrari.md. Brand = Rosso Corsa #da291c, literal
+       bg do button-primary, igual nos dois modos (usado com moderacao,
+       mas e o unico acento real do arquivo). Caso raro: os dois modos sao
+       literais no proprio arquivo (canvas quase-preto #181818 E
+       canvas-light #ffffff ja documentados, nenhum extrapolado).
+       cat-1..6 evita os dois amarelos Hypersail de proposito - Don't
+       explicito "Don't use Hypersail yellow outside the Hypersail sailing
+       program context" - usa Rosso Corsa/info/success/warning + 2 cinzas.
+       --danger usa semantic-warning (#f13a2c): apesar do nome "warning",
+       o hex e um vermelho de alerta, mais proximo semanticamente de erro/
+       perigo que do nosso --warn; --warn reusa um cinza na ausencia de
+       amarelo permitido. Forma: rounded.none (0px, "sharp 0px corners are
+       the brand button shape - never rounded pills") em --radius-s/
+       --radius-m, MAS rounded.full (9999px) em --radius-pill - o proprio
+       arquivo abre uma excecao explicita so para badges ("badge-pill...
+       The only place pill geometry is used"). --shadow-chunky: none
+       (Don't explicito "add drop shadow tiers... photography carries
+       the depth", a mencao a 1 sombra e so hover, nao padrao). Fonte:
+       FerrariSans e licenciada; substituto literal do proprio arquivo e
+       Inter. */
+  :root[data-theme-family="ferrari"][data-theme="dark"] {
+    --cat-1: #da291c;
+    --cat-2: #4c98b9;
+    --cat-3: #03904a;
+    --cat-4: #f13a2c;
+    --cat-5: #666666;
+    --cat-6: #8f8f8f;
+    --on-cat: #ffffff;
+    --bg-deep: #181818;
+    --bg-panel: #303030;
+    --bg-card: #303030;
+    --bg-card-hover: #666666;
+    --border-ink: #303030;
+    --text-main: #ffffff;
+    --gold: #da291c;
+    --gold-glow: #b01e0a;
+    --purple: #4c98b9;
+    --terminal-green: #03904a;
+    --danger: #f13a2c;
+    --muted: #969696;
+    --info: #4c98b9;
+    --warn: #8f8f8f;
+    --gold-glow-rgb: 176, 30, 10;
+    --terminal-green-rgb: 3, 144, 74;
+    --font-heading: 'Inter', -apple-system, system-ui, sans-serif;
+    --font-body: 'Inter', -apple-system, system-ui, sans-serif;
+    --font-display: 'Inter', -apple-system, system-ui, sans-serif;
+    --radius-s: 0px;
+    --radius-m: 0px;
+    --radius-pill: 9999px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: -0.36px;
+    --heading-transform: none;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="ferrari"][data-theme="light"] {
+    --cat-1: #da291c;
+    --cat-2: #4c98b9;
+    --cat-3: #03904a;
+    --cat-4: #f13a2c;
+    --cat-5: #666666;
+    --cat-6: #8f8f8f;
+    --on-cat: #ffffff;
+    --bg-deep: #ffffff;
+    --bg-panel: #f7f7f7;
+    --bg-card: #ffffff;
+    --bg-card-hover: #ebebeb;
+    --border-ink: #d2d2d2;
+    --text-main: #181818;
+    --gold: #da291c;
+    --gold-glow: #b01e0a;
+    --purple: #4c98b9;
+    --terminal-green: #03904a;
+    --danger: #f13a2c;
+    --muted: #8f8f8f;
+    --info: #4c98b9;
+    --warn: #8f8f8f;
+    --gold-glow-rgb: 176, 30, 10;
+    --terminal-green-rgb: 3, 144, 74;
+    --font-heading: 'Inter', -apple-system, system-ui, sans-serif;
+    --font-body: 'Inter', -apple-system, system-ui, sans-serif;
+    --font-display: 'Inter', -apple-system, system-ui, sans-serif;
+    --radius-s: 0px;
+    --radius-m: 0px;
+    --radius-pill: 9999px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: -0.36px;
+    --heading-transform: none;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>
