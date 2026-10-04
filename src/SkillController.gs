@@ -83,7 +83,8 @@ function registerSkillFromGithub(formPayload) {
       default_branch: metadata.defaultBranch,
       zip_url: zipUrl,
       clone_bash: cloneCommands.bash,
-      clone_powershell: cloneCommands.powershell
+      clone_powershell: cloneCommands.powershell,
+      time_responsavel: formPayload.timeResponsavel || ''
     };
 
     var saved = appendSkillRow(skillObject);

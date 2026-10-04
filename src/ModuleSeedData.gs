@@ -161,8 +161,10 @@ var SEED_REQUEST_BOARD = [
 ];
 
 var SEED_AI_RADAR = [
-  { nome: 'Claude Code', quadrante: 'ADOPT', descricao: 'Em uso diario pelo time de engenharia para desenvolvimento assistido por IA.' },
-  { nome: 'Gemini 2.0 Flash', quadrante: 'TRIAL', descricao: 'Em avaliacao para automacoes de alto volume e baixo custo.' },
-  { nome: 'LangGraph', quadrante: 'ASSESS', descricao: 'Orquestracao de agentes multi-step; ainda sem caso de uso interno validado.' },
-  { nome: 'AutoGPT (projeto original)', quadrante: 'HOLD', descricao: 'Abordagem de agente totalmente autonomo mostrou-se instavel para casos de producao.' }
+  { nome: 'Claude Code', quadrante: 'ADOPT', categoria_blip: 'TOOLS', descricao: 'Em uso diario pelo time de engenharia para desenvolvimento assistido por IA.' },
+  { nome: 'Gemini 2.0 Flash', quadrante: 'TRIAL', categoria_blip: 'PLATFORMS', descricao: 'Em avaliacao para automacoes de alto volume e baixo custo.' },
+  { nome: 'LangGraph', quadrante: 'ASSESS', categoria_blip: 'TECHNIQUES', descricao: 'Orquestracao de agentes multi-step; ainda sem caso de uso interno validado.' },
+  { nome: 'AutoGPT (projeto original)', quadrante: 'HOLD', categoria_blip: 'TECHNIQUES', descricao: 'Abordagem de agente totalmente autonomo mostrou-se instavel para casos de producao.' },
+  { nome: 'TypeScript 5.x', quadrante: 'ADOPT', categoria_blip: 'LANGUAGES_FRAMEWORKS', descricao: 'Padrao de fato para novos projetos frontend/backend Node do time.' },
+  { nome: 'Backstage (Spotify)', quadrante: 'ASSESS', categoria_blip: 'PLATFORMS', descricao: 'IDP open source sendo avaliado como referencia de software catalog e portal de devs.' }
 ];
