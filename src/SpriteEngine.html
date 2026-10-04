@@ -187,18 +187,38 @@
   var bgOffset = 0;
   var GROUND_Y = 80; // banner mantem 96px de altura total
 
+  // O cenario do banner acompanha o tema selecionado (ver THEMES em
+  // Script.html): le as CSS custom properties atuais em vez de cores fixas,
+  // e re-le quando 'codexThemeChange' dispara (troca de tema em tempo real).
+  var bannerColors = { sky: '#0a0b16', stars: '#f3f4fc', mountains: '#262a47', ground: '#181a2c', groundLine: '#000000' };
+
+  function readBannerColors_() {
+    var computed = getComputedStyle(document.documentElement);
+    function readVar(name, fallback) {
+      var value = computed.getPropertyValue(name).trim();
+      return value || fallback;
+    }
+    bannerColors.sky = readVar('--bg-deep', bannerColors.sky);
+    bannerColors.stars = readVar('--text-main', bannerColors.stars);
+    bannerColors.mountains = readVar('--bg-card-hover', bannerColors.mountains);
+    bannerColors.ground = readVar('--bg-panel', bannerColors.ground);
+    bannerColors.groundLine = readVar('--border-ink', bannerColors.groundLine);
+  }
+  readBannerColors_();
+  document.addEventListener('codexThemeChange', readBannerColors_);
+
   function render() {
-    ctx.fillStyle = '#121826';
+    ctx.fillStyle = bannerColors.sky;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = bannerColors.stars;
     for (var i = 0; i < 20; i++) {
       var sx = (i * 35 + bgOffset * 0.1) % canvas.width;
       var sy = 4 + (i * 7) % 45;
       ctx.fillRect(sx, sy, 1, 1);
     }
 
-    ctx.fillStyle = '#1e293b';
+    ctx.fillStyle = bannerColors.mountains;
     for (var m = 0; m < 8; m++) {
       var mx = (m * 90 - bgOffset * 0.2) % (canvas.width + 90) - 45;
       ctx.beginPath();
@@ -208,9 +228,9 @@
       ctx.fill();
     }
 
-    ctx.fillStyle = '#334155';
+    ctx.fillStyle = bannerColors.ground;
     ctx.fillRect(0, GROUND_Y, canvas.width, 16);
-    ctx.fillStyle = '#0f172a';
+    ctx.fillStyle = bannerColors.groundLine;
     ctx.fillRect(0, GROUND_Y + 4, canvas.width, 2);
 
     heroes.forEach(function (h) {
