@@ -1,0 +1,109 @@
+<style>
+  /* De docs/themes/DESIGN-playstation.md. Brand = PlayStation Blue
+       #0070d1, literal e universal nos dois canvases (claro e escuro).
+       O arquivo tem um segundo CTA explicitamente escopado - Commerce
+       Orange #d53b00, Don't literal "never used on marketing chrome or
+       hero pills... reserved exclusively for store actions" - mesmo
+       padrao do tema Meta. Por isso --info guarda o laranja de compra e
+       --chrome-gradient-success usa --info em vez de --gold: nosso botao
+       "BAIXAR .ZIP" e uma acao de AQUISICAO (equivalente a "Add to bag"),
+       nao uma navegacao de marketing. cat-1..6 evita marathon-yellow e o
+       gradiente dourado do PS Plus de proposito - ambos tem Don'ts
+       explicitos de escopo exclusivo ("never decorate other components
+       with the gold", "not part of the system's general accent
+       vocabulary"). Sem verde literal no arquivo - --terminal-green
+       reusa primary-pressed (um azul, escolha consistente com o
+       principio "sem verde, reusa a familia da marca" ja usado no Apple).
+       Forma: rounded.full (9999px) em botoes/badges, rounded.md (8px) em
+       cards. --shadow-chunky: none ("cards lift only on press", sem
+       sombra de repouso). Fonte: PlayStation SST e proprietaria; o
+       proprio arquivo recomenda Roboto Light para display e Inter para
+       corpo/chrome. */
+  :root[data-theme-family="playstation"][data-theme="dark"] {
+    --cat-1: #0070d1;
+    --cat-2: #004d8d;
+    --cat-3: #d53b00;
+    --cat-4: #aa2f00;
+    --cat-5: #c81b3a;
+    --cat-6: #53b1ff;
+    --on-cat: #ffffff;
+    --bg-deep: #000000;
+    --bg-panel: #121314;
+    --bg-card: #181818;
+    --bg-card-hover: #1f2024;
+    --border-ink: rgba(229, 229, 229, 0.2);
+    --text-main: #ffffff;
+    --gold: #0070d1;
+    --gold-glow: #0064b7;
+    --purple: #53b1ff;
+    --terminal-green: #0064b7;
+    --danger: #c81b3a;
+    --muted: #cccccc;
+    --info: #d53b00;
+    --warn: #aa2f00;
+    --gold-glow-rgb: 0, 100, 183;
+    --terminal-green-rgb: 0, 100, 183;
+    --font-heading: 'Roboto', Arial, Helvetica, sans-serif;
+    --font-body: 'Inter', Arial, Helvetica, sans-serif;
+    --font-display: 'Roboto', Arial, Helvetica, sans-serif;
+    --radius-s: 9999px;
+    --radius-m: 8px;
+    --radius-pill: 9999px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0.1px;
+    --heading-transform: none;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--info);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="playstation"][data-theme="light"] {
+    --cat-1: #0070d1;
+    --cat-2: #004d8d;
+    --cat-3: #d53b00;
+    --cat-4: #aa2f00;
+    --cat-5: #c81b3a;
+    --cat-6: #53b1ff;
+    --on-cat: #ffffff;
+    --bg-deep: #ffffff;
+    --bg-panel: #f3f3f3;
+    --bg-card: #f5f7fa;
+    --bg-card-hover: #f3f3f3;
+    --border-ink: #cccccc;
+    --text-main: #000000;
+    --gold: #0070d1;
+    --gold-glow: #0064b7;
+    --purple: #53b1ff;
+    --terminal-green: #0064b7;
+    --danger: #c81b3a;
+    --muted: #6b6b6b;
+    --info: #d53b00;
+    --warn: #aa2f00;
+    --gold-glow-rgb: 0, 100, 183;
+    --terminal-green-rgb: 0, 100, 183;
+    --font-heading: 'Roboto', Arial, Helvetica, sans-serif;
+    --font-body: 'Inter', Arial, Helvetica, sans-serif;
+    --font-display: 'Roboto', Arial, Helvetica, sans-serif;
+    --radius-s: 9999px;
+    --radius-m: 8px;
+    --radius-pill: 9999px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0.1px;
+    --heading-transform: none;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--info);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>
