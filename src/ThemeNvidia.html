@@ -1,0 +1,108 @@
+<style>
+  /* De docs/themes/DESIGN-nvidia.md. Brand = NVIDIA Green #76b900, literal
+       bg do button-primary, com texto preto literal (on-primary #000000) -
+       igual nos dois modos (o verde funciona tanto no surface-dark quanto
+       no canvas claro, sem precisar inverter). --gold-glow usa
+       primary-dark #5a8d00 (literal, estado pressed). O modo escuro NAO e
+       extrapolado: surface-dark/surface-elevated sao fundos escuros reais
+       do site (hero, footer, nav), nao inventados. cat-1..6 evita
+       link-blue e accent-green-pale de proposito - o arquivo probe
+       ambos explicitamente como cor de chrome/UI ("not a button color",
+       "never on chrome") - usa purple/purple-deep/error/warning/success-
+       deep + mute. --terminal-green usa success-deep (literal, motivo
+       explicito: "positive confirmation where NVIDIA Green's saturation
+       would clash"). Forma: rounded.sm (2px, "every interactive element...
+       never go to 0, never go past 4") em --radius-s/--radius-m/
+       --radius-pill - nao e pill: Don't explicito "no pill buttons...
+       no rounded.lg or higher anywhere except avatars", badge-tag do
+       proprio arquivo usa os mesmos 2px. --shadow-chunky: none ("no drop
+       shadows on cards"). Fonte: NVIDIA-EMEA e proprietaria; substituto
+       literal do proprio arquivo e Inter. */
+  :root[data-theme-family="nvidia"][data-theme="dark"] {
+    --cat-1: #952fc6;
+    --cat-2: #4d1368;
+    --cat-3: #e52020;
+    --cat-4: #df6500;
+    --cat-5: #3f8500;
+    --cat-6: #757575;
+    --on-cat: #ffffff;
+    --bg-deep: #000000;
+    --bg-panel: #1a1a1a;
+    --bg-card: #1a1a1a;
+    --bg-card-hover: #5e5e5e;
+    --border-ink: #5e5e5e;
+    --text-main: #ffffff;
+    --gold: #76b900;
+    --gold-glow: #5a8d00;
+    --purple: #952fc6;
+    --terminal-green: #3f8500;
+    --danger: #e52020;
+    --muted: rgba(255, 255, 255, 0.7);
+    --info: #757575;
+    --warn: #df6500;
+    --gold-glow-rgb: 90, 141, 0;
+    --terminal-green-rgb: 63, 133, 0;
+    --font-heading: 'Inter', Arial, Helvetica, sans-serif;
+    --font-body: 'Inter', Arial, Helvetica, sans-serif;
+    --font-display: 'Inter', Arial, Helvetica, sans-serif;
+    --radius-s: 2px;
+    --radius-m: 2px;
+    --radius-pill: 2px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0px;
+    --heading-transform: none;
+    --on-accent: #000000;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="nvidia"][data-theme="light"] {
+    --cat-1: #952fc6;
+    --cat-2: #4d1368;
+    --cat-3: #e52020;
+    --cat-4: #df6500;
+    --cat-5: #3f8500;
+    --cat-6: #757575;
+    --on-cat: #ffffff;
+    --bg-deep: #ffffff;
+    --bg-panel: #f7f7f7;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f7f7f7;
+    --border-ink: #cccccc;
+    --text-main: #000000;
+    --gold: #76b900;
+    --gold-glow: #5a8d00;
+    --purple: #952fc6;
+    --terminal-green: #3f8500;
+    --danger: #e52020;
+    --muted: #757575;
+    --info: #757575;
+    --warn: #df6500;
+    --gold-glow-rgb: 90, 141, 0;
+    --terminal-green-rgb: 63, 133, 0;
+    --font-heading: 'Inter', Arial, Helvetica, sans-serif;
+    --font-body: 'Inter', Arial, Helvetica, sans-serif;
+    --font-display: 'Inter', Arial, Helvetica, sans-serif;
+    --radius-s: 2px;
+    --radius-m: 2px;
+    --radius-pill: 2px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0px;
+    --heading-transform: none;
+    --on-accent: #000000;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>
