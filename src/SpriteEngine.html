@@ -43,7 +43,7 @@
   // purge manual de CDN. Sempre que assets/sprites/ mudar, atualize este
   // valor para o novo SHA do commit correspondente.
   var ASSET_REPO = 'brunotrolo/APP_GAS_Skill_Catalog';
-  var ASSET_REF = 'main'; // TODO: trocar para o SHA do commit que adiciona os PNGs reais em assets/sprites/
+  var ASSET_REF = '435649e1eee62e1fd3c4bbe786f047cdcb0a573d'; // commit que adiciona os PNGs reais em assets/sprites/
 
   function spriteUrl_(relPath) {
     return 'https://cdn.jsdelivr.net/gh/' + ASSET_REPO + '@' + ASSET_REF + '/assets/sprites/' + relPath;
@@ -58,42 +58,44 @@
     return img;
   }
 
-  // --- 3. Catalogo de entidades (spritesheets reais, Hi-Bit) ------------
+  // --- 3. Catalogo de entidades (spritesheets reais CC0 da Kenney.nl) ----
   // Cada entrada descreve um spritesheet de ciclo de animacao (corrida, voo,
   // etc). "lane: ground" corre sobre a linha de chao do banner; "lane: air"
-  // oscila em trajetoria senoidal (amplitude/period) como as naves/avioes.
-  // Ate os PNGs reais serem adicionados em assets/sprites/ (ver
-  // assets/sprites/LICENSES.md para o passo a passo de sourcing CC0), essas
-  // entradas falham silenciosamente ao carregar e o motor usa o tipo de
-  // emergencia "fallback" abaixo para o banner nunca ficar vazio.
+  // oscila em trajetoria senoidal (amplitude/period) como as naves. Os PNGs
+  // reais ja estao em assets/sprites/ (packs CC0 "Pixel Platformer",
+  // "Top-down Shooter", "Racing Pack" e "Space Shooter Extension" da
+  // Kenney.nl - ver assets/sprites/LICENSES.md). Os valores de
+  // frameWidth/frameHeight/totalFrames abaixo batem exatamente com os
+  // spritesheets gerados a partir desses packs; se os arquivos forem
+  // trocados, atualize esses valores junto.
   var ENTITY_CONFIGS = [
     {
       id: 'platformer_hero_run',
       category: 'PLATFORMER',
       src: spriteUrl_('platformer/hero-run.png'),
-      frameWidth: 32, frameHeight: 32, totalFrames: 6, fps: 10,
-      scale: 2, lane: 'ground', speed: 42
+      frameWidth: 24, frameHeight: 24, totalFrames: 2, fps: 4,
+      scale: 3, lane: 'ground', speed: 42
     },
     {
       id: 'gunner_soldier_run',
       category: 'GUNNER',
       src: spriteUrl_('gunner/soldier-run.png'),
-      frameWidth: 32, frameHeight: 32, totalFrames: 8, fps: 12,
-      scale: 2, lane: 'ground', speed: 55
+      frameWidth: 52, frameHeight: 43, totalFrames: 3, fps: 6,
+      scale: 1.8, lane: 'ground', speed: 55
     },
     {
       id: 'racer_car_drive',
       category: 'RACER',
       src: spriteUrl_('racer/car-drive.png'),
-      frameWidth: 32, frameHeight: 16, totalFrames: 4, fps: 10,
-      scale: 2.5, lane: 'ground', speed: 90
+      frameWidth: 131, frameHeight: 71, totalFrames: 1, fps: 1,
+      scale: 0.9, lane: 'ground', speed: 90
     },
     {
       id: 'spaceship_fighter_fly',
       category: 'SPACESHIP',
       src: spriteUrl_('spaceship/fighter-fly.png'),
-      frameWidth: 24, frameHeight: 24, totalFrames: 4, fps: 8,
-      scale: 2.5, lane: 'air', speed: 70, amplitude: 14, period: 2.5
+      frameWidth: 104, frameHeight: 106, totalFrames: 2, fps: 6,
+      scale: 0.7, lane: 'air', speed: 70, amplitude: 14, period: 2.5
     },
     // Tipo de emergencia: homenagem original desenhada em blocos de pixel via
     // canvas (nenhum bitmap/sprite de jogo real e copiado), usado enquanto os
