@@ -124,6 +124,50 @@
     box-shadow: 2px 3px 0px #000, 0 0 12px rgba(255, 216, 74, 0.35);
   }
 
+  /* ---- Tooltip de ajuda estilo balao de dialogo (Zelda) ---- */
+  .module-nav-item[data-tooltip] {
+    position: relative;
+  }
+
+  .module-nav-item[data-tooltip]:hover::after,
+  .module-nav-item[data-tooltip]:focus-visible::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 14px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 240px;
+    max-width: 70vw;
+    background: linear-gradient(180deg, #16207a, #0a1152);
+    color: #f4f6ff;
+    border: 3px solid #f4f6ff;
+    border-radius: 4px;
+    box-shadow: 0 0 0 3px #0a1152, 5px 6px 0px rgba(0, 0, 0, 0.6);
+    padding: 10px 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    font-weight: 400;
+    text-align: left;
+    white-space: normal;
+    z-index: 80;
+    pointer-events: none;
+    text-shadow: none;
+  }
+
+  .module-nav-item[data-tooltip]:hover::before,
+  .module-nav-item[data-tooltip]:focus-visible::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 7px solid transparent;
+    border-top-color: #f4f6ff;
+    z-index: 81;
+    pointer-events: none;
+  }
+
   .app-view {
     display: none;
   }
