@@ -4,6 +4,20 @@
   var ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
 
+  // O CSS exibe o canvas em 100% da largura da pagina, mas o atributo width
+  // do HTML define a resolucao interna de desenho. Sem sincronizar os dois,
+  // o navegador estica a imagem (distorcendo os sprites horizontalmente).
+  // Ajusta a resolucao interna para bater 1:1 com a largura real exibida.
+  function resizeCanvasToDisplaySize_() {
+    var displayWidth = canvas.clientWidth;
+    if (displayWidth > 0 && canvas.width !== displayWidth) {
+      canvas.width = displayWidth;
+      ctx.imageSmoothingEnabled = false;
+    }
+  }
+  resizeCanvasToDisplaySize_();
+  window.addEventListener('resize', resizeCanvasToDisplaySize_);
+
   var PALETTE = {
     '.': 'transparent',
     'K': '#000000',
