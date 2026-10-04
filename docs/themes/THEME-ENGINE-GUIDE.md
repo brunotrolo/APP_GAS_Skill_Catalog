@@ -75,17 +75,22 @@ azul, tag laranja) — o algoritmo usado para corrigir:
 
 ## O botão de download (`--chrome-gradient-success`)
 
-No app, o botão "BAIXAR .ZIP" é a ação universal — o equivalente ao
-`components.button-primary` de cada marca, não necessariamente ao token
-chamado literalmente `success` no YAML. Regra:
+No app, o botão "BAIXAR .ZIP" é a ação universal e onipresente — aparece
+em TODO card — o equivalente ao `components.button-primary` de cada
+marca, não necessariamente ao token chamado literalmente `success` no
+YAML. Regra: **usar sempre `var(--gold)`**, mesmo quando o arquivo define
+um token `success`/verde dedicado.
 
-1. Se o arquivo **não** define nenhum token `success`/verde distinto do
-   Brand (caso Apple, caso OpenCode), usar `var(--gold)` — o download É o
-   CTA primário, deve usar a cor de marca.
-2. Se o arquivo **define** um token `success` literal e semanticamente
-   dedicado a confirmação (caso BMW: `success: #0fa336`, "order
-   confirmation states"), manter esse token — é mais fiel ao arquivo do
-   que forçar a cor de marca num botão de confirmação.
+Por quê: um token `success` literal (ex. BMW: `success: #0fa336`) quase
+sempre vem descrito no arquivo como um estado raro e específico ("order
+confirmation states", "rare on marketing surfaces") — o oposto de um botão
+que aparece em toda tela do app. Usar esse verde raro como a cor mais
+visível e repetida do app contradiz a própria instrução de uso do
+arquivo, mesmo que o hex em si seja literal. O papel que o botão de
+download ocupa no app (CTA principal, onipresente) é sempre o do Brand,
+nunca o de um estado semântico raro — foi exatamente o erro corrigido no
+tema BMW (verde no botão de download, quando o arquivo já nomeia o
+vermelho como "the signature" cor onipresente da marca).
 
 ## O ladder de categorias (`--cat-1` .. `--cat-6`, `--on-cat`)
 
