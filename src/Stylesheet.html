@@ -1,5 +1,5 @@
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@500;700&family=Space+Mono:wght@400;700&display=swap');
 
   :root {
     --bg-deep: #0a0b16;
@@ -7,15 +7,30 @@
     --bg-card: #1d2037;
     --bg-card-hover: #262a47;
     --border-ink: #000000;
-    --text-main: #eceefb;
+    --text-main: #f3f4fc;
     --gold: #ffd84a;
     --gold-glow: #ffe98a;
     --purple: #b06aed;
     --terminal-green: #2effa0;
     --danger: #ff5d6c;
-    --muted: #9496b8;
+    --muted: #b7b9d8;
     --radius-s: 6px;
     --radius-m: 10px;
+  }
+
+  :root[data-theme="light"] {
+    --bg-deep: #eef0fb;
+    --bg-panel: #ffffff;
+    --bg-card: #f6f7ff;
+    --bg-card-hover: #e9ebfb;
+    --border-ink: #1b1d2e;
+    --text-main: #1b1d2e;
+    --gold: #c98f00;
+    --gold-glow: #e8b23a;
+    --purple: #8a3fd6;
+    --terminal-green: #0f9d64;
+    --danger: #c92a3a;
+    --muted: #51546f;
   }
 
   * { box-sizing: border-box; }
@@ -27,9 +42,10 @@
       radial-gradient(1000px 500px at 100% 0%, rgba(46, 255, 160, 0.08), transparent 55%),
       var(--bg-deep);
     color: var(--text-main);
-    font-family: 'VT323', monospace;
-    font-size: 19px;
-    -webkit-font-smoothing: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.15s ease, color 0.15s ease;
   }
 
   canvas, img.pixel-art {
@@ -37,8 +53,35 @@
   }
 
   h1, h2, h3, .pixel-font, button, .badge {
-    font-family: 'Press Start 2P', monospace;
+    font-family: 'Pixelify Sans', monospace;
+    font-weight: 700;
     letter-spacing: 0.5px;
+  }
+
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Pixelify Sans', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 9px 12px;
+    background: linear-gradient(180deg, var(--bg-card-hover), var(--bg-card));
+    color: var(--text-main);
+    border: 2px solid var(--border-ink);
+    border-radius: var(--radius-s);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset, 2px 3px 0px #000;
+    cursor: pointer;
+  }
+
+  .theme-toggle:hover {
+    color: var(--gold);
+  }
+
+  .theme-toggle {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 16px;
   }
 
   .pixel-panel {
@@ -123,7 +166,7 @@
 
   .sidebar-tag-search {
     width: 100%;
-    font-family: 'VT323', monospace;
+    font-family: 'Space Mono', monospace;
     font-size: 16px;
     padding: 7px 9px;
     margin-bottom: 8px;
@@ -166,7 +209,7 @@
 
   .search-row input[type="text"],
   .search-row select {
-    font-family: 'VT323', monospace;
+    font-family: 'Space Mono', monospace;
     font-size: 18px;
     padding: 9px 12px;
     background: var(--bg-card);
@@ -287,8 +330,8 @@
 
   .skill-card .badge {
     align-self: flex-start;
-    font-size: 9px;
-    padding: 5px 9px;
+    font-size: 11px;
+    padding: 6px 10px;
     border: 2px solid var(--border-ink);
     border-radius: var(--radius-s);
     box-shadow: 2px 3px 0px #000;
@@ -307,8 +350,9 @@
   }
 
   .skill-card h3 {
-    font-size: 13px;
-    line-height: 1.5;
+    font-family: 'Pixelify Sans', monospace;
+    font-size: 19px;
+    line-height: 1.4;
     margin: 4px 0 0 0;
     color: var(--gold);
     max-width: 100%;
@@ -318,21 +362,23 @@
   }
 
   .skill-card .meta {
-    font-size: 14px;
+    font-size: 16px;
     color: var(--muted);
     overflow-wrap: break-word;
     word-break: break-word;
   }
 
   .skill-card .resumo {
-    font-size: 16px;
+    font-size: 18px;
+    line-height: 1.4;
     flex: 1;
     overflow-wrap: break-word;
     word-break: break-word;
   }
 
   .skill-card .categoria {
-    font-size: 11px;
+    font-size: 14px;
+    font-weight: 700;
     color: var(--terminal-green);
     overflow-wrap: break-word;
   }
@@ -340,16 +386,16 @@
   .skill-card .tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 6px;
     max-width: 100%;
   }
 
   .skill-card .tags span {
-    font-size: 10px;
+    font-size: 13px;
     background: var(--bg-panel);
     border: 1px solid var(--border-ink);
     border-radius: 999px;
-    padding: 2px 8px;
+    padding: 3px 10px;
     max-width: 100%;
     overflow-wrap: break-word;
   }
@@ -364,7 +410,7 @@
   .skill-card .actions a,
   .skill-card .actions button {
     text-decoration: none;
-    font-size: 10px;
+    font-size: 12px;
     padding: 8px 10px;
   }
 
@@ -426,7 +472,7 @@
   .form-field input[type="text"],
   .form-field textarea,
   .form-field select {
-    font-family: 'VT323', monospace;
+    font-family: 'Space Mono', monospace;
     font-size: 18px;
     padding: 9px;
     background: var(--bg-card);
@@ -453,7 +499,7 @@
     background: #050608;
     color: var(--terminal-green);
     padding: 10px;
-    font-family: 'VT323', monospace;
+    font-family: 'Space Mono', monospace;
     font-size: 14px;
     word-break: break-all;
     border: 2px dashed var(--terminal-green);

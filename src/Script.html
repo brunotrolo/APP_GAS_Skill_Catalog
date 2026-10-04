@@ -32,7 +32,36 @@
     google.script.run.withSuccessHandler(onSkillsLoaded).withFailureHandler(onLoadFailure).getSkills();
     google.script.run.withSuccessHandler(onCategoriasLoaded).withFailureHandler(onLoadFailure).getCategoriasList();
     wireSidebarNav();
+    initTheme();
   });
+
+  function initTheme() {
+    var saved = null;
+    try {
+      saved = localStorage.getItem('codexMuninTheme');
+    } catch (e) {
+      saved = null;
+    }
+    applyTheme(saved === 'light' ? 'light' : 'dark');
+  }
+
+  function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    applyTheme(current === 'light' ? 'dark' : 'light');
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    var btn = document.getElementById('themeToggle');
+    if (btn) {
+      btn.textContent = theme === 'light' ? '☀️ MODO CLARO' : '🌙 MODO ESCURO';
+    }
+    try {
+      localStorage.setItem('codexMuninTheme', theme);
+    } catch (e) {
+      /* localStorage indisponivel, ignora persistencia */
+    }
+  }
 
   function wireSidebarNav() {
     wireNavGroup('tipoNav', 'tipo', function (value) {
