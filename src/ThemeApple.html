@@ -5,8 +5,13 @@
        azul (primary/primary-focus/primary-on-dark); o arquivo nao define
        verde/vermelho/roxo, entao --terminal-green/--danger reusam tons de
        Text (ink-muted-80/surface-black/body-muted) em vez de inventar cor.
-       Forma: botoes em pill total (rounded.pill = 9999px), cards em 18px
-       (rounded.lg), 1px hairline, zero sombra em chrome. */
+       chrome-gradient-success usa --gold (Brand) e nao --terminal-green: o
+       arquivo nao tem nenhum token "success"/verde literal, e o unico botao
+       de acao do sistema (components.button-primary) tem
+       backgroundColor = {colors.primary} - o mesmo bug de "botao de download
+       com cor errada" corrigido no tema OpenCode. Forma: botoes em pill
+       total (rounded.pill = 9999px), cards em 18px (rounded.lg), 1px
+       hairline, zero sombra em chrome. */
   :root[data-theme-family="apple"][data-theme="dark"] {
     --cat-1: #0066cc;
     --cat-2: #0071e3;
@@ -45,7 +50,7 @@
     --chrome-gradient-accent: var(--gold);
     --chrome-gradient-card: var(--bg-card);
     --chrome-gradient-panel: var(--bg-panel);
-    --chrome-gradient-success: var(--terminal-green);
+    --chrome-gradient-success: var(--gold);
     --chrome-gradient-curadoria: var(--purple);
     --ambient-glow: none;
   }
@@ -88,7 +93,7 @@
     --chrome-gradient-accent: var(--gold);
     --chrome-gradient-card: var(--bg-card);
     --chrome-gradient-panel: var(--bg-panel);
-    --chrome-gradient-success: var(--terminal-green);
+    --chrome-gradient-success: var(--gold);
     --chrome-gradient-curadoria: var(--purple);
     --ambient-glow: none;
   }
