@@ -18,17 +18,13 @@
   <?!= include('ModuleNav'); ?>
 
   <div id="view-catalog" class="app-view active">
-    <div class="app-layout">
-      <?!= include('Sidebar'); ?>
+    <main class="app-main">
+      <?!= include('SearchBar'); ?>
 
-      <main class="app-main">
-        <?!= include('SearchBar'); ?>
-
-        <div id="skill-grid">
-          <div class="empty-state">CARREGANDO INVENTARIO...</div>
-        </div>
-      </main>
-    </div>
+      <div id="skill-grid">
+        <div class="empty-state">CARREGANDO INVENTARIO...</div>
+      </div>
+    </main>
   </div>
 
   <?!= include('OdinArchiveView'); ?>

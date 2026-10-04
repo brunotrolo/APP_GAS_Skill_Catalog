@@ -365,7 +365,7 @@
   }
 
 
-  var DROPDOWN_IDS = ['tagDropdown', 'sortDropdown'];
+  var DROPDOWN_IDS = ['navDropdown', 'themeDropdown', 'tagDropdown', 'sortDropdown'];
 
   function toggleDropdown(dropdownId) {
     var panel = document.getElementById(dropdownId + 'Panel');
@@ -396,6 +396,8 @@
     wireNavGroup('tipoNav', 'tipo', function (value) {
       activeTipo = value;
       applyFilters();
+      var navPanel = document.getElementById('navDropdownPanel');
+      if (navPanel) navPanel.classList.remove('open');
     });
     wireNavGroup('sortNav', 'sort', function (value) {
       activeSort = value;
