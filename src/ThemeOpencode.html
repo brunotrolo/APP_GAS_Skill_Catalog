@@ -1,11 +1,16 @@
 <style>
   /* De docs/themes/DESIGN-opencode.ai.md. O arquivo descreve os dois
        modos: canvas/surface-soft/surface-card para claro, surface-dark/
-       surface-dark-elevated/on-dark para o "hero card" escuro. Brand =
-       accent #007aff (constante nos dois modos) + warning #ff9f0a (reusado
-       como --purple, ja que o arquivo nao tem roxo) + success #30d158 +
-       danger #ff3b30 - tudo literal. Forma: rounded.sm (4px) em todo
-       elemento interativo, 1px hairline, sem sombra, tudo monoespacado. */
+       surface-dark-elevated/on-dark para o "hero card" escuro. BRAND =
+       primary/on-primary (preto/branco, #201d1d/#fdfcfc) - e literalmente
+       o backgroundColor do componente button-primary (o CTA "Download" do
+       arquivo) no spec; invertido entre os modos (preto no claro, branco no
+       escuro) so para manter contraste legivel, nunca cor. accent #007aff
+       e um toque secundario raro (reusado aqui so em --info), nao o Brand.
+       warning #ff9f0a (--purple/--warn), success #30d158 (--terminal-green)
+       e danger #ff3b30 continuam literais para estados/categorias, nao para
+       o CTA principal. Forma: rounded.sm (4px) em todo elemento interativo,
+       1px hairline, sem sombra, tudo monoespacado. */
   :root[data-theme-family="opencode"][data-theme="dark"] {
     --bg-deep: #201d1d;
     --bg-panel: #302c2c;
@@ -13,15 +18,15 @@
     --bg-card-hover: #0f0000;
     --border-ink: #646262;
     --text-main: #fdfcfc;
-    --gold: #007aff;
-    --gold-glow: #0056b3;
+    --gold: #fdfcfc;
+    --gold-glow: #9a9898;
     --purple: #ff9f0a;
     --terminal-green: #30d158;
     --danger: #ff3b30;
     --muted: #9a9898;
-    --info: #004085;
+    --info: #007aff;
     --warn: #ff9f0a;
-    --gold-glow-rgb: 0, 122, 255;
+    --gold-glow-rgb: 154, 152, 152;
     --terminal-green-rgb: 48, 209, 88;
     --font-heading: 'Space Mono', 'Berkeley Mono', monospace;
     --font-body: 'Space Mono', 'Berkeley Mono', monospace;
@@ -32,12 +37,12 @@
     --shadow-chunky: none;
     --letter-spacing-heading: 0px;
     --heading-transform: none;
-    --on-accent: #fdfcfc;
+    --on-accent: #201d1d;
     --chrome-gradient: var(--bg-card);
     --chrome-gradient-accent: var(--gold);
     --chrome-gradient-card: var(--bg-card);
     --chrome-gradient-panel: var(--bg-panel);
-    --chrome-gradient-success: var(--terminal-green);
+    --chrome-gradient-success: var(--gold);
     --chrome-gradient-curadoria: var(--purple);
     --ambient-glow: none;
   }
@@ -49,15 +54,15 @@
     --bg-card-hover: #e8e4e4;
     --border-ink: #201d1d;
     --text-main: #201d1d;
-    --gold: #007aff;
-    --gold-glow: #0056b3;
+    --gold: #201d1d;
+    --gold-glow: #0f0000;
     --purple: #ff9f0a;
     --terminal-green: #30d158;
     --danger: #ff3b30;
     --muted: #646262;
-    --info: #004085;
+    --info: #007aff;
     --warn: #ff9f0a;
-    --gold-glow-rgb: 0, 122, 255;
+    --gold-glow-rgb: 32, 29, 29;
     --terminal-green-rgb: 48, 209, 88;
     --font-heading: 'Space Mono', 'Berkeley Mono', monospace;
     --font-body: 'Space Mono', 'Berkeley Mono', monospace;
@@ -73,7 +78,7 @@
     --chrome-gradient-accent: var(--gold);
     --chrome-gradient-card: var(--bg-card);
     --chrome-gradient-panel: var(--bg-panel);
-    --chrome-gradient-success: var(--terminal-green);
+    --chrome-gradient-success: var(--gold);
     --chrome-gradient-curadoria: var(--purple);
     --ambient-glow: none;
   }
