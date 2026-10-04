@@ -18,20 +18,9 @@
     --radius-m: 10px;
   }
 
-  :root[data-theme="light"] {
-    --bg-deep: #eef0fb;
-    --bg-panel: #ffffff;
-    --bg-card: #f6f7ff;
-    --bg-card-hover: #e9ebfb;
-    --border-ink: #1b1d2e;
-    --text-main: #1b1d2e;
-    --gold: #c98f00;
-    --gold-glow: #e8b23a;
-    --purple: #8a3fd6;
-    --terminal-green: #0f9d64;
-    --danger: #c92a3a;
-    --muted: #51546f;
-  }
+  /* Temas alem do "dark" acima sao aplicados em tempo real via JS
+     (document.documentElement.style.setProperty), nao em blocos CSS estaticos
+     aqui - ver var THEMES em Script.html. Este :root e so o fallback sem JS. */
 
   * { box-sizing: border-box; }
 
@@ -81,7 +70,26 @@
   .theme-toggle {
     width: 100%;
     justify-content: center;
+    margin-bottom: 8px;
+  }
+
+  .theme-select {
+    width: 100%;
+    font-family: 'Space Mono', monospace;
+    font-size: 15px;
+    padding: 8px 10px;
     margin-bottom: 16px;
+    background: var(--bg-card);
+    color: var(--text-main);
+    border: 2px solid var(--border-ink);
+    border-radius: var(--radius-s);
+    cursor: pointer;
+  }
+
+  .theme-select:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 8px rgba(255, 216, 74, 0.3);
   }
 
   .pixel-panel {
