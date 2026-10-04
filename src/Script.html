@@ -50,6 +50,22 @@
     applyTheme(current === 'light' ? 'dark' : 'light');
   }
 
+  function toggleTagDropdown() {
+    var panel = document.getElementById('tagDropdownPanel');
+    panel.classList.toggle('open');
+    if (panel.classList.contains('open')) {
+      document.getElementById('tagSearchBox').focus();
+    }
+  }
+
+  document.addEventListener('click', function (event) {
+    var dropdown = document.getElementById('tagDropdown');
+    var panel = document.getElementById('tagDropdownPanel');
+    if (dropdown && panel && panel.classList.contains('open') && !dropdown.contains(event.target)) {
+      panel.classList.remove('open');
+    }
+  });
+
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     var btn = document.getElementById('themeToggle');
