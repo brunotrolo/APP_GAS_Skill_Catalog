@@ -35,10 +35,13 @@ function setupSpreadsheet() {
   } else {
     alreadyExisted.push(SKILLS_SHEET_NAME);
     var existingHeaders = skillsSheet.getRange(1, 1, 1, Math.max(skillsSheet.getLastColumn(), 1)).getValues()[0];
-    if (existingHeaders.indexOf('clones') === -1) {
+    var missingHeaders = SKILLS_HEADERS.filter(function (header) {
+      return existingHeaders.indexOf(header) === -1;
+    });
+    if (missingHeaders.length > 0) {
       var nextCol = skillsSheet.getLastColumn() + 1;
-      skillsSheet.getRange(1, nextCol).setValue('clones');
-      Logger.log('setupSpreadsheet: coluna "clones" adicionada em ' + SKILLS_SHEET_NAME + '.');
+      skillsSheet.getRange(1, nextCol, 1, missingHeaders.length).setValues([missingHeaders]);
+      Logger.log('setupSpreadsheet: coluna(s) ' + missingHeaders.join(', ') + ' adicionada(s) em ' + SKILLS_SHEET_NAME + '.');
     }
   }
 
@@ -54,6 +57,24 @@ function setupSpreadsheet() {
   } else {
     alreadyExisted.push(CATEGORIAS_SHEET_NAME);
   }
+
+  var extraModules = [
+    { sheet: ODIN_DOCS_SHEET, headers: ODIN_DOCS_HEADERS },
+    { sheet: ORACLE_WEEKLY_SHEET, headers: ORACLE_WEEKLY_HEADERS },
+    { sheet: COMMUNITY_RADAR_SHEET, headers: COMMUNITY_RADAR_HEADERS },
+    { sheet: GOLDEN_PROMPTS_SHEET, headers: GOLDEN_PROMPTS_HEADERS },
+    { sheet: WALL_OF_FAME_SHEET, headers: WALL_OF_FAME_HEADERS },
+    { sheet: REQUEST_BOARD_SHEET, headers: REQUEST_BOARD_HEADERS },
+    { sheet: AI_RADAR_SHEET, headers: AI_RADAR_HEADERS }
+  ];
+  extraModules.forEach(function (module) {
+    if (spreadsheet.getSheetByName(module.sheet)) {
+      alreadyExisted.push(module.sheet);
+    } else {
+      ensureSheet_(module.sheet, module.headers);
+      created.push(module.sheet);
+    }
+  });
 
   var result = { created: created, alreadyExisted: alreadyExisted };
   Logger.log(

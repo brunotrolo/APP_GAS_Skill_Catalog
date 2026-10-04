@@ -1,0 +1,14 @@
+<div id="view-sandbox" class="app-view">
+  <div class="pixel-panel module-panel">
+    <h2>🧪 SANDBOX / TEST-DRIVE</h2>
+    <p class="module-desc">Experimente uma skill com um input de teste antes de clonar. Requer a Script Property <code>GEMINI_API_KEY</code> configurada no Apps Script.</p>
+
+    <form class="module-form" onsubmit="return submitSandboxPrompt(event)">
+      <input type="text" id="sandboxSkillNome" placeholder="Nome da skill que voce esta testando">
+      <textarea id="sandboxInput" placeholder="Seu input de teste..." required></textarea>
+      <button type="submit" class="pixel-button" id="sandboxSubmitBtn">▶️ RODAR TESTE</button>
+    </form>
+
+    <div class="preview-box" id="sandboxOutput" style="margin-top:12px; display:none;"></div>
+  </div>
+</div>

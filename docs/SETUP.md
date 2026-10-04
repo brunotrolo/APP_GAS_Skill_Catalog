@@ -94,7 +94,14 @@ O script detecta automaticamente a planilha ativa quando está **vinculado (boun
 | Propriedade | Valor | Quando é necessário |
 |---|---|---|
 | `SPREADSHEET_ID` | `1-H5lMr3q_u9M1CYaqMCikZZRtP3ke4yVtwj7tuatp-0` | Só se o script **não** estiver vinculado à planilha |
-| `GITHUB_TOKEN` (opcional) | Personal Access Token do GitHub com escopo `repo` | Só para registrar repositórios **privados** |
+| `GITHUB_TOKEN` (opcional) | Personal Access Token do GitHub com escopo `repo` | Só para registrar repositórios **privados** e para o Health Check funcionar em repos privados |
+| `GEMINI_API_KEY` (opcional) | Chave da API do Gemini (ai.google.dev) | Só para o módulo **Sandbox / Test-Drive**. Sem ela, a aba Sandbox mostra um erro amigável pedindo a chave |
+
+### Módulos extras (abas novas, criadas automaticamente)
+
+Além do catálogo principal, o app agora tem páginas independentes para **Odin Archive**, **Oracle Weekly**, **Community Radar**, **Golden Prompts**, **Sandbox**, **Hall da Fama**, **Mural de Missões** e **AI Tech Radar**. Cada uma usa sua própria aba na mesma planilha (`Odin_Docs`, `Oracle_Weekly`, `Community_Radar`, `Golden_Prompts`, `Wall_of_Fame`, `Request_Board`, `AI_Radar`), criadas automaticamente na primeira vez que `setupSpreadsheet()` roda ou que alguém usa a página.
+
+**Health Check** (indicador 🟢🟡🔴 de saúde nos cards do catálogo) precisa de um passo manual único: rode `installHealthCheckTrigger()` uma vez no editor do Apps Script para criar o gatilho semanal que atualiza o status de cada skill com base no último push no GitHub. Para rodar manualmente a qualquer momento, use `checkSkillsHealth()`.
 
 ## 4. Publicar como Web App
 

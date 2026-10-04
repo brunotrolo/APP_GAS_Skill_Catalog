@@ -9,7 +9,7 @@ var SKILLS_HEADERS = [
   'id', 'nome', 'tipo', 'autor', 'resumo', 'categoria_primaria', 'tags',
   'repo_url', 'owner', 'repo_name', 'default_branch', 'zip_url',
   'clone_bash', 'clone_powershell', 'data_registro', 'registrado_por', 'ativo',
-  'clones'
+  'clones', 'status_saude'
 ];
 
 /**
