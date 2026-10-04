@@ -85,6 +85,81 @@
     ctx.drawImage(img, Math.round(x), Math.round(y), Math.round(w), Math.round(h));
   }
 
+  // --- 3b. Heroi animado (guerreiro viking) -------------------------------
+  // Unico personagem em cena, com ciclos de animacao reais (correr, parado
+  // respirando, golpe de machado) - sem motor de spawn/multiplas entidades,
+  // entao nao ha risco de sobreposicao. Pack "Viking - 2D Pixel Art
+  // Character Pack" (ByteBox, itch.io) - uso livre em projetos pessoais e
+  // comerciais, sem revenda/redistribuicao do asset em si (ver
+  // assets/sprites/LICENSES.md). Frames 48x48, viradas para a direita.
+  var HERO_FRAME = 48;
+  var HERO_ANIMS = {
+    run: { img: loadImageSafe_(spriteUrl_('hero/run.png')), frames: 8, fps: 10 },
+    idle: { img: loadImageSafe_(spriteUrl_('hero/idle.png')), frames: 11, fps: 8 },
+    attack: { img: loadImageSafe_(spriteUrl_('hero/attack.png')), frames: 8, fps: 14 }
+  };
+  var HERO_SCALE = 1.5;
+  var HERO_RUN_SPEED = 46; // px/s
+  var HERO_STOP_X = 190; // onde o heroi para para o golpe, antes da arvore
+  var HERO_IDLE_SECONDS = 1.1;
+
+  var hero = {
+    x: -HERO_FRAME * HERO_SCALE,
+    state: 'run',
+    frame: 0,
+    frameTimer: 0,
+    idleTimer: 0,
+    hasPerformed: false // evita repetir o golpe em loop enquanto atravessa o ponto de parada
+  };
+
+  function updateHero_(dt) {
+    var anim = HERO_ANIMS[hero.state];
+    hero.frameTimer += dt;
+    var frameDur = 1 / anim.fps;
+    if (hero.frameTimer >= frameDur) {
+      hero.frameTimer -= frameDur;
+      hero.frame++;
+      if (hero.frame >= anim.frames) {
+        hero.frame = 0;
+        if (hero.state === 'attack') hero.state = 'run';
+      }
+    }
+
+    if (hero.state === 'run') {
+      hero.x += HERO_RUN_SPEED * dt;
+      if (!hero.hasPerformed && hero.x >= HERO_STOP_X) {
+        hero.hasPerformed = true;
+        hero.state = 'idle';
+        hero.frame = 0;
+        hero.frameTimer = 0;
+        hero.idleTimer = 0;
+      }
+      if (hero.x > cssWidth + HERO_FRAME * HERO_SCALE) {
+        hero.x = -HERO_FRAME * HERO_SCALE;
+        hero.hasPerformed = false;
+      }
+    } else if (hero.state === 'idle') {
+      hero.idleTimer += dt;
+      if (hero.idleTimer >= HERO_IDLE_SECONDS) {
+        hero.state = 'attack';
+        hero.frame = 0;
+        hero.frameTimer = 0;
+      }
+    }
+    // 'attack' avanca sozinho via contagem de frames acima.
+  }
+
+  function drawHero_() {
+    var anim = HERO_ANIMS[hero.state];
+    var img = anim.img;
+    if (img.__failed || !img.complete || img.naturalWidth === 0) return;
+    var dw = HERO_FRAME * HERO_SCALE;
+    var dh = HERO_FRAME * HERO_SCALE;
+    var sx = hero.frame * HERO_FRAME;
+    var dy = GROUND_Y - dh + 6; // +6 compensa a margem vazia nos pes do sprite
+    ctx.drawImage(img, sx, 0, HERO_FRAME, HERO_FRAME, Math.round(hero.x), Math.round(dy), dw, dh);
+  }
+
   // --- 4. Elementos proceduais da cena (vetores puros, sem assets) --------
   var GROUND_Y = 80;
 
@@ -265,10 +340,16 @@
   // --- 5. Loop de renderizacao (cena praticamente estatica: so estrelas
   // piscando, aurora ondulando bem devagar e um leve pulso na lua) --------
   var startTs = null;
+  var lastTs = null;
 
   function tick_(ts) {
     if (startTs === null) startTs = ts;
+    if (lastTs === null) lastTs = ts;
     var t = (ts - startTs) / 1000;
+    var dt = Math.min((ts - lastTs) / 1000, 0.05);
+    lastTs = ts;
+
+    updateHero_(dt);
 
     drawSky_();
     drawAurora_(t);
@@ -280,6 +361,7 @@
     drawGround_();
     drawRaven_(huginn, 316, 16, 24);
     drawRaven_(muninn, 364, 21, 20);
+    drawHero_();
 
     requestAnimationFrame(tick_);
   }
