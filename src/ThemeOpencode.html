@@ -1,0 +1,80 @@
+<style>
+  /* De docs/themes/DESIGN-opencode.ai.md. O arquivo descreve os dois
+       modos: canvas/surface-soft/surface-card para claro, surface-dark/
+       surface-dark-elevated/on-dark para o "hero card" escuro. Brand =
+       accent #007aff (constante nos dois modos) + warning #ff9f0a (reusado
+       como --purple, ja que o arquivo nao tem roxo) + success #30d158 +
+       danger #ff3b30 - tudo literal. Forma: rounded.sm (4px) em todo
+       elemento interativo, 1px hairline, sem sombra, tudo monoespacado. */
+  :root[data-theme-family="opencode"][data-theme="dark"] {
+    --bg-deep: #201d1d;
+    --bg-panel: #302c2c;
+    --bg-card: #302c2c;
+    --bg-card-hover: #0f0000;
+    --border-ink: #646262;
+    --text-main: #fdfcfc;
+    --gold: #007aff;
+    --gold-glow: #0056b3;
+    --purple: #ff9f0a;
+    --terminal-green: #30d158;
+    --danger: #ff3b30;
+    --muted: #9a9898;
+    --info: #004085;
+    --warn: #ff9f0a;
+    --gold-glow-rgb: 0, 122, 255;
+    --terminal-green-rgb: 48, 209, 88;
+    --font-heading: 'Space Mono', 'Berkeley Mono', monospace;
+    --font-body: 'Space Mono', 'Berkeley Mono', monospace;
+    --font-display: 'Space Mono', 'Berkeley Mono', monospace;
+    --radius-s: 4px;
+    --radius-m: 4px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0px;
+    --heading-transform: none;
+    --on-accent: #fdfcfc;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--terminal-green);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="opencode"][data-theme="light"] {
+    --bg-deep: #fdfcfc;
+    --bg-panel: #f8f7f7;
+    --bg-card: #f1eeee;
+    --bg-card-hover: #e8e4e4;
+    --border-ink: #201d1d;
+    --text-main: #201d1d;
+    --gold: #007aff;
+    --gold-glow: #0056b3;
+    --purple: #ff9f0a;
+    --terminal-green: #30d158;
+    --danger: #ff3b30;
+    --muted: #646262;
+    --info: #004085;
+    --warn: #ff9f0a;
+    --gold-glow-rgb: 0, 122, 255;
+    --terminal-green-rgb: 48, 209, 88;
+    --font-heading: 'Space Mono', 'Berkeley Mono', monospace;
+    --font-body: 'Space Mono', 'Berkeley Mono', monospace;
+    --font-display: 'Space Mono', 'Berkeley Mono', monospace;
+    --radius-s: 4px;
+    --radius-m: 4px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0px;
+    --heading-transform: none;
+    --on-accent: #fdfcfc;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--terminal-green);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>

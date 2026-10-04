@@ -1,0 +1,85 @@
+<script>
+  /**
+   * Codex Munin - orquestrador do motor de temas (design system em tempo real).
+   *
+   * As cores/fontes/formas de cada tema NAO vivem aqui - elas sao blocos de
+   * CSS puro com seletores de atributo, um arquivo por tema (ThemeRetro.html,
+   * ThemeApple.html, ThemeBmw.html, ThemeOpencode.html), cada um definindo
+   * :root[data-theme-family="X"][data-theme="dark"|"light"] { --var: valor; }.
+   * Este controller so troca os atributos data-theme-family/data-theme em
+   * <html> - a cascata do CSS faz o resto, em tempo real, sem reload.
+   *
+   * Dois eixos independentes, como pedido: TEMA (familia visual) x TIPO
+   * (Claro/Escuro). Retro e o tema original/padrao do app.
+   */
+
+  var THEME_LIST = [
+    { id: 'retro', label: '🕹️ Retro' },
+    { id: 'apple', label: '🍎 Apple' },
+    { id: 'bmw', label: '🏁 BMW M' },
+    { id: 'opencode', label: '💻 OpenCode' }
+  ];
+
+  var currentThemeFamily = 'retro';
+  var currentThemeType = 'dark';
+
+  function initTheme() {
+    var savedFamily = null;
+    var savedType = null;
+    try {
+      savedFamily = localStorage.getItem('codexMuninThemeFamily');
+      savedType = localStorage.getItem('codexMuninThemeType');
+    } catch (e) {
+      savedFamily = null;
+      savedType = null;
+    }
+    renderThemeList();
+    var validFamily = THEME_LIST.some(function (t) { return t.id === savedFamily; });
+    applyTheme(validFamily ? savedFamily : 'retro', savedType === 'light' ? 'light' : 'dark');
+  }
+
+  function renderThemeList() {
+    var select = document.getElementById('themeSelect');
+    if (!select) return;
+    select.innerHTML = '';
+    THEME_LIST.forEach(function (theme) {
+      var opt = document.createElement('option');
+      opt.value = theme.id;
+      opt.textContent = theme.label;
+      select.appendChild(opt);
+    });
+  }
+
+  function toggleTheme() {
+    applyTheme(currentThemeFamily, currentThemeType === 'light' ? 'dark' : 'light');
+  }
+
+  function applyTheme(familyId, typeId) {
+    var validFamily = THEME_LIST.some(function (t) { return t.id === familyId; });
+    var resolvedFamilyId = validFamily ? familyId : 'retro';
+    var resolvedTypeId = typeId === 'light' ? 'light' : 'dark';
+
+    currentThemeFamily = resolvedFamilyId;
+    currentThemeType = resolvedTypeId;
+
+    document.documentElement.setAttribute('data-theme', resolvedTypeId);
+    document.documentElement.setAttribute('data-theme-family', resolvedFamilyId);
+    document.dispatchEvent(new CustomEvent('codexThemeChange', {
+      detail: { family: resolvedFamilyId, type: resolvedTypeId }
+    }));
+
+    var btn = document.getElementById('themeToggle');
+    if (btn) {
+      btn.textContent = resolvedTypeId === 'light' ? '☀️ CLARO' : '🌙 ESCURO';
+    }
+    var select = document.getElementById('themeSelect');
+    if (select) select.value = resolvedFamilyId;
+
+    try {
+      localStorage.setItem('codexMuninThemeFamily', resolvedFamilyId);
+      localStorage.setItem('codexMuninThemeType', resolvedTypeId);
+    } catch (e) {
+      /* localStorage indisponivel, ignora persistencia */
+    }
+  }
+</script>

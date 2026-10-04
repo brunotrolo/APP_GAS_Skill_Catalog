@@ -1,0 +1,81 @@
+<style>
+  /* De docs/themes/DESIGN-apple.md. O arquivo literalmente descreve os
+       dois modos: canvas/canvas-parchment/surface-pearl/divider-soft para
+       claro, surface-tile-1/2/3/surface-black para escuro. Brand = familia
+       azul (primary/primary-focus/primary-on-dark); o arquivo nao define
+       verde/vermelho/roxo, entao --terminal-green/--danger reusam tons de
+       Text (ink-muted-80/surface-black/body-muted) em vez de inventar cor.
+       Forma: botoes em pill total (rounded.pill = 9999px), cards em 18px
+       (rounded.lg), 1px hairline, zero sombra em chrome. */
+  :root[data-theme-family="apple"][data-theme="dark"] {
+    --bg-deep: #000000;
+    --bg-panel: #252527;
+    --bg-card: #272729;
+    --bg-card-hover: #2a2a2c;
+    --border-ink: #2a2a2c;
+    --text-main: #ffffff;
+    --gold: #2997ff;
+    --gold-glow: #0071e3;
+    --purple: #0066cc;
+    --terminal-green: #cccccc;
+    --danger: #7a7a7a;
+    --muted: #7a7a7a;
+    --info: #2997ff;
+    --warn: #cccccc;
+    --gold-glow-rgb: 41, 151, 255;
+    --terminal-green-rgb: 204, 204, 204;
+    --font-heading: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+    --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    --radius-s: 9999px;
+    --radius-m: 18px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: -0.4px;
+    --heading-transform: none;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--terminal-green);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="apple"][data-theme="light"] {
+    --bg-deep: #ffffff;
+    --bg-panel: #fafafc;
+    --bg-card: #f5f5f7;
+    --bg-card-hover: #f0f0f0;
+    --border-ink: #e0e0e0;
+    --text-main: #1d1d1f;
+    --gold: #0066cc;
+    --gold-glow: #0071e3;
+    --purple: #2997ff;
+    --terminal-green: #333333;
+    --danger: #000000;
+    --muted: #7a7a7a;
+    --info: #2997ff;
+    --warn: #333333;
+    --gold-glow-rgb: 0, 102, 204;
+    --terminal-green-rgb: 51, 51, 51;
+    --font-heading: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+    --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    --radius-s: 9999px;
+    --radius-m: 18px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: -0.4px;
+    --heading-transform: none;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--terminal-green);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>
