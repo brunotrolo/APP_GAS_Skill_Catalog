@@ -2,37 +2,50 @@
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
 
   :root {
-    --bg-deep: #0f101d;
-    --bg-panel: #1b1d2e;
-    --bg-card: #20223a;
+    --bg-deep: #0a0b16;
+    --bg-panel: #181a2c;
+    --bg-card: #1d2037;
+    --bg-card-hover: #262a47;
     --border-ink: #000000;
-    --text-main: #e7e7f0;
-    --gold: #ffd700;
-    --purple: #9b59b6;
-    --terminal-green: #00ff66;
-    --danger: #ff5555;
-    --muted: #8a8ca8;
+    --text-main: #eceefb;
+    --gold: #ffd84a;
+    --gold-glow: #ffe98a;
+    --purple: #b06aed;
+    --terminal-green: #2effa0;
+    --danger: #ff5d6c;
+    --muted: #9496b8;
+    --radius-s: 6px;
+    --radius-m: 10px;
   }
 
   * { box-sizing: border-box; }
 
   body {
     margin: 0;
-    background: var(--bg-deep);
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(176, 106, 237, 0.12), transparent 60%),
+      radial-gradient(1000px 500px at 100% 0%, rgba(46, 255, 160, 0.08), transparent 55%),
+      var(--bg-deep);
     color: var(--text-main);
     font-family: 'VT323', monospace;
-    font-size: 18px;
+    font-size: 19px;
+    -webkit-font-smoothing: none;
+  }
+
+  canvas, img.pixel-art {
     image-rendering: pixelated;
   }
 
   h1, h2, h3, .pixel-font, button, .badge {
     font-family: 'Press Start 2P', monospace;
+    letter-spacing: 0.5px;
   }
 
   .pixel-panel {
     background: var(--bg-panel);
-    border: 4px solid var(--border-ink);
-    box-shadow: 6px 6px 0px #000;
+    border: 2px solid var(--border-ink);
+    border-radius: var(--radius-m);
+    box-shadow: 0 0 0 1px rgba(255, 216, 74, 0.08), 4px 6px 0px #000, 0 12px 28px rgba(0, 0, 0, 0.45);
     padding: 16px;
   }
 
@@ -75,22 +88,27 @@
 
   .sidebar-nav li {
     font-size: 13px;
-    padding: 8px 10px;
-    background: var(--bg-card);
+    padding: 9px 12px;
+    background: linear-gradient(180deg, var(--bg-card-hover), var(--bg-card));
     border: 2px solid var(--border-ink);
-    box-shadow: 2px 2px 0px #000;
+    border-radius: var(--radius-s);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset, 2px 3px 0px #000;
     cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
   }
 
   .sidebar-nav li:hover {
     color: var(--gold);
+    transform: translate(-1px, -1px);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset, 3px 4px 0px #000;
   }
 
   .sidebar-nav li.active {
-    background: var(--gold);
-    color: #000;
+    background: linear-gradient(180deg, var(--gold-glow), var(--gold));
+    color: #231a00;
     font-family: 'Press Start 2P', monospace;
     font-size: 9px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2) inset, 2px 3px 0px #000, 0 0 12px rgba(255, 216, 74, 0.35);
   }
 
   @media (max-width: 720px) {
@@ -126,11 +144,19 @@
   .search-row select {
     font-family: 'VT323', monospace;
     font-size: 18px;
-    padding: 8px 10px;
+    padding: 9px 12px;
     background: var(--bg-card);
     color: var(--text-main);
-    border: 3px solid var(--border-ink);
-    box-shadow: 3px 3px 0px #000;
+    border: 2px solid var(--border-ink);
+    border-radius: var(--radius-s);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset, 3px 4px 0px #000;
+  }
+
+  .search-row input[type="text"]:focus,
+  .search-row select:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset, 3px 4px 0px #000, 0 0 10px rgba(255, 216, 74, 0.3);
   }
 
   .search-row input[type="text"] {
@@ -148,119 +174,160 @@
     cursor: pointer;
     background: var(--bg-card);
     border: 2px solid var(--border-ink);
+    border-radius: 999px;
     color: var(--terminal-green);
-    padding: 4px 8px;
+    padding: 4px 10px;
     font-size: 11px;
-    box-shadow: 2px 2px 0px #000;
+    box-shadow: 2px 3px 0px #000;
+    transition: transform 0.1s ease;
+  }
+
+  .tag-pill:hover {
+    transform: translateY(-1px);
   }
 
   .tag-pill.active {
     background: var(--terminal-green);
-    color: #000;
+    color: #042016;
+    box-shadow: 2px 3px 0px #000, 0 0 10px rgba(46, 255, 160, 0.4);
   }
 
   .pixel-button {
     font-family: 'Press Start 2P', monospace;
     font-size: 11px;
-    padding: 10px 14px;
-    background: var(--gold);
-    color: #000;
-    border: 3px solid var(--border-ink);
-    box-shadow: 4px 4px 0px #000;
+    padding: 11px 16px;
+    background: linear-gradient(180deg, var(--gold-glow), var(--gold));
+    color: #231a00;
+    border: 2px solid var(--border-ink);
+    border-radius: var(--radius-s);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15) inset, 3px 4px 0px #000;
     cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+
+  .pixel-button:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15) inset, 4px 5px 0px #000, 0 0 14px rgba(255, 216, 74, 0.3);
   }
 
   .pixel-button:active {
-    box-shadow: 1px 1px 0px #000;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset, 1px 1px 0px #000;
     transform: translate(3px, 3px);
   }
 
   .pixel-button.secondary {
-    background: var(--bg-card);
+    background: linear-gradient(180deg, var(--bg-card-hover), var(--bg-card));
     color: var(--text-main);
   }
 
   .pixel-button.success {
-    background: var(--terminal-green);
-    color: #000;
+    background: linear-gradient(180deg, #7bffc9, var(--terminal-green));
+    color: #042016;
   }
 
   .pixel-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none !important;
   }
 
   /* ---- Skill grid / cards ---- */
   #skill-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
+    gap: 18px;
     padding: 16px;
+    align-items: stretch;
   }
 
   .skill-card {
-    background: var(--bg-card);
-    border: 4px solid var(--border-ink);
-    box-shadow: 6px 6px 0px #000;
-    padding: 14px;
+    background: linear-gradient(165deg, var(--bg-card-hover) 0%, var(--bg-card) 40%);
+    border: 2px solid var(--border-ink);
+    border-radius: var(--radius-m);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset, 4px 6px 0px #000, 0 10px 22px rgba(0, 0, 0, 0.35);
+    padding: 16px 14px 14px;
     display: flex;
     flex-direction: column;
     gap: 8px;
     position: relative;
+    overflow: hidden;
+    max-width: 100%;
+    min-width: 0;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .skill-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset, 5px 8px 0px #000, 0 14px 28px rgba(0, 0, 0, 0.45);
   }
 
   .skill-card .badge {
-    position: absolute;
-    top: -10px;
-    right: -10px;
+    align-self: flex-start;
     font-size: 9px;
-    padding: 6px 8px;
+    padding: 5px 9px;
     border: 2px solid var(--border-ink);
-    box-shadow: 2px 2px 0px #000;
+    border-radius: var(--radius-s);
+    box-shadow: 2px 3px 0px #000;
+    max-width: 100%;
+    white-space: nowrap;
   }
 
   .badge.interna {
-    background: var(--gold);
-    color: #000;
+    background: linear-gradient(180deg, var(--gold-glow), var(--gold));
+    color: #231a00;
   }
 
   .badge.curadoria {
-    background: var(--purple);
-    color: #fff;
+    background: linear-gradient(180deg, #d19bff, var(--purple));
+    color: #230033;
   }
 
   .skill-card h3 {
     font-size: 13px;
-    margin: 6px 0 0 0;
+    line-height: 1.5;
+    margin: 4px 0 0 0;
     color: var(--gold);
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
   }
 
   .skill-card .meta {
     font-size: 14px;
     color: var(--muted);
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .skill-card .resumo {
     font-size: 16px;
     flex: 1;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .skill-card .categoria {
     font-size: 11px;
     color: var(--terminal-green);
+    overflow-wrap: break-word;
   }
 
   .skill-card .tags {
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
+    max-width: 100%;
   }
 
   .skill-card .tags span {
     font-size: 10px;
     background: var(--bg-panel);
     border: 1px solid var(--border-ink);
-    padding: 2px 6px;
+    border-radius: 999px;
+    padding: 2px 8px;
+    max-width: 100%;
+    overflow-wrap: break-word;
   }
 
   .skill-card .actions {
@@ -274,6 +341,7 @@
   .skill-card .actions button {
     text-decoration: none;
     font-size: 10px;
+    padding: 8px 10px;
   }
 
   .empty-state {
@@ -301,9 +369,10 @@
   }
 
   .modal-box {
-    background: var(--bg-panel);
-    border: 4px solid var(--border-ink);
-    box-shadow: 8px 8px 0px #000;
+    background: linear-gradient(165deg, var(--bg-card-hover), var(--bg-panel) 45%);
+    border: 2px solid var(--border-ink);
+    border-radius: var(--radius-m);
+    box-shadow: 0 0 0 1px rgba(255, 216, 74, 0.08) inset, 6px 8px 0px #000, 0 20px 40px rgba(0, 0, 0, 0.5);
     padding: 20px;
     width: 90%;
     max-width: 520px;
@@ -335,10 +404,19 @@
   .form-field select {
     font-family: 'VT323', monospace;
     font-size: 18px;
-    padding: 8px;
+    padding: 9px;
     background: var(--bg-card);
     color: var(--text-main);
-    border: 3px solid var(--border-ink);
+    border: 2px solid var(--border-ink);
+    border-radius: var(--radius-s);
+  }
+
+  .form-field input[type="text"]:focus,
+  .form-field textarea:focus,
+  .form-field select:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 10px rgba(255, 216, 74, 0.3);
   }
 
   .radio-group {
@@ -348,13 +426,14 @@
   }
 
   .preview-box {
-    background: #000;
+    background: #050608;
     color: var(--terminal-green);
-    padding: 8px;
+    padding: 10px;
     font-family: 'VT323', monospace;
     font-size: 14px;
     word-break: break-all;
     border: 2px dashed var(--terminal-green);
+    border-radius: var(--radius-s);
   }
 
   .toast {
@@ -364,8 +443,9 @@
     padding: 12px 16px;
     font-family: 'Press Start 2P', monospace;
     font-size: 11px;
-    border: 3px solid var(--border-ink);
-    box-shadow: 4px 4px 0px #000;
+    border: 2px solid var(--border-ink);
+    border-radius: var(--radius-s);
+    box-shadow: 4px 5px 0px #000, 0 10px 24px rgba(0, 0, 0, 0.4);
     z-index: 200;
     display: none;
   }
