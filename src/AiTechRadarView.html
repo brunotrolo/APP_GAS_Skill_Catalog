@@ -1,18 +1,25 @@
 <div id="view-airadar" class="app-view">
   <div class="pixel-panel module-panel">
     <h2>🛰️ AI TECH RADAR</h2>
-    <p class="module-desc">Classificacao Adopt / Trial / Assess / Hold das tecnologias de IA avaliadas pelo time.</p>
+    <p class="module-desc">Inspirado no <a href="https://www.thoughtworks.com/radar" target="_blank" style="color: var(--gold);">ThoughtWorks Technology Radar</a>: dois eixos, anel de adocao (Adopt/Trial/Assess/Hold) e categoria do blip (Techniques/Tools/Platforms/Languages &amp; Frameworks).</p>
 
     <form class="module-form" onsubmit="return submitAiRadarItem(event)">
       <input type="text" id="airadarNome" placeholder="Nome da tecnologia/ferramenta" required>
       <select id="airadarQuadrante" required>
-        <option value="">Quadrante...</option>
+        <option value="">Anel (adocao)...</option>
         <option value="ADOPT">ADOPT</option>
         <option value="TRIAL">TRIAL</option>
         <option value="ASSESS">ASSESS</option>
         <option value="HOLD">HOLD</option>
       </select>
-      <input type="text" id="airadarDescricao" placeholder="Por que esse quadrante? (opcional)">
+      <select id="airadarCategoriaBlip" required>
+        <option value="">Categoria...</option>
+        <option value="TECHNIQUES">TECHNIQUES</option>
+        <option value="TOOLS">TOOLS</option>
+        <option value="PLATFORMS">PLATFORMS</option>
+        <option value="LANGUAGES_FRAMEWORKS">LANGUAGES &amp; FRAMEWORKS</option>
+      </select>
+      <input type="text" id="airadarDescricao" placeholder="Por que esse anel? (opcional)">
       <button type="submit" class="pixel-button">+ CLASSIFICAR</button>
     </form>
 

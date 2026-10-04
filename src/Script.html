@@ -338,8 +338,10 @@
       if (!result.success) { showToast(friendlyMessage(result), 'error'); return; }
       renderModuleList('airadarList', result.data, 'NENHUMA TECNOLOGIA CLASSIFICADA AINDA', function (item) {
         var quadClass = 'q-' + String(item.quadrante || '').toLowerCase();
+        var categoriaLabel = String(item.categoria_blip || '').replace('_', ' & ');
         return '<span class="quadrant-badge ' + quadClass + '">' + escapeHtml(item.quadrante) + '</span>' +
           '<h3>' + escapeHtml(item.nome) + '</h3>' +
+          (categoriaLabel ? '<div class="module-meta">' + escapeHtml(categoriaLabel) + '</div>' : '') +
           '<p>' + escapeHtml(item.descricao || '') + '</p>';
       });
     }).withFailureHandler(onLoadFailure).getAiRadarItems();
@@ -350,6 +352,7 @@
     var payload = {
       nome: document.getElementById('airadarNome').value.trim(),
       quadrante: document.getElementById('airadarQuadrante').value,
+      categoria_blip: document.getElementById('airadarCategoriaBlip').value,
       descricao: document.getElementById('airadarDescricao').value.trim()
     };
     google.script.run.withSuccessHandler(function (result) {
@@ -581,7 +584,8 @@
     card.innerHTML =
       '<span class="badge ' + badgeClass + '">' + badgeLabel + '</span>' +
       '<h3>' + (healthDot ? healthDot + ' ' : '') + escapeHtml(skill.nome) + '</h3>' +
-      '<div class="meta">por ' + escapeHtml(skill.autor) + '</div>' +
+      '<div class="meta">por ' + escapeHtml(skill.autor) +
+      (skill.time_responsavel ? ' · 👥 ' + escapeHtml(skill.time_responsavel) : '') + '</div>' +
       '<span class="categoria-badge ' + categoriaClass + '">' + escapeHtml(skill.categoria_primaria || '') + '</span>' +
       '<div class="resumo">' + escapeHtml(skill.resumo || '') + '</div>' +
       '<div class="tags">' + tagsHtml + '</div>' +
@@ -747,7 +751,8 @@
       categoria: categoria,
       tags: document.getElementById('skillTags').value.trim(),
       resumoOverride: document.getElementById('skillResumo').value.trim(),
-      nomeOverride: document.getElementById('skillNome').value.trim()
+      nomeOverride: document.getElementById('skillNome').value.trim(),
+      timeResponsavel: document.getElementById('skillTimeResponsavel').value.trim()
     };
 
     document.getElementById('saveSkillBtn').disabled = true;
