@@ -4,7 +4,7 @@
   "private": true,
   "description": "Codex Munin - Catalogo de Skills do Odin (Google Apps Script + Google Sheets)",
   "devDependencies": {
-    "@google/clasp": "^2.4.2"
+    "@google/clasp": "^3.4.1"
   },
   "scripts": {
     "login": "clasp login",
