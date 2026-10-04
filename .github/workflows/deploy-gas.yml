@@ -1,0 +1,51 @@
+name: Deploy to Google Apps Script
+
+on:
+  workflow_dispatch:
+    inputs:
+      create_deployment:
+        description: "Tambem criar/atualizar o deployment de Web App (clasp deploy)"
+        required: false
+        default: "false"
+        type: boolean
+
+jobs:
+  clasp-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure clasp credentials
+        env:
+          CLASP_CREDENTIALS: ${{ secrets.CLASP_CREDENTIALS }}
+        run: |
+          if [ -z "$CLASP_CREDENTIALS" ]; then
+            echo "::error::Secret CLASP_CREDENTIALS nao configurado. Veja docs/SETUP.md."
+            exit 1
+          fi
+          echo "$CLASP_CREDENTIALS" > ~/.clasprc.json
+
+      - name: Configure .clasp.json
+        run: |
+          cat > .clasp.json << 'EOF'
+          {
+            "scriptId": "1vQMqYIbWpfKcZwvSi0TH6oZjbqnwRvgfUUFEOp0qLZeJyzlfPQRWhfMB",
+            "rootDir": "./src"
+          }
+          EOF
+
+      - name: Push to Apps Script
+        run: npx clasp push --force
+
+      - name: Create/update Web App deployment
+        if: ${{ inputs.create_deployment == 'true' }}
+        run: npx clasp deploy --description "Deploy via GitHub Actions - ${{ github.sha }}"

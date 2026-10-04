@@ -6,7 +6,7 @@ Passos manuais para colocar o Codex Munin (MVP) no ar.
 > - Google Sheets: `1-H5lMr3q_u9M1CYaqMCikZZRtP3ke4yVtwj7tuatp-0`
 > - Apps Script: `1vQMqYIbWpfKcZwvSi0TH6oZjbqnwRvgfUUFEOp0qLZeJyzlfPQRWhfMB`
 >
-> **Ainda não implantado/deployado** — siga os passos abaixo para configurar as abas, fazer o `clasp push` e só então decidir quando publicar como Web App.
+> Deploy autorizado. O envio do código (`clasp push`) é feito automaticamente via GitHub Actions (veja a seção 2A) — só falta você gerar o segredo `CLASP_CREDENTIALS` uma única vez, passo que exige login manual na sua conta Google.
 
 ## 1. Preparar a planilha (Google Sheets)
 
@@ -33,15 +33,29 @@ DevOps & Release
 Architecture & Workflows
 ```
 
-## 2. Instalar o clasp e conectar ao projeto Apps Script existente
+## 2. Enviar o código ao Apps Script
+
+### 2A. Via GitHub Actions (recomendado — é o que está configurado)
+
+O workflow `.github/workflows/deploy-gas.yml` roda `clasp push` automaticamente contra o script `1vQMqYIbWpfKcZwvSi0TH6oZjbqnwRvgfUUFEOp0qLZeJyzlfPQRWhfMB`. Ele precisa de **um segredo único** no repositório, gerado uma vez pela sua conta Google (a autenticação OAuth do clasp não pode ser feita por terceiros, só por você):
+
+1. Na sua máquina: `npm install -g @google/clasp && clasp login` (abre o navegador, autorize com a conta Google dona da planilha/script).
+2. Copie o conteúdo do arquivo gerado (`~/.clasprc.json` no Linux/Mac, `%USERPROFILE%\.clasprc.json` no Windows).
+3. No GitHub: **Settings → Secrets and variables → Actions → New repository secret**, nome `CLASP_CREDENTIALS`, cole o conteúdo do arquivo.
+4. Na aba **Actions** do repositório, rode o workflow **Deploy to Google Apps Script** manualmente (`Run workflow`). Ele faz o `clasp push`; marque a opção "também criar/atualizar o deployment de Web App" se quiser que ele rode `clasp deploy` também.
+
+Esse segredo só precisa ser gerado uma vez; os próximos deploys são só rodar o workflow de novo (ou ele pode ser configurado para rodar a cada push na branch principal).
+
+### 2B. Manualmente (alternativa)
 
 ```bash
 npm install
 npx clasp login
 npx clasp clone 1vQMqYIbWpfKcZwvSi0TH6oZjbqnwRvgfUUFEOp0qLZeJyzlfPQRWhfMB --rootDir ./src
+npx clasp push
 ```
 
-> Como o projeto Apps Script já existe, use `clasp clone` (não `clasp create`) para não criar um segundo script. Isso gera um `.clasp.json` local (não versionado) apontando para o `scriptId` acima — cuidado para não sobrescrever os arquivos locais em `src/` já implementados neste repositório; confirme o conteúdo antes de rodar `clasp push`.
+> Use `clasp clone` (não `clasp create`), já que o projeto Apps Script já existe — cuidado para não sobrescrever os arquivos locais em `src/` já implementados neste repositório; confirme o conteúdo antes de rodar `clasp push`.
 
 ## 3. Configurar Script Properties
 
@@ -52,23 +66,15 @@ Abra o projeto no editor (`npx clasp open`) → **Project Settings** → **Scrip
 | `SPREADSHEET_ID` | `1-H5lMr3q_u9M1CYaqMCikZZRtP3ke4yVtwj7tuatp-0` |
 | `GITHUB_TOKEN` (opcional) | Personal Access Token do GitHub com escopo `repo`, necessário apenas para registrar repositórios **privados** |
 
-## 4. Enviar o código
+## 4. Publicar como Web App
 
-```bash
-npx clasp push
-```
-
-## 5. Publicar como Web App (aguardar sinal verde)
-
-> ⚠️ Não publicar ainda — aguardar confirmação explícita antes de fazer o deploy, mesmo após `clasp push`.
-
-Quando autorizado, no editor: **Deploy** → **New deployment** → tipo **Web app**:
+No editor (`npx clasp open` ou direto em script.google.com): **Deploy** → **New deployment** → tipo **Web app**:
 - Execute as: **Me**
 - Who has access: **Anyone within [seu domínio Google Workspace]**
 
 Clique em **Deploy** e copie a URL gerada.
 
-## 6. Validar
+## 5. Validar
 
 Abra a URL do Web App e confirme:
 - O banner com sprites animados carrega no topo.
