@@ -7,10 +7,23 @@
     </select>
 
     <div class="tag-dropdown" id="tagDropdown">
-      <button type="button" class="pixel-button secondary" onclick="toggleTagDropdown()" id="tagDropdownToggle">🏷️ TAGS</button>
+      <button type="button" class="pixel-button secondary" onclick="toggleDropdown('tagDropdown')" id="tagDropdownToggle">🏷️ TAGS</button>
       <div class="tag-dropdown-panel" id="tagDropdownPanel">
         <input type="text" id="tagSearchBox" class="sidebar-tag-search" placeholder="Buscar tag..." oninput="renderTagPills()">
         <div class="tag-pills sidebar-tags" id="tagPills"></div>
+      </div>
+    </div>
+
+    <div class="tag-dropdown" id="sortDropdown">
+      <button type="button" class="pixel-button secondary" onclick="toggleDropdown('sortDropdown')" id="sortDropdownToggle">↕️ ORDENAR</button>
+      <div class="tag-dropdown-panel" id="sortDropdownPanel">
+        <ul class="sidebar-nav" id="sortNav">
+          <li data-sort="nome_asc" class="active">NOME (A-Z)</li>
+          <li data-sort="nome_desc">NOME (Z-A)</li>
+          <li data-sort="data_desc">MAIS RECENTES</li>
+          <li data-sort="data_asc">MAIS ANTIGOS</li>
+          <li data-sort="autor_asc">AUTOR (A-Z)</li>
+        </ul>
       </div>
     </div>
 
