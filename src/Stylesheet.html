@@ -149,15 +149,23 @@
 
   .module-nav-item {
     font-family: var(--font-heading);
-    font-size: 11px;
+    font-size: 17px;
     font-weight: 700;
-    padding: 9px 12px;
+    padding: 12px 14px;
     background: var(--chrome-gradient);
     color: var(--text-main);
     border: var(--border-width) solid var(--border-ink);
     border-radius: var(--radius-s);
     box-shadow: var(--shadow-chunky);
     cursor: pointer;
+    flex: 0 1 calc((100% - 8px) / 2);
+    text-align: center;
+  }
+
+  @media (min-width: 740px) {
+    .module-nav-item {
+      flex-basis: calc((100% - 32px) / 5);
+    }
   }
 
   .module-nav-item:hover {
