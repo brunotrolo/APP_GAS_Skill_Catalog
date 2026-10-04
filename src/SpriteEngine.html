@@ -19,7 +19,7 @@
   window.addEventListener('resize', resizeCanvasToDisplaySize_);
 
   var SPRITE_SIZE = 16;
-  var SCALE = 4;
+  var SCALE = 2;
 
   var PALETTE = {
     '.': 'transparent',
@@ -40,11 +40,11 @@
   };
 
   // ---- Helpers geometricos: cada personagem e montado com varios
-  // fillRect/fillCircle proprios (nao um template compartilhado), para
-  // manter os detalhes que o tornam reconhecivel. Cada um tem 2 frames que
-  // representam a ACAO caracteristica dele no jogo original (nao so andar),
-  // pesquisada quando a cor/pose exata nao era obvia. Homenagens
-  // estilizadas - nao copias pixel-a-pixel dos sprites oficiais.
+  // fillRect/fillCircle proprios (nao um template compartilhado), para que
+  // os detalhes que tornam cada um reconhecivel (bone, bigode, orelhas,
+  // casco, crista) fiquem no codigo e nao se percam numa silhueta generica.
+  // Homenagens estilizadas, pesquisadas para bater com o design original de
+  // cada personagem - nao sao copias pixel-a-pixel dos sprites oficiais.
   function newGrid() {
     var grid = [];
     for (var y = 0; y < SPRITE_SIZE; y++) {
@@ -79,361 +79,260 @@
     if (grid[y] && x >= 0 && x < SPRITE_SIZE) grid[y][x] = color;
   }
 
-  function clearRect(grid, x0, y0, w, h) {
-    fillRect(grid, x0, y0, w, h, '.');
+  /**
+   * Aplica pernas (linhas 12-15) num torso ja desenhado (linhas 0-11),
+   * gerando os 2 frames do ciclo de caminhada (juntas / abertas). A
+   * identidade de cada personagem esta toda no torso/cabeca, desenhados a
+   * mao por personagem; as pernas sao o unico elemento compartilhado.
+   */
+  function withWalkCycle(torso, legColor) {
+    var frameA = cloneGrid(torso);
+    fillRect(frameA, 6, 12, 4, 4, legColor);
+
+    var frameB = cloneGrid(torso);
+    fillRect(frameB, 4, 12, 4, 4, legColor);
+    fillRect(frameB, 8, 12, 4, 4, legColor);
+
+    return [frameA, frameB];
   }
 
-  // --- Cada personagem: frame "idle" (parado/andando) + frame da ACAO
-  // caracteristica do jogo original ---
-
   function buildMario() {
-    var idle = newGrid();
-    fillRect(idle, 5, 0, 6, 2, 'R');
-    fillRect(idle, 4, 2, 8, 2, 'R');
-    fillRect(idle, 4, 4, 8, 3, 'S');
-    setPixel(idle, 6, 5, 'K'); setPixel(idle, 9, 5, 'K');
-    fillRect(idle, 4, 6, 8, 2, 'D');
-    fillRect(idle, 5, 8, 6, 1, 'S');
-    fillRect(idle, 3, 9, 10, 2, 'R');
-    fillRect(idle, 3, 11, 10, 1, 'B');
-    fillRect(idle, 5, 11, 2, 1, 'Y');
-    fillRect(idle, 9, 11, 2, 1, 'Y');
-    fillRect(idle, 6, 12, 4, 4, 'B');
-
-    // Acao: pulo classico (joelhos dobrados, braco para cima - pose de salto)
-    var jump = cloneGrid(idle);
-    clearRect(jump, 6, 12, 4, 4);
-    fillRect(jump, 12, 3, 2, 3, 'S');   // braco erguido
-    fillRect(jump, 4, 12, 3, 3, 'B');   // pernas dobradas
-    fillRect(jump, 9, 12, 3, 3, 'B');
-
-    return [idle, jump];
+    var t = newGrid();
+    fillRect(t, 5, 0, 6, 2, 'R');             // bone (topo)
+    fillRect(t, 4, 2, 8, 2, 'R');             // aba do bone
+    fillRect(t, 4, 4, 8, 3, 'S');             // rosto
+    setPixel(t, 6, 5, 'K'); setPixel(t, 9, 5, 'K'); // olhos
+    fillRect(t, 4, 6, 8, 2, 'D');             // bigode largo
+    fillRect(t, 5, 8, 6, 1, 'S');             // queixo
+    fillRect(t, 3, 9, 10, 2, 'R');            // camisa vermelha
+    fillRect(t, 3, 11, 10, 1, 'B');           // faixa do macacao
+    fillRect(t, 5, 11, 2, 1, 'Y');            // botao esquerdo
+    fillRect(t, 9, 11, 2, 1, 'Y');            // botao direito
+    return withWalkCycle(t, 'B');
   }
 
   function buildLuigi() {
-    var idle = newGrid();
-    fillRect(idle, 5, 0, 6, 3, 'G');
-    fillRect(idle, 4, 3, 8, 2, 'G');
-    fillRect(idle, 4, 5, 8, 3, 'S');
-    setPixel(idle, 6, 6, 'K'); setPixel(idle, 9, 6, 'K');
-    fillRect(idle, 4, 7, 8, 2, 'D');
-    fillRect(idle, 5, 9, 6, 1, 'S');
-    fillRect(idle, 3, 10, 10, 1, 'G');
-    fillRect(idle, 3, 11, 10, 1, 'B');
-    fillRect(idle, 6, 12, 4, 4, 'B');
-
-    // Acao: pulo MAIS alto que o Mario (marca registrada do Luigi)
-    var jump = cloneGrid(idle);
-    clearRect(jump, 6, 12, 4, 4);
-    fillRect(jump, 12, 2, 2, 3, 'S');
-    fillRect(jump, 4, 12, 3, 3, 'B');
-    fillRect(jump, 9, 12, 3, 3, 'B');
-
-    return [idle, jump];
+    var t = newGrid();
+    fillRect(t, 5, 0, 6, 3, 'G');             // bone mais alto (Luigi e mais alto que Mario)
+    fillRect(t, 4, 3, 8, 2, 'G');
+    fillRect(t, 4, 5, 8, 3, 'S');
+    setPixel(t, 6, 6, 'K'); setPixel(t, 9, 6, 'K');
+    fillRect(t, 4, 7, 8, 2, 'D');
+    fillRect(t, 5, 9, 6, 1, 'S');
+    fillRect(t, 3, 10, 10, 1, 'G');
+    fillRect(t, 3, 11, 10, 1, 'B');
+    return withWalkCycle(t, 'B');
   }
 
   function buildPeach() {
-    var idle = newGrid();
-    setPixel(idle, 6, 0, 'N'); setPixel(idle, 8, 0, 'N'); setPixel(idle, 10, 0, 'N');
-    fillRect(idle, 5, 1, 7, 2, 'Y');
-    fillRect(idle, 4, 3, 8, 3, 'S');
-    setPixel(idle, 6, 4, 'K'); setPixel(idle, 9, 4, 'K');
-    fillRect(idle, 3, 6, 10, 1, 'Y');
-    fillRect(idle, 3, 7, 10, 5, 'E');
-    fillRect(idle, 2, 11, 12, 1, 'E');
-    fillRect(idle, 6, 12, 4, 4, 'E');
-
-    // Acao: flutuando com o guarda-chuva/vestido (Super Mario Bros. 2)
-    var floatFrame = cloneGrid(idle);
-    clearRect(floatFrame, 6, 12, 4, 4);
-    fillRect(floatFrame, 1, 7, 14, 2, 'E');  // vestido se abre feito paraquedas
-    fillRect(floatFrame, 4, 12, 8, 2, 'E');
-
-    return [idle, floatFrame];
+    var t = newGrid();
+    setPixel(t, 6, 0, 'N'); setPixel(t, 8, 0, 'N'); setPixel(t, 10, 0, 'N'); // pontas da coroa
+    fillRect(t, 5, 1, 7, 2, 'Y');              // cabelo loiro / coroa
+    fillRect(t, 4, 3, 8, 3, 'S');               // rosto
+    setPixel(t, 6, 4, 'K'); setPixel(t, 9, 4, 'K');
+    fillRect(t, 3, 6, 10, 1, 'Y');              // cabelo caindo nos ombros
+    fillRect(t, 3, 7, 10, 5, 'E');              // vestido rosa
+    fillRect(t, 2, 11, 12, 1, 'E');             // barra do vestido larga
+    return withWalkCycle(t, 'E');
   }
 
   function buildBowser() {
-    var idle = newGrid();
-    setPixel(idle, 4, 0, 'W'); setPixel(idle, 11, 0, 'W');
-    fillRect(idle, 4, 1, 8, 3, 'O');
-    setPixel(idle, 6, 2, 'R'); setPixel(idle, 9, 2, 'R');
-    fillRect(idle, 5, 3, 6, 1, 'W');
-    fillRect(idle, 3, 4, 10, 2, 'O');
-    fillRect(idle, 2, 6, 12, 1, 'G');
-    fillRect(idle, 1, 7, 14, 3, 'G');
-    setPixel(idle, 3, 8, 'K'); setPixel(idle, 6, 8, 'K'); setPixel(idle, 9, 8, 'K'); setPixel(idle, 12, 8, 'K');
-    fillRect(idle, 4, 10, 8, 2, 'W');
-    fillRect(idle, 4, 12, 8, 4, 'O');
-
-    // Acao: cuspindo fogo (boca aberta + chama)
-    var fire = cloneGrid(idle);
-    clearRect(fire, 5, 3, 6, 1);
-    fillRect(fire, 5, 3, 6, 2, 'K');          // boca escancarada
-    fillRect(fire, 11, 3, 4, 3, 'F');          // chama saindo
-    fillRect(fire, 14, 4, 2, 2, 'R');
-
-    return [idle, fire];
+    var t = newGrid();
+    setPixel(t, 4, 0, 'W'); setPixel(t, 11, 0, 'W'); // chifres
+    fillRect(t, 4, 1, 8, 3, 'O');                // cabeca laranja
+    setPixel(t, 6, 2, 'R'); setPixel(t, 9, 2, 'R'); // olhos vermelhos
+    fillRect(t, 5, 3, 6, 1, 'W');                 // dentes
+    fillRect(t, 3, 4, 10, 2, 'O');                // pescoco/ombros
+    fillRect(t, 2, 6, 12, 1, 'G');                // topo do casco
+    fillRect(t, 1, 7, 14, 3, 'G');                // casco verde largo
+    setPixel(t, 3, 8, 'K'); setPixel(t, 6, 8, 'K'); setPixel(t, 9, 8, 'K'); setPixel(t, 12, 8, 'K'); // pontas do casco
+    fillRect(t, 4, 10, 8, 2, 'W');                // barriga branca
+    return withWalkCycle(t, 'O');
   }
 
   function buildYoshi() {
-    var idle = newGrid();
-    fillRect(idle, 4, 1, 8, 3, 'G');
-    setPixel(idle, 6, 2, 'W'); setPixel(idle, 9, 2, 'W');
-    fillRect(idle, 5, 4, 6, 1, 'O');
-    fillRect(idle, 3, 5, 10, 2, 'G');
-    fillRect(idle, 2, 7, 12, 1, 'R');
-    fillRect(idle, 2, 8, 12, 2, 'G');
-    fillRect(idle, 4, 10, 8, 2, 'W');
-    fillRect(idle, 4, 12, 8, 4, 'O');
-
-    // Acao: lingua comprida pra fora (Yoshi engole tudo com a lingua)
-    var tongue = cloneGrid(idle);
-    fillRect(tongue, 11, 4, 5, 1, 'E');
-
-    return [idle, tongue];
+    var t = newGrid();
+    fillRect(t, 4, 1, 8, 3, 'G');                // cabeca verde
+    setPixel(t, 6, 2, 'W'); setPixel(t, 9, 2, 'W'); // olhos brancos
+    fillRect(t, 5, 4, 6, 1, 'O');                 // focinho/boca laranja
+    fillRect(t, 3, 5, 10, 2, 'G');                // pescoco
+    fillRect(t, 2, 7, 12, 1, 'R');                 // sela vermelha
+    fillRect(t, 2, 8, 12, 2, 'G');                 // corpo
+    fillRect(t, 4, 10, 8, 2, 'W');                 // barriga branca
+    return withWalkCycle(t, 'O');
   }
 
   function buildLink() {
-    var idle = newGrid();
-    fillRect(idle, 6, 0, 4, 1, 'G');
-    fillRect(idle, 4, 1, 8, 2, 'G');
-    fillRect(idle, 4, 3, 8, 3, 'S');
-    setPixel(idle, 6, 4, 'K'); setPixel(idle, 9, 4, 'K');
-    fillRect(idle, 3, 6, 10, 2, 'G');
-    fillRect(idle, 3, 8, 10, 3, 'G');
-    fillRect(idle, 1, 8, 2, 4, 'N');
-    setPixel(idle, 1, 9, 'B');
-    fillRect(idle, 13, 7, 1, 5, 'N');
-    fillRect(idle, 6, 12, 4, 4, 'D');
-
-    // Acao: golpe de espada (arco de ataque a frente)
-    var slash = cloneGrid(idle);
-    clearRect(slash, 13, 7, 1, 5);
-    setPixel(slash, 13, 5, 'N'); setPixel(slash, 14, 7, 'N'); setPixel(slash, 14, 9, 'N');
-    fillRect(slash, 14, 6, 2, 1, 'W');
-    fillRect(slash, 15, 8, 1, 2, 'W');
-
-    return [idle, slash];
+    var t = newGrid();
+    fillRect(t, 6, 0, 4, 1, 'G');                 // ponta do gorro
+    fillRect(t, 4, 1, 8, 2, 'G');                 // gorro
+    fillRect(t, 4, 3, 8, 3, 'S');                 // rosto
+    setPixel(t, 6, 4, 'K'); setPixel(t, 9, 4, 'K');
+    fillRect(t, 3, 6, 10, 2, 'G');                 // tunica ombros
+    fillRect(t, 3, 8, 10, 3, 'G');                 // tunica
+    fillRect(t, 1, 8, 2, 4, 'N');                  // escudo (prata) a esquerda
+    setPixel(t, 1, 9, 'B');                        // detalhe azul no escudo
+    fillRect(t, 13, 7, 1, 5, 'N');                 // espada a direita
+    return withWalkCycle(t, 'D');
   }
 
   function buildSamus() {
-    var idle = newGrid();
-    fillRect(idle, 4, 0, 8, 3, 'O');
-    fillRect(idle, 4, 2, 8, 1, 'K');
-    fillRect(idle, 3, 3, 10, 2, 'O');
-    fillRect(idle, 2, 5, 12, 2, 'O');
-    setPixel(idle, 3, 5, 'Y'); setPixel(idle, 12, 5, 'Y');
-    fillRect(idle, 4, 7, 8, 4, 'O');
-    fillRect(idle, 6, 9, 4, 1, 'Y');
-    fillRect(idle, 4, 12, 8, 4, 'O');
-
-    // Acao: Morph Ball (vira uma esfera - transformacao mais icônica da franquia)
-    var morphBall = newGrid();
-    fillCircle(morphBall, 8, 10, 5, 'O');
-    fillCircle(morphBall, 8, 10, 2, 'Y');
-    setPixel(morphBall, 5, 7, 'K'); setPixel(morphBall, 11, 7, 'K');
-
-    return [idle, morphBall];
+    var t = newGrid();
+    fillRect(t, 4, 0, 8, 3, 'O');                  // capacete laranja
+    fillRect(t, 4, 2, 8, 1, 'K');                  // viseira
+    fillRect(t, 3, 3, 10, 2, 'O');                 // capacete largo
+    fillRect(t, 2, 5, 12, 2, 'O');                 // ombreiras largas
+    setPixel(t, 3, 5, 'Y'); setPixel(t, 12, 5, 'Y'); // detalhe amarelo nas ombreiras
+    fillRect(t, 4, 7, 8, 4, 'O');                   // peitoral/traje
+    fillRect(t, 6, 9, 4, 1, 'Y');                   // faixa amarela na cintura
+    return withWalkCycle(t, 'O');
   }
 
   function buildDonkeyKong() {
-    var idle = newGrid();
-    fillRect(idle, 4, 0, 8, 3, 'D');
-    fillRect(idle, 3, 2, 2, 2, 'D'); fillRect(idle, 11, 2, 2, 2, 'D');
-    fillRect(idle, 5, 3, 6, 2, 'S');
-    setPixel(idle, 6, 4, 'K'); setPixel(idle, 9, 4, 'K');
-    fillRect(idle, 3, 5, 10, 2, 'D');
-    fillRect(idle, 3, 7, 10, 1, 'R');
-    fillRect(idle, 5, 8, 2, 1, 'R'); fillRect(idle, 9, 8, 2, 1, 'R');
-    fillRect(idle, 3, 9, 10, 3, 'D');
-    fillRect(idle, 6, 12, 4, 4, 'D');
-
-    // Acao: jogando barril (bracos erguidos segurando um barril - DK arcade)
-    var throwBarrel = cloneGrid(idle);
-    fillRect(throwBarrel, 2, 1, 3, 3, 'D');
-    fillCircle(throwBarrel, 8, 1, 3, 'D');
-    setPixel(throwBarrel, 6, 0, 'K'); setPixel(throwBarrel, 10, 0, 'K');
-    fillRect(throwBarrel, 11, 1, 3, 3, 'D');
-
-    return [idle, throwBarrel];
-  }
-
-  function buildKirby() {
-    var idle = newGrid();
-    fillCircle(idle, 8, 8, 6, 'E');
-    fillRect(idle, 2, 11, 3, 2, 'R');
-    fillRect(idle, 11, 11, 3, 2, 'R');
-    setPixel(idle, 5, 7, 'K'); setPixel(idle, 10, 7, 'K');
-    setPixel(idle, 4, 9, 'R'); setPixel(idle, 11, 9, 'R');
-
-    // Acao: inalando (boca bem aberta - habilidade de copia do Kirby)
-    var inhale = cloneGrid(idle);
-    fillCircle(inhale, 8, 9, 3, 'K');
-    setPixel(inhale, 2, 9, 'W'); setPixel(inhale, 1, 8, 'W'); // "sugado" para dentro
-
-    return [idle, inhale];
-  }
-
-  function buildSpark() {
-    var idle = newGrid();
-    fillCircle(idle, 8, 9, 6, 'Y');
-    fillRect(idle, 3, 4, 2, 4, 'Y');
-    fillRect(idle, 11, 4, 2, 4, 'Y');
-    setPixel(idle, 3, 3, 'K'); setPixel(idle, 12, 3, 'K');
-    fillRect(idle, 5, 9, 2, 1, 'R');
-    fillRect(idle, 9, 9, 2, 1, 'R');
-
-    // Acao: Trovoada (Thunderbolt) - raios saindo do corpo
-    var thunder = cloneGrid(idle);
-    setPixel(thunder, 1, 2, 'Y'); setPixel(thunder, 2, 3, 'W'); setPixel(thunder, 0, 5, 'Y');
-    setPixel(thunder, 14, 2, 'Y'); setPixel(thunder, 13, 3, 'W'); setPixel(thunder, 15, 5, 'Y');
-    setPixel(thunder, 8, 1, 'W'); setPixel(thunder, 7, 0, 'Y');
-
-    return [idle, thunder];
+    var t = newGrid();
+    fillRect(t, 4, 0, 8, 3, 'D');                  // cabeca peluda
+    fillRect(t, 3, 2, 2, 2, 'D'); fillRect(t, 11, 2, 2, 2, 'D'); // orelhas
+    fillRect(t, 5, 3, 6, 2, 'S');                   // rosto
+    setPixel(t, 6, 4, 'K'); setPixel(t, 9, 4, 'K');
+    fillRect(t, 3, 5, 10, 2, 'D');                  // pescoco/ombros peludos
+    fillRect(t, 3, 7, 10, 1, 'R');                  // topo da gravata
+    fillRect(t, 5, 8, 2, 1, 'R'); fillRect(t, 9, 8, 2, 1, 'R'); // no da gravata
+    fillRect(t, 3, 9, 10, 3, 'D');                  // peito peludo
+    return withWalkCycle(t, 'D');
   }
 
   function buildMegaman() {
-    var idle = newGrid();
-    fillRect(idle, 4, 0, 8, 3, 'B');
-    fillRect(idle, 3, 1, 1, 2, 'B'); fillRect(idle, 12, 1, 1, 2, 'B');
-    fillRect(idle, 5, 3, 6, 2, 'W');
-    setPixel(idle, 7, 4, 'R'); setPixel(idle, 8, 4, 'R');
-    fillRect(idle, 3, 5, 10, 2, 'B');
-    fillRect(idle, 2, 7, 12, 3, 'B');
-    fillRect(idle, 5, 8, 6, 1, 'N');
-    fillRect(idle, 1, 10, 3, 2, 'N');
-    fillRect(idle, 6, 12, 4, 4, 'B');
-
-    // Acao: disparando o Mega Buster (projetil saindo do canhao)
-    var shoot = cloneGrid(idle);
-    fillRect(shoot, 14, 10, 2, 2, 'C');
-    fillRect(shoot, 12, 10, 2, 1, 'W');
-
-    return [idle, shoot];
+    var t = newGrid();
+    fillRect(t, 4, 0, 8, 3, 'B');                   // capacete azul
+    fillRect(t, 3, 1, 1, 2, 'B'); fillRect(t, 12, 1, 1, 2, 'B'); // "orelhas" do capacete
+    fillRect(t, 5, 3, 6, 2, 'W');                    // viseira branca
+    setPixel(t, 7, 4, 'R'); setPixel(t, 8, 4, 'R');  // joia vermelha
+    fillRect(t, 3, 5, 10, 2, 'B');                   // pescoco/ombros
+    fillRect(t, 2, 7, 12, 3, 'B');                   // armadura do peito
+    fillRect(t, 5, 8, 6, 1, 'N');                    // detalhe prata no peito
+    fillRect(t, 1, 10, 3, 2, 'N');                   // buster (canhao) no braco
+    return withWalkCycle(t, 'B');
   }
 
   function buildSonic() {
-    var idle = newGrid();
-    fillRect(idle, 4, 2, 8, 3, 'B');
-    fillRect(idle, 2, 0, 3, 3, 'B'); fillRect(idle, 11, 0, 3, 3, 'B');
-    fillRect(idle, 5, 4, 6, 2, 'S');
-    setPixel(idle, 6, 4, 'W'); setPixel(idle, 9, 4, 'W');
-    fillRect(idle, 3, 6, 10, 2, 'B');
-    fillRect(idle, 2, 8, 12, 3, 'B');
-    fillRect(idle, 5, 9, 6, 2, 'S');
-    fillRect(idle, 4, 12, 3, 3, 'R'); fillRect(idle, 9, 12, 3, 3, 'R');
-
-    // Acao: Spin Dash - vira uma bola espinhenta girando
-    var spinBall = newGrid();
-    fillCircle(spinBall, 8, 9, 6, 'B');
-    setPixel(spinBall, 2, 6, 'B'); setPixel(spinBall, 1, 9, 'B'); setPixel(spinBall, 2, 12, 'B');
-    setPixel(spinBall, 13, 6, 'B'); setPixel(spinBall, 14, 9, 'B'); setPixel(spinBall, 13, 12, 'B');
-    fillRect(spinBall, 6, 14, 4, 2, 'R');
-
-    return [idle, spinBall];
+    var t = newGrid();
+    fillRect(t, 4, 2, 8, 3, 'B');                    // cabeca azul
+    fillRect(t, 2, 0, 3, 3, 'B'); fillRect(t, 11, 0, 3, 3, 'B'); // espinhos atras da cabeca
+    fillRect(t, 5, 4, 6, 2, 'S');                     // focinho bege
+    setPixel(t, 6, 4, 'W'); setPixel(t, 9, 4, 'W');   // olhos
+    fillRect(t, 3, 6, 10, 2, 'B');                    // pescoco/ombros
+    fillRect(t, 2, 8, 12, 3, 'B');                    // corpo
+    fillRect(t, 5, 9, 6, 2, 'S');                     // barriga bege
+    return withWalkCycle(t, 'R');
   }
 
   function buildWario() {
-    var idle = newGrid();
-    fillRect(idle, 5, 0, 6, 3, 'Y');
-    fillRect(idle, 4, 3, 8, 3, 'S');
-    setPixel(idle, 6, 4, 'K'); setPixel(idle, 9, 4, 'K');
-    fillRect(idle, 3, 6, 10, 2, 'D');
-    setPixel(idle, 2, 6, 'D'); setPixel(idle, 13, 6, 'D');
-    fillRect(idle, 5, 8, 6, 1, 'S');
-    fillRect(idle, 3, 9, 10, 2, 'Y');
-    fillRect(idle, 3, 11, 10, 1, 'P');
-    fillRect(idle, 6, 12, 4, 4, 'P');
-
-    // Acao: investida de ombro (Wario Shoulder Bash) - corpo inclinado pra frente
-    var bash = newGrid();
-    fillRect(bash, 7, 1, 6, 3, 'Y');
-    fillRect(bash, 6, 4, 8, 3, 'S');
-    setPixel(bash, 9, 5, 'K'); setPixel(bash, 12, 5, 'K');
-    fillRect(bash, 5, 7, 10, 2, 'D');
-    fillRect(bash, 7, 9, 6, 1, 'S');
-    fillRect(bash, 5, 10, 10, 2, 'Y');
-    fillRect(bash, 5, 12, 10, 1, 'P');
-    fillRect(bash, 8, 13, 4, 3, 'P');
-
-    return [idle, bash];
+    var t = newGrid();
+    fillRect(t, 5, 0, 6, 3, 'Y');                     // bone amarelo
+    fillRect(t, 4, 3, 8, 3, 'S');                      // rosto largo
+    setPixel(t, 6, 4, 'K'); setPixel(t, 9, 4, 'K');
+    fillRect(t, 3, 6, 10, 2, 'D');                     // bigode grande e largo
+    setPixel(t, 2, 6, 'D'); setPixel(t, 13, 6, 'D');   // pontas do bigode
+    fillRect(t, 5, 8, 6, 1, 'S');
+    fillRect(t, 3, 9, 10, 2, 'Y');                      // camisa amarela
+    fillRect(t, 3, 11, 10, 1, 'P');                     // macacao roxo
+    return withWalkCycle(t, 'P');
   }
 
   function buildAlexKidd() {
-    var idle = newGrid();
-    fillRect(idle, 5, 0, 6, 2, 'D');
-    fillRect(idle, 2, 2, 2, 2, 'S'); fillRect(idle, 12, 2, 2, 2, 'S');
-    fillRect(idle, 4, 2, 8, 4, 'S');
-    setPixel(idle, 6, 4, 'K'); setPixel(idle, 9, 4, 'K');
-    fillRect(idle, 3, 7, 10, 2, 'R');
-    fillRect(idle, 3, 9, 10, 1, 'W');
-    fillRect(idle, 3, 10, 10, 2, 'R');
-    fillRect(idle, 6, 12, 4, 4, 'R');
+    var t = newGrid();
+    fillRect(t, 5, 0, 6, 2, 'D');                       // cabelo castanho
+    fillRect(t, 2, 2, 2, 2, 'S'); fillRect(t, 12, 2, 2, 2, 'S'); // orelhas grandes
+    fillRect(t, 4, 2, 8, 4, 'S');                        // rosto grande (cabeca grande)
+    setPixel(t, 6, 4, 'K'); setPixel(t, 9, 4, 'K');
+    fillRect(t, 3, 7, 10, 2, 'R');                       // gi vermelho ombros
+    fillRect(t, 3, 9, 10, 1, 'W');                       // faixa branca
+    fillRect(t, 3, 10, 10, 2, 'R');                      // gi
+    return withWalkCycle(t, 'R');
+  }
 
-    // Acao: soco (golpe de artes marciais - Alex Kidd luta com socos)
-    var punch = cloneGrid(idle);
-    fillRect(punch, 13, 7, 3, 2, 'S');
-    setPixel(punch, 15, 8, 'W');
+  function buildKirby() {
+    var frameA = newGrid();
+    fillCircle(frameA, 8, 8, 6, 'E');
+    fillRect(frameA, 2, 11, 3, 2, 'R');
+    fillRect(frameA, 11, 11, 3, 2, 'R');
+    setPixel(frameA, 5, 7, 'K'); setPixel(frameA, 10, 7, 'K');
+    setPixel(frameA, 4, 9, 'R'); setPixel(frameA, 11, 9, 'R');
 
-    return [idle, punch];
+    var frameB = cloneGrid(frameA);
+    fillRect(frameB, 1, 10, 3, 3, 'R');
+    fillRect(frameB, 12, 10, 3, 3, 'R');
+
+    return [frameA, frameB];
+  }
+
+  function buildSpark() {
+    var frameA = newGrid();
+    fillCircle(frameA, 8, 9, 6, 'Y');
+    fillRect(frameA, 3, 4, 2, 4, 'Y');
+    fillRect(frameA, 11, 4, 2, 4, 'Y');
+    setPixel(frameA, 3, 3, 'K'); setPixel(frameA, 12, 3, 'K');
+    fillRect(frameA, 5, 9, 2, 1, 'R');
+    fillRect(frameA, 9, 9, 2, 1, 'R');
+
+    var frameB = cloneGrid(frameA);
+    fillRect(frameB, 5, 9, 2, 2, 'R');
+    fillRect(frameB, 9, 9, 2, 2, 'R');
+
+    return [frameA, frameB];
   }
 
   function buildShip(primaryColor) {
-    var idle = newGrid();
-    fillRect(idle, 7, 1, 2, 3, primaryColor);
-    fillRect(idle, 5, 4, 6, 3, primaryColor);
-    fillRect(idle, 3, 7, 10, 3, primaryColor);
-    fillRect(idle, 6, 10, 4, 2, 'N');
-    fillRect(idle, 6, 12, 4, 2, 'F');
+    var base = newGrid();
+    fillRect(base, 7, 1, 2, 3, primaryColor);
+    fillRect(base, 5, 4, 6, 3, primaryColor);
+    fillRect(base, 3, 7, 10, 3, primaryColor);
+    fillRect(base, 6, 10, 4, 2, 'N');
 
-    // Acao: barrel roll / boost - propulsor forte + asas "giradas" (trocadas)
-    var boost = newGrid();
-    fillRect(boost, 7, 1, 2, 3, primaryColor);
-    fillRect(boost, 5, 4, 6, 3, primaryColor);
-    fillRect(boost, 3, 7, 10, 3, 'N');       // asas invertidas (efeito de giro)
-    fillRect(boost, 6, 10, 4, 2, primaryColor);
-    fillRect(boost, 5, 12, 6, 3, 'F');        // chama maior do impulso
+    var frameA = cloneGrid(base);
+    fillRect(frameA, 6, 12, 4, 2, 'F');
 
-    return [idle, boost];
+    var frameB = cloneGrid(base);
+    fillRect(frameB, 7, 12, 2, 3, 'F');
+
+    return [frameA, frameB];
   }
 
   function buildCar(bodyColor) {
-    var idle = newGrid();
-    fillRect(idle, 3, 6, 10, 4, bodyColor);
-    fillRect(idle, 6, 4, 5, 3, 'C');
-    fillCircle(idle, 5, 11, 2, 'K');
-    fillCircle(idle, 11, 11, 2, 'K');
+    var base = newGrid();
+    fillRect(base, 3, 6, 10, 4, bodyColor);
+    fillRect(base, 6, 4, 5, 3, 'C');
+    var frameA = cloneGrid(base);
+    fillCircle(frameA, 5, 11, 2, 'K');
+    fillCircle(frameA, 11, 11, 2, 'K');
 
-    // Acao: turbo boost - rastro de velocidade atras do carro
-    var boost = cloneGrid(idle);
-    fillRect(boost, 0, 7, 3, 1, 'W');
-    fillRect(boost, 0, 9, 2, 1, 'W');
-    fillCircle(boost, 5, 11, 2, 'N');
-    fillCircle(boost, 11, 11, 2, 'N');
+    var frameB = cloneGrid(base);
+    fillCircle(frameB, 5, 11, 2, 'N');
+    fillCircle(frameB, 11, 11, 2, 'N');
 
-    return [idle, boost];
+    return [frameA, frameB];
   }
 
-  // Homenagens estilizadas, pesquisadas uma a uma para manter cores e a
-  // ACAO caracteristica de cada personagem no jogo original (nao so andar).
-  // Foco em Nintendo (NES/SNES/N64) e Sega Master System, por pedido.
+  // Homenagens estilizadas, pesquisadas uma a uma para manter as cores e
+  // detalhes que tornam cada personagem reconhecivel. Foco em Nintendo
+  // (NES/SNES/N64) e Sega Master System, por pedido.
   var SPRITES = {
-    mario: { frames: buildMario(), move: 'jump', jumpHeight: 16 },
-    luigi: { frames: buildLuigi(), move: 'jump', jumpHeight: 28 },
-    peach: { frames: buildPeach(), move: 'float' },
-    bowser: { frames: buildBowser(), move: 'bob' },
-    yoshi: { frames: buildYoshi(), move: 'bob' },
-    link: { frames: buildLink(), move: 'bob' },
-    samus: { frames: buildSamus(), move: 'flat' },
-    donkeykong: { frames: buildDonkeyKong(), move: 'bob' },
-    kirby: { frames: buildKirby(), move: 'float' },
-    pikachu: { frames: buildSpark(), move: 'bob' },
-    megaman: { frames: buildMegaman(), move: 'bob' },
-    sonic: { frames: buildSonic(), move: 'flat' },
-    wario: { frames: buildWario(), move: 'bob' },
-    alexkidd: { frames: buildAlexKidd(), move: 'bob' },
-    starfox: { frames: buildShip('W'), move: 'fly' },
-    fzero: { frames: buildCar('B'), move: 'drive' }
+    mario: { frames: buildMario(), type: 'walk' },              // Super Mario Bros (NES)
+    luigi: { frames: buildLuigi(), type: 'walk' },              // Super Mario Bros (NES)
+    peach: { frames: buildPeach(), type: 'walk' },              // Super Mario Bros (NES/SNES)
+    bowser: { frames: buildBowser(), type: 'walk' },            // Super Mario Bros (NES/SNES)
+    yoshi: { frames: buildYoshi(), type: 'walk' },              // Super Mario World (SNES)
+    link: { frames: buildLink(), type: 'walk' },                // The Legend of Zelda (NES/SNES)
+    samus: { frames: buildSamus(), type: 'walk' },              // Metroid (NES/SNES)
+    donkeykong: { frames: buildDonkeyKong(), type: 'walk' },    // Donkey Kong (NES)
+    kirby: { frames: buildKirby(), type: 'hop' },               // Kirby (NES/SNES/N64)
+    pikachu: { frames: buildSpark(), type: 'walk' },            // Pokemon (Game Boy/N64)
+    megaman: { frames: buildMegaman(), type: 'walk' },          // Mega Man (NES)
+    sonic: { frames: buildSonic(), type: 'walk' },              // Sonic the Hedgehog (Master System)
+    wario: { frames: buildWario(), type: 'walk' },              // Wario Land (Game Boy)
+    alexkidd: { frames: buildAlexKidd(), type: 'walk' },        // Alex Kidd in Miracle World (Master System)
+    starfox: { frames: buildShip('W'), type: 'fly' },           // Star Fox (SNES)
+    fzero: { frames: buildCar('B'), type: 'drive' }             // F-Zero - Blue Falcon (SNES)
   };
 
   var SPRITE_KEYS = Object.keys(SPRITES);
@@ -460,8 +359,7 @@
   SPRITE_KEYS.forEach(function (key) {
     PARSED_SPRITES[key] = {
       frames: SPRITES[key].frames.map(parseFrame),
-      move: SPRITES[key].move,
-      jumpHeight: SPRITES[key].jumpHeight || 20
+      type: SPRITES[key].type
     };
   });
 
@@ -474,14 +372,14 @@
       x: x,
       speed: 0.45 + Math.random() * 0.35,
       key: randomSpriteKey(),
-      actionTick: Math.floor(Math.random() * 60),
+      frameTick: Math.floor(Math.random() * 100),
       bob: Math.random() * Math.PI * 2
     };
   }
 
   // Densidade proporcional a largura da tela, com limite para nao poluir.
-  var HERO_SPACING_PX = 130;
-  var numHeroes = Math.min(12, Math.max(6, Math.round(canvas.width / HERO_SPACING_PX)));
+  var HERO_SPACING_PX = 70;
+  var numHeroes = Math.min(18, Math.max(8, Math.round(canvas.width / HERO_SPACING_PX)));
   var heroes = [];
   for (var h = 0; h < numHeroes; h++) {
     heroes.push(spawnHero((h / numHeroes) * (canvas.width + 200) - 100));
@@ -506,62 +404,53 @@
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     ctx.fillStyle = '#ffffff';
-    for (var i = 0; i < 30; i++) {
+    for (var i = 0; i < 20; i++) {
       var sx = (i * 35 + bgOffset * 0.1) % canvas.width;
-      var sy = 10 + (i * 7) % 90;
-      ctx.fillRect(sx, sy, 2, 2);
+      var sy = 5 + (i * 7) % 45;
+      ctx.fillRect(sx, sy, 1, 1);
     }
 
     ctx.fillStyle = '#1e293b';
     for (var m = 0; m < 8; m++) {
-      var mx = (m * 180 - bgOffset * 0.2) % (canvas.width + 180) - 90;
+      var mx = (m * 90 - bgOffset * 0.2) % (canvas.width + 90) - 45;
       ctx.beginPath();
-      ctx.moveTo(mx, 160);
-      ctx.lineTo(mx + 90, 72);
-      ctx.lineTo(mx + 180, 160);
+      ctx.moveTo(mx, 80);
+      ctx.lineTo(mx + 45, 36);
+      ctx.lineTo(mx + 90, 80);
       ctx.fill();
     }
 
     ctx.fillStyle = '#334155';
-    ctx.fillRect(0, 160, canvas.width, 32);
+    ctx.fillRect(0, 80, canvas.width, 16);
     ctx.fillStyle = '#0f172a';
-    ctx.fillRect(0, 168, canvas.width, 4);
+    ctx.fillRect(0, 84, canvas.width, 2);
 
     heroes.forEach(function (h) {
       h.x += h.speed;
-      h.actionTick++;
+      h.frameTick++;
 
       var sprite = PARSED_SPRITES[h.key];
-      // A acao (frame 1) dispara periodicamente por ~18 ticks a cada ciclo,
-      // o resto do tempo mostra o frame parado/andando (frame 0).
-      var cyclePos = h.actionTick % 90;
-      var frameIndex = cyclePos < 18 ? 1 : 0;
+      var frameIndex = Math.floor(h.frameTick / 10) % sprite.frames.length;
       var y;
 
-      if (sprite.move === 'fly') {
-        y = 28;
-      } else if (sprite.move === 'drive') {
-        y = 96;
-      } else if (sprite.move === 'flat') {
-        y = 112;
-      } else if (sprite.move === 'float') {
-        h.bob = (h.bob + 0.04) % (Math.PI * 2);
-        y = 88 + Math.sin(h.bob) * 6;
-      } else if (sprite.move === 'jump') {
-        var t = (h.actionTick % 60) / 60;
-        y = 112 - Math.abs(Math.sin(t * Math.PI)) * sprite.jumpHeight;
-        frameIndex = t > 0.2 && t < 0.8 ? 1 : 0;
+      if (sprite.type === 'fly') {
+        y = 14;
+      } else if (sprite.type === 'drive') {
+        y = 48;
+      } else if (sprite.type === 'hop') {
+        h.bob = (h.bob + 0.07) % (Math.PI * 2);
+        y = 48 - Math.abs(Math.sin(h.bob)) * 6;
       } else {
         h.bob = (h.bob + 0.1) % (Math.PI * 2);
-        y = 96 + Math.sin(h.bob) * 4;
+        y = 48 + Math.sin(h.bob) * 2;
       }
 
       drawFrame(sprite.frames[frameIndex], Math.floor(h.x), Math.floor(y));
 
       if (h.x > canvas.width) {
-        h.x = -64;
+        h.x = -32;
         h.key = randomSpriteKey();
-        h.actionTick = 0;
+        h.frameTick = 0;
       }
     });
 
