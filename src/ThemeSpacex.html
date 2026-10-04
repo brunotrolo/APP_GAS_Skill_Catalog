@@ -1,0 +1,112 @@
+<style>
+  /* De docs/themes/DESIGN-spacex.md. O arquivo e explicito: "The brand has
+       no accent colors. Black and white do all the chromatic work" e
+       "The black-and-white-only rule is load-bearing" - nem um semantico
+       literal existe (sem danger/warn/info/success). --gold inverte por
+       modo (branco no escuro, preto no claro, igual OpenCode/Figma/Nike).
+       cat-1..6 usa so a escada de neutros do arquivo (canvas-night/
+       canvas-night-soft/hairline-on-dark/ink-mute), com 2 repeticoes
+       inevitaveis - um sistema sem nenhuma cor com matiz literalmente so
+       pode gerar uma ladder quase monocromatica; inventar matizes novos
+       quebraria a premissa central do arquivo. --purple reusa on-primary-
+       mute/ink-mute (tokens literalmente descritos como "barely
+       distinguishable... enough to suggest hierarchy") para diferenciar
+       sutilmente Curadoria de Interna sem introduzir cor. Botao CTA e
+       "ghost" (outline, nunca preenchido) no site real; nosso botao de
+       download preenchido usa o mesmo neutro invertido como aproximacao,
+       mesma logica ja aplicada ao BMW. Forma: rounded.pill (32px, "the
+       brand's signature button shape") em botoes/badges, rounded.sm (8px)
+       em cards. --heading-transform: uppercase e tracking positivo
+       (0.96px, o valor do proprio arquivo para texto pequeno em caixa
+       alta) - "every display tier renders in uppercase... never
+       sentence-case". --shadow-chunky: none (sem sombra/blur/glow em
+       lugar nenhum). Fonte: D-DIN-Bold/D-DIN; substituto literal do
+       proprio arquivo e Inter peso 700. */
+  :root[data-theme-family="spacex"][data-theme="dark"] {
+    --cat-1: #000000;
+    --cat-2: #0a0a0a;
+    --cat-3: #3a3a3f;
+    --cat-4: #5a5a5f;
+    --cat-5: #0a0a0a;
+    --cat-6: #3a3a3f;
+    --on-cat: #ffffff;
+    --bg-deep: #000000;
+    --bg-panel: #0a0a0a;
+    --bg-card: #0a0a0a;
+    --bg-card-hover: #3a3a3f;
+    --border-ink: #3a3a3f;
+    --text-main: #ffffff;
+    --gold: #ffffff;
+    --gold-glow: #3a3a3f;
+    --purple: #f0f0fa;
+    --terminal-green: #5a5a5f;
+    --danger: #3a3a3f;
+    --muted: #f0f0fa;
+    --info: #5a5a5f;
+    --warn: #3a3a3f;
+    --gold-glow-rgb: 58, 58, 63;
+    --terminal-green-rgb: 90, 90, 95;
+    --font-heading: 'Inter', 'Arial Narrow', Arial, Verdana, sans-serif;
+    --font-body: 'Inter', Arial, Verdana, sans-serif;
+    --font-display: 'Inter', 'Arial Narrow', Arial, Verdana, sans-serif;
+    --radius-s: 32px;
+    --radius-m: 8px;
+    --radius-pill: 32px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0.96px;
+    --heading-transform: uppercase;
+    --on-accent: #000000;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="spacex"][data-theme="light"] {
+    --cat-1: #000000;
+    --cat-2: #0a0a0a;
+    --cat-3: #3a3a3f;
+    --cat-4: #5a5a5f;
+    --cat-5: #0a0a0a;
+    --cat-6: #3a3a3f;
+    --on-cat: #ffffff;
+    --bg-deep: #ffffff;
+    --bg-panel: #f0f0fa;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f0f0fa;
+    --border-ink: #e0e0e8;
+    --text-main: #000000;
+    --gold: #000000;
+    --gold-glow: #5a5a5f;
+    --purple: #5a5a5f;
+    --terminal-green: #5a5a5f;
+    --danger: #3a3a3f;
+    --muted: #5a5a5f;
+    --info: #5a5a5f;
+    --warn: #3a3a3f;
+    --gold-glow-rgb: 90, 90, 95;
+    --terminal-green-rgb: 90, 90, 95;
+    --font-heading: 'Inter', 'Arial Narrow', Arial, Verdana, sans-serif;
+    --font-body: 'Inter', Arial, Verdana, sans-serif;
+    --font-display: 'Inter', 'Arial Narrow', Arial, Verdana, sans-serif;
+    --radius-s: 32px;
+    --radius-m: 8px;
+    --radius-pill: 32px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0.96px;
+    --heading-transform: uppercase;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>

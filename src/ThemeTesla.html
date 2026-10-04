@@ -1,0 +1,108 @@
+<style>
+  /* De docs/themes/DESIGN-tesla.md. Brand = Electric Blue #3E6AE1, literal
+       e unico hue do sistema ("the only chromatic color in the entire
+       interface... used exclusively for primary action buttons"). O
+       arquivo explicita "no semantic color coding" (sem verde/vermelho/
+       amarelo literal) - por isso terminal-green/danger/warn reusam a
+       propria escada de cinzas do arquivo (graphite/pewter/silver-fog) em
+       vez de inventar cor, e --purple reusa o mesmo azul de --gold (nao
+       ha segundo hue - "intentionally monochrome-plus-one"). cat-1..6 usa
+       azul + os 5 tons de cinza documentados (carbon-dark/graphite/
+       pewter/silver-fog/pale-silver), unica ladder possivel num sistema
+       com 1 cor so. radius-pill NAO e 9999px: o arquivo probe
+       explicitamente "introduce rounded-pill buttons or large
+       border-radii" - badges/tags ficam no mesmo 4px das bordas de botao.
+       --border-ink usa o tom mais claro (cloud-gray) pois o arquivo pede
+       "no borders... separation is achieved through spacing, not lines".
+       --shadow-chunky: none ("avoids box-shadows entirely"). Fonte:
+       Universal Sans e proprietaria; o proprio arquivo ja documenta o
+       fallback real (-apple-system, Arial, sans-serif), sem precisar de
+       substituto aberto. */
+  :root[data-theme-family="tesla"][data-theme="dark"] {
+    --cat-1: #3E6AE1;
+    --cat-2: #171A20;
+    --cat-3: #393C41;
+    --cat-4: #5C5E62;
+    --cat-5: #8E8E8E;
+    --cat-6: #D0D1D2;
+    --on-cat: #ffffff;
+    --bg-deep: #171A20;
+    --bg-panel: #393C41;
+    --bg-card: #393C41;
+    --bg-card-hover: #5C5E62;
+    --border-ink: #5C5E62;
+    --text-main: #ffffff;
+    --gold: #3E6AE1;
+    --gold-glow: #3E6AE1;
+    --purple: #3E6AE1;
+    --terminal-green: #393C41;
+    --danger: #5C5E62;
+    --muted: #8E8E8E;
+    --info: #3E6AE1;
+    --warn: #8E8E8E;
+    --gold-glow-rgb: 62, 106, 225;
+    --terminal-green-rgb: 57, 60, 65;
+    --font-heading: 'Universal Sans Display', -apple-system, Arial, sans-serif;
+    --font-body: 'Universal Sans Text', -apple-system, Arial, sans-serif;
+    --font-display: 'Universal Sans Display', -apple-system, Arial, sans-serif;
+    --radius-s: 4px;
+    --radius-m: 12px;
+    --radius-pill: 4px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0px;
+    --heading-transform: none;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="tesla"][data-theme="light"] {
+    --cat-1: #3E6AE1;
+    --cat-2: #171A20;
+    --cat-3: #393C41;
+    --cat-4: #5C5E62;
+    --cat-5: #8E8E8E;
+    --cat-6: #D0D1D2;
+    --on-cat: #ffffff;
+    --bg-deep: #ffffff;
+    --bg-panel: #F4F4F4;
+    --bg-card: #ffffff;
+    --bg-card-hover: #EEEEEE;
+    --border-ink: #EEEEEE;
+    --text-main: #171A20;
+    --gold: #3E6AE1;
+    --gold-glow: #3E6AE1;
+    --purple: #3E6AE1;
+    --terminal-green: #393C41;
+    --danger: #5C5E62;
+    --muted: #5C5E62;
+    --info: #3E6AE1;
+    --warn: #8E8E8E;
+    --gold-glow-rgb: 62, 106, 225;
+    --terminal-green-rgb: 57, 60, 65;
+    --font-heading: 'Universal Sans Display', -apple-system, Arial, sans-serif;
+    --font-body: 'Universal Sans Text', -apple-system, Arial, sans-serif;
+    --font-display: 'Universal Sans Display', -apple-system, Arial, sans-serif;
+    --radius-s: 4px;
+    --radius-m: 12px;
+    --radius-pill: 4px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0px;
+    --heading-transform: none;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>
