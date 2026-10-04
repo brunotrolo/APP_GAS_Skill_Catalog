@@ -4,11 +4,6 @@
   var ctx = canvas.getContext('2d');
 
   // --- 1. Canvas em alta densidade (4K / Retina) -----------------------
-  // O HTML define o tamanho em pixels CSS (480x96), mas a resolucao interna
-  // de desenho (canvas.width/height) precisa ser multiplicada pelo
-  // devicePixelRatio para a tela nao borrar os sprites em monitores de
-  // alta densidade. Desenhamos sempre em unidades CSS (via ctx.setTransform)
-  // e deixamos o canvas fisico maior por baixo dos panos.
   var cssWidth = 480;
   var cssHeight = 96;
 
@@ -29,21 +24,44 @@
     resizeTimer = setTimeout(fitCanvasToDpr_, 150);
   });
 
-  // --- 2. Assets Hi-Bit via jsDelivr --------------------------------
-  // O Google Apps Script (HtmlService) nao serve arquivos estaticos de uma
-  // pasta do repositorio em tempo de execucao - so os arquivos .gs/.html
-  // enviados via clasp existem no app publicado. Por isso os spritesheets
-  // reais (PNG) ficam versionados em assets/sprites/ neste mesmo
-  // repositorio GitHub e sao carregados pelo cliente via jsDelivr, que serve
-  // o conteudo do GitHub com cabecalhos de CORS corretos para uso em canvas.
-  //
-  // ASSET_REF e fixado em um SHA de commit (nao em "main") porque o jsDelivr
-  // trata URLs com SHA como imutaveis e as mantem em cache para sempre -
-  // ou seja, um novo SHA e sempre um cache-miss automatico, sem precisar de
-  // purge manual de CDN. Sempre que assets/sprites/ mudar, atualize este
-  // valor para o novo SHA do commit correspondente.
+  // --- 2. Cores reativas ao tema ativo -----------------------------------
+  // A cena e desenhada em canvas puro (vetores/formas), entao ela recolore
+  // junto com qualquer um dos temas do app (ver THEME_LIST em
+  // ThemeController.html), lendo as mesmas CSS custom properties que o
+  // resto da UI usa.
+  var colors = {
+    skyTop: '#1b1033', skyBottom: '#0a0b16', aurora: '#2e8f7a',
+    stars: '#f3f4fc', moon: '#eef0fb', mountains: '#262a47',
+    mountainsFar: '#181a2c', ground: '#181a2c', groundLine: '#000000',
+    silhouette: '#05050a', gold: '#ffd84a'
+  };
+
+  function readColors_() {
+    var computed = getComputedStyle(document.documentElement);
+    function readVar(name, fallback) {
+      var value = computed.getPropertyValue(name).trim();
+      return value || fallback;
+    }
+    colors.skyBottom = readVar('--bg-deep', colors.skyBottom);
+    colors.aurora = readVar('--terminal-green', colors.aurora);
+    colors.stars = readVar('--text-main', colors.stars);
+    colors.moon = readVar('--text-main', colors.moon);
+    colors.mountains = readVar('--bg-card-hover', colors.mountains);
+    colors.mountainsFar = readVar('--bg-panel', colors.mountainsFar);
+    colors.ground = readVar('--bg-panel', colors.ground);
+    colors.groundLine = readVar('--border-ink', colors.groundLine);
+    colors.gold = readVar('--gold', colors.gold);
+  }
+  readColors_();
+  document.addEventListener('codexThemeChange', readColors_);
+
+  // --- 3. Corvos de Odin (Huginn e Muninn) --------------------------------
+  // Unicos bitmaps da cena - o resto e desenhado em canvas puro. Pack CC0
+  // "Pixel Raven" por Commander (OpenGameArt.org) - ver
+  // assets/sprites/LICENSES.md. Hospedados via jsDelivr apontando para este
+  // repositorio (o GAS HtmlService nao serve arquivos estaticos de pasta).
   var ASSET_REPO = 'brunotrolo/APP_GAS_Skill_Catalog';
-  var ASSET_REF = '435649e1eee62e1fd3c4bbe786f047cdcb0a573d'; // commit que adiciona os PNGs reais em assets/sprites/
+  var ASSET_REF = 'main'; // TODO: trocar para o SHA do commit que adiciona esta cena
 
   function spriteUrl_(relPath) {
     return 'https://cdn.jsdelivr.net/gh/' + ASSET_REPO + '@' + ASSET_REF + '/assets/sprites/' + relPath;
@@ -58,261 +76,211 @@
     return img;
   }
 
-  // --- 3. Catalogo de entidades (spritesheets reais CC0 da Kenney.nl) ----
-  // Cada entrada descreve um spritesheet de ciclo de animacao (corrida, voo,
-  // etc). "lane: ground" corre sobre a linha de chao do banner; "lane: air"
-  // oscila em trajetoria senoidal (amplitude/period) como as naves. Os PNGs
-  // reais ja estao em assets/sprites/ (packs CC0 "Pixel Platformer",
-  // "Top-down Shooter", "Racing Pack" e "Space Shooter Extension" da
-  // Kenney.nl - ver assets/sprites/LICENSES.md). Os valores de
-  // frameWidth/frameHeight/totalFrames abaixo batem exatamente com os
-  // spritesheets gerados a partir desses packs; se os arquivos forem
-  // trocados, atualize esses valores junto.
-  var ENTITY_CONFIGS = [
-    {
-      id: 'platformer_hero_run',
-      category: 'PLATFORMER',
-      src: spriteUrl_('platformer/hero-run.png'),
-      frameWidth: 24, frameHeight: 24, totalFrames: 2, fps: 4,
-      scale: 3, lane: 'ground', speed: 42
-    },
-    {
-      id: 'gunner_soldier_run',
-      category: 'GUNNER',
-      src: spriteUrl_('gunner/soldier-run.png'),
-      frameWidth: 52, frameHeight: 43, totalFrames: 3, fps: 6,
-      scale: 1.8, lane: 'ground', speed: 55
-    },
-    {
-      id: 'racer_car_drive',
-      category: 'RACER',
-      src: spriteUrl_('racer/car-drive.png'),
-      frameWidth: 131, frameHeight: 71, totalFrames: 1, fps: 1,
-      scale: 0.9, lane: 'ground', speed: 90
-    },
-    {
-      id: 'spaceship_fighter_fly',
-      category: 'SPACESHIP',
-      src: spriteUrl_('spaceship/fighter-fly.png'),
-      frameWidth: 104, frameHeight: 106, totalFrames: 2, fps: 6,
-      scale: 0.7, lane: 'air', speed: 70, amplitude: 14, period: 2.5
-    },
-    // Tipo de emergencia: homenagem original desenhada em blocos de pixel via
-    // canvas (nenhum bitmap/sprite de jogo real e copiado), usado enquanto os
-    // spritesheets reais acima ainda nao existem ou falham ao carregar.
-    {
-      id: 'fallback_runner',
-      category: 'GUNNER',
-      fallback: true,
-      frameWidth: 12, frameHeight: 18, totalFrames: 4, fps: 8,
-      scale: 3, lane: 'ground', speed: 48
-    }
-  ];
+  var huginn = loadImageSafe_(spriteUrl_('raven/huginn.png'));
+  var muninn = loadImageSafe_(spriteUrl_('raven/muninn.png'));
 
-  var REAL_CONFIGS = ENTITY_CONFIGS.filter(function (c) { return !c.fallback; });
-  var FALLBACK_CONFIG = ENTITY_CONFIGS.filter(function (c) { return c.fallback; })[0];
+  function drawRaven_(img, x, y, h) {
+    if (img.__failed || !img.complete || img.naturalWidth === 0) return;
+    var w = h * (img.naturalWidth / img.naturalHeight);
+    ctx.drawImage(img, Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+  }
 
-  REAL_CONFIGS.forEach(function (c) { c.image = loadImageSafe_(c.src); });
+  // --- 4. Elementos proceduais da cena (vetores puros, sem assets) --------
+  var GROUND_Y = 80;
 
-  // Da um tempo para o load/erro das imagens reais resolver; depois disso,
-  // se nenhuma carregou com sucesso, o spawn passa a priorizar o fallback
-  // para o banner nunca parecer vazio durante a janela de sourcing dos
-  // assets (ver assets/sprites/LICENSES.md).
-  var realAssetsReady = false;
-  setTimeout(function () {
-    realAssetsReady = REAL_CONFIGS.some(function (c) {
-      return c.image.complete && c.image.naturalWidth > 0 && !c.image.__failed;
+  // Estrelas fixas (posicao estavel entre frames, so a opacidade pisca)
+  var STAR_COUNT = 28;
+  var stars = [];
+  for (var s = 0; s < STAR_COUNT; s++) {
+    stars.push({
+      x: (s * 53 + 17) % 480,
+      y: 4 + (s * 11) % 46,
+      phase: Math.random() * Math.PI * 2,
+      speed: 0.6 + Math.random() * 0.8
     });
-  }, 1500);
-
-  function pickEntityConfig_() {
-    var usableReal = REAL_CONFIGS.filter(function (c) {
-      return !c.image.__failed && (c.image.complete ? c.image.naturalWidth > 0 : true);
-    });
-    if (realAssetsReady && usableReal.length > 0) {
-      return usableReal[Math.floor(Math.random() * usableReal.length)];
-    }
-    if (usableReal.length > 0 && Math.random() < 0.5) {
-      return usableReal[Math.floor(Math.random() * usableReal.length)];
-    }
-    return FALLBACK_CONFIG;
   }
 
-  // --- 4. Entidade (instancia em cena) -----------------------------------
-  var GROUND_Y = 80; // o banner mantem 96px de altura total
-
-  function Entity(config) {
-    this.config = config;
-    this.direction = Math.random() < 0.5 ? 1 : -1;
-    var dw = config.frameWidth * config.scale;
-    this.x = this.direction === 1 ? -dw : cssWidth + dw;
-    this.frame = 0;
-    this.frameTimer = 0;
-    this.airBaseY = 10 + Math.random() * 30;
-    this.airPhase = Math.random() * Math.PI * 2;
-  }
-
-  Entity.prototype.update = function (dtSec) {
-    this.x += this.config.speed * this.direction * dtSec;
-    this.frameTimer += dtSec;
-    var frameDur = 1 / this.config.fps;
-    if (this.frameTimer >= frameDur) {
-      this.frameTimer -= frameDur;
-      this.frame = (this.frame + 1) % this.config.totalFrames;
-    }
-  };
-
-  Entity.prototype.isOffscreen = function () {
-    var margin = this.config.frameWidth * this.config.scale + 20;
-    return this.x < -margin || this.x > cssWidth + margin;
-  };
-
-  Entity.prototype.draw = function (ctx) {
-    var cfg = this.config;
-    var dw = cfg.frameWidth * cfg.scale;
-    var dh = cfg.frameHeight * cfg.scale;
-    var dy = cfg.lane === 'air'
-      ? this.airBaseY + Math.sin((performance.now() / 1000 / cfg.period) * Math.PI * 2 + this.airPhase) * cfg.amplitude
-      : GROUND_Y - dh;
-
-    if (cfg.fallback) {
-      drawFallbackRunner_(ctx, this.x, dy, dw, dh, this.frame, this.direction);
-      return;
-    }
-
-    var img = cfg.image;
-    if (!img || img.__failed || !img.complete || img.naturalWidth === 0) return;
-
-    var sx = this.frame * cfg.frameWidth;
-    ctx.save();
-    if (this.direction === -1) {
-      ctx.translate(this.x + dw, dy);
-      ctx.scale(-1, 1);
-      ctx.drawImage(img, sx, 0, cfg.frameWidth, cfg.frameHeight, 0, 0, dw, dh);
-    } else {
-      ctx.drawImage(img, sx, 0, cfg.frameWidth, cfg.frameHeight, this.x, dy, dw, dh);
-    }
-    ctx.restore();
-  };
-
-  // Figura de emergencia em blocos de pixel (sem bitmap externo), so para
-  // garantir que sempre haja algo em cena enquanto os PNGs reais nao estao
-  // disponiveis.
-  function drawFallbackRunner_(ctx, x, y, dw, dh, frame, direction) {
-    var u = dw / 4;
-    var legOffset = [0, 1, 0, -1][frame % 4] * u * 0.3;
-    ctx.save();
-    ctx.translate(x, y);
-    if (direction === -1) { ctx.scale(-1, 1); ctx.translate(-dw, 0); }
-    ctx.fillStyle = '#55672f';
-    ctx.fillRect(u * 0.5, u * 2.2, u * 2, u * 3.2);
-    ctx.fillStyle = '#d9a066';
-    ctx.fillRect(u * 0.9, u * 1.2, u * 1.2, u * 1.2);
-    ctx.fillStyle = '#3a4a2a';
-    ctx.fillRect(u * 0.5, u * 0.8, u * 2, u * 1);
-    ctx.fillStyle = '#2e3b22';
-    ctx.fillRect(u * 0.5, u * 5.2 + legOffset, u * 0.9, u * 1.6);
-    ctx.fillRect(u * 1.6 - legOffset, u * 5.2, u * 0.9, u * 1.6);
-    ctx.restore();
-  }
-
-  // --- 5. Fundo em parallax (procedural, reativo ao tema) ----------------
-  // Nao e realista garantir arte de cenario tileavel e verificada como CC0
-  // para os 4 generos nesta etapa - por isso o fundo continua procedural,
-  // reagindo as variaveis CSS do tema ativo (ver THEME_LIST em
-  // ThemeController.html); so os personagens/veiculos/naves acima usam
-  // spritesheets reais.
-  var bannerColors = { sky: '#0a0b16', stars: '#f3f4fc', mountains: '#262a47', ground: '#181a2c', groundLine: '#000000' };
-
-  function readBannerColors_() {
-    var computed = getComputedStyle(document.documentElement);
-    function readVar(name, fallback) {
-      var value = computed.getPropertyValue(name).trim();
-      return value || fallback;
-    }
-    bannerColors.sky = readVar('--bg-deep', bannerColors.sky);
-    bannerColors.stars = readVar('--text-main', bannerColors.stars);
-    bannerColors.mountains = readVar('--bg-card-hover', bannerColors.mountains);
-    bannerColors.ground = readVar('--bg-panel', bannerColors.ground);
-    bannerColors.groundLine = readVar('--border-ink', bannerColors.groundLine);
-  }
-  readBannerColors_();
-  document.addEventListener('codexThemeChange', readBannerColors_);
-
-  var layerOffsets = [0, 0, 0, 0];
-
-  function drawBackground_(dtSec) {
-    layerOffsets[0] += 2 * dtSec;
-    layerOffsets[1] += 10 * dtSec;
-    layerOffsets[2] += 25 * dtSec;
-    layerOffsets[3] += 55 * dtSec;
-
-    // Camada 1: ceu / gradiente profundo (quase estatico)
-    ctx.fillStyle = bannerColors.sky;
+  function drawSky_() {
+    var grad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
+    grad.addColorStop(0, colors.skyTop);
+    grad.addColorStop(1, colors.skyBottom);
+    ctx.fillStyle = grad;
     ctx.fillRect(0, 0, cssWidth, cssHeight);
+  }
 
-    // Camada 2: silhuetas distantes (estrelas + montanhas), ~0.2x
-    ctx.fillStyle = bannerColors.stars;
-    for (var i = 0; i < 20; i++) {
-      var sx = (i * 35 + layerOffsets[0]) % cssWidth;
-      var sy = 4 + (i * 7) % 45;
-      ctx.fillRect(sx, sy, 1, 1);
+  function drawAurora_(t) {
+    // Faixas suaves de "aurora" ondulando bem devagar - unico movimento
+    // continuo da cena, alem do piscar das estrelas.
+    ctx.save();
+    ctx.globalAlpha = 0.16;
+    ctx.strokeStyle = colors.aurora;
+    ctx.lineWidth = 3;
+    for (var band = 0; band < 2; band++) {
+      ctx.beginPath();
+      for (var x = 0; x <= cssWidth; x += 8) {
+        var y = 16 + band * 10 + Math.sin(x * 0.02 + t * 0.3 + band * 2) * 6;
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
     }
+    ctx.restore();
+  }
 
-    ctx.fillStyle = bannerColors.mountains;
-    for (var m = 0; m < 8; m++) {
-      var mx = (m * 90 - layerOffsets[1]) % (cssWidth + 90) - 45;
+  function drawStars_(t) {
+    stars.forEach(function (star) {
+      var twinkle = 0.4 + 0.6 * Math.abs(Math.sin(t * star.speed + star.phase));
+      ctx.globalAlpha = twinkle;
+      ctx.fillStyle = colors.stars;
+      ctx.fillRect(star.x, star.y, 1, 1);
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  function drawMoon_(t) {
+    var mx = 404, my = 22, r = 13;
+    var pulse = 0.85 + 0.15 * Math.sin(t * 0.5);
+    ctx.save();
+    ctx.globalAlpha = 0.18 * pulse;
+    ctx.fillStyle = colors.moon;
+    ctx.beginPath();
+    ctx.arc(mx, my, r * 2.1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = colors.moon;
+    ctx.beginPath();
+    ctx.arc(mx, my, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = colors.skyBottom;
+    ctx.globalAlpha = 0.5;
+    ctx.beginPath();
+    ctx.arc(mx - 4, my - 3, 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(mx + 3, my + 5, 1.6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawMountains_() {
+    // Cordilheira gelada ao fundo (camada mais clara/distante)
+    ctx.fillStyle = colors.mountainsFar;
+    for (var m = 0; m < 7; m++) {
+      var mx = m * 76 - 20;
       ctx.beginPath();
       ctx.moveTo(mx, GROUND_Y);
-      ctx.lineTo(mx + 45, 36);
-      ctx.lineTo(mx + 90, GROUND_Y);
+      ctx.lineTo(mx + 38, 44 - (m % 3) * 6);
+      ctx.lineTo(mx + 76, GROUND_Y);
       ctx.fill();
     }
-
-    // Camada 3: linha de chao / pista, ~0.5x
-    ctx.fillStyle = bannerColors.ground;
-    ctx.fillRect(0, GROUND_Y, cssWidth, 16);
-    ctx.fillStyle = bannerColors.groundLine;
-    ctx.fillRect(0, GROUND_Y + 4, cssWidth, 2);
-  }
-
-  function drawForegroundParticles_() {
-    // Camada 4: particulas esparsas de primeiro plano (sensacao de velocidade)
-    ctx.fillStyle = bannerColors.groundLine;
-    for (var p = 0; p < 6; p++) {
-      var px = (p * 80 - layerOffsets[3]) % (cssWidth + 80) - 40;
-      ctx.fillRect(px, GROUND_Y + 2, 10, 1);
+    // Cordilheira proxima (mais escura, sobreposta)
+    ctx.fillStyle = colors.mountains;
+    for (var n = 0; n < 6; n++) {
+      var nx = n * 92 - 10;
+      ctx.beginPath();
+      ctx.moveTo(nx, GROUND_Y);
+      ctx.lineTo(nx + 46, 54 - (n % 2) * 8);
+      ctx.lineTo(nx + 92, GROUND_Y);
+      ctx.fill();
     }
   }
 
-  // --- 6. Loop principal: spawn, update, despawn -------------------------
-  var MAX_ENTITIES = 6;
-  var entities = [];
-  var nextSpawnAt = 0;
-  var lastTs = null;
-
-  function maybeSpawn_(nowSec) {
-    if (nowSec < nextSpawnAt || entities.length >= MAX_ENTITIES) return;
-    entities.push(new Entity(pickEntityConfig_()));
-    nextSpawnAt = nowSec + 0.8 + Math.random() * 2.2;
+  function drawGround_() {
+    ctx.fillStyle = colors.ground;
+    ctx.fillRect(0, GROUND_Y, cssWidth, cssHeight - GROUND_Y);
+    ctx.fillStyle = colors.groundLine;
+    ctx.fillRect(0, GROUND_Y, cssWidth, 2);
   }
 
-  function tick_(ts) {
-    if (lastTs === null) lastTs = ts;
-    var dtSec = Math.min((ts - lastTs) / 1000, 0.05);
-    lastTs = ts;
+  // Yggdrasil estilizada - tronco retorcido + copa de galhos nus,
+  // posicionada a direita do banner para equilibrar o titulo (esquerda).
+  function drawTree_() {
+    var baseX = 352, baseY = GROUND_Y;
+    ctx.fillStyle = colors.silhouette;
+    ctx.beginPath();
+    ctx.moveTo(baseX - 7, baseY);
+    ctx.quadraticCurveTo(baseX - 9, baseY - 30, baseX - 3, baseY - 54);
+    ctx.quadraticCurveTo(baseX, baseY - 60, baseX + 3, baseY - 54);
+    ctx.quadraticCurveTo(baseX + 9, baseY - 30, baseX + 7, baseY);
+    ctx.closePath();
+    ctx.fill();
 
-    ctx.clearRect(0, 0, cssWidth, cssHeight);
-    drawBackground_(dtSec);
-    maybeSpawn_(ts / 1000);
+    function branch(x1, y1, x2, y2, width) {
+      ctx.save();
+      ctx.strokeStyle = colors.silhouette;
+      ctx.lineWidth = width;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.restore();
+    }
 
-    entities = entities.filter(function (e) {
-      e.update(dtSec);
-      return !e.isOffscreen();
+    var top = baseY - 56;
+    branch(baseX, top + 4, baseX - 40, top - 18, 4);
+    branch(baseX - 40, top - 18, baseX - 62, top - 10, 2.5);
+    branch(baseX - 40, top - 18, baseX - 58, top - 32, 2.5);
+    branch(baseX, top + 2, baseX + 36, top - 22, 4);
+    branch(baseX + 36, top - 22, baseX + 58, top - 14, 2.5);
+    branch(baseX + 36, top - 22, baseX + 54, top - 36, 2.5);
+    branch(baseX, top, baseX - 6, top - 34, 3);
+    branch(baseX, top, baseX + 10, top - 30, 3);
+  }
+
+  // Pedras ruinicas simples no primeiro plano, com marcas entalhadas
+  // abstratas (nao caracteres reais, so sugestao visual de runas).
+  function drawRuneStones_() {
+    [
+      { x: 56, h: 22 },
+      { x: 230, h: 18 }
+    ].forEach(function (stone) {
+      var w = 11;
+      var topY = GROUND_Y - stone.h;
+      ctx.fillStyle = colors.silhouette;
+      ctx.beginPath();
+      ctx.moveTo(stone.x - w / 2, GROUND_Y);
+      ctx.lineTo(stone.x - w / 2 + 1, topY + 3);
+      ctx.lineTo(stone.x, topY);
+      ctx.lineTo(stone.x + w / 2 - 1, topY + 3);
+      ctx.lineTo(stone.x + w / 2, GROUND_Y);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.save();
+      ctx.strokeStyle = colors.gold;
+      ctx.globalAlpha = 0.55;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(stone.x, topY + 6);
+      ctx.lineTo(stone.x, GROUND_Y - 4);
+      ctx.moveTo(stone.x - 3, topY + 9);
+      ctx.lineTo(stone.x + 3, topY + 13);
+      ctx.moveTo(stone.x + 3, topY + 9);
+      ctx.lineTo(stone.x - 3, topY + 13);
+      ctx.stroke();
+      ctx.restore();
     });
-    entities.forEach(function (e) { e.draw(ctx); });
+  }
 
-    drawForegroundParticles_();
+  // --- 5. Loop de renderizacao (cena praticamente estatica: so estrelas
+  // piscando, aurora ondulando bem devagar e um leve pulso na lua) --------
+  var startTs = null;
+
+  function tick_(ts) {
+    if (startTs === null) startTs = ts;
+    var t = (ts - startTs) / 1000;
+
+    drawSky_();
+    drawAurora_(t);
+    drawStars_(t);
+    drawMoon_(t);
+    drawMountains_();
+    drawTree_();
+    drawRuneStones_();
+    drawGround_();
+    drawRaven_(huginn, 316, 16, 24);
+    drawRaven_(muninn, 364, 21, 20);
+
     requestAnimationFrame(tick_);
   }
 
