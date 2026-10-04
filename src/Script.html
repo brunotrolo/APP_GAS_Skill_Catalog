@@ -2,6 +2,16 @@
   var allSkills = [];
   var activeTags = new Set();
   var lastFetchedMetadata = null;
+  var activeTipo = 'ALL';
+  var activeSort = 'nome_asc';
+
+  var SORT_COMPARATORS = {
+    nome_asc: function (a, b) { return (a.nome || '').localeCompare(b.nome || ''); },
+    nome_desc: function (a, b) { return (b.nome || '').localeCompare(a.nome || ''); },
+    data_desc: function (a, b) { return new Date(b.data_registro) - new Date(a.data_registro); },
+    data_asc: function (a, b) { return new Date(a.data_registro) - new Date(b.data_registro); },
+    autor_asc: function (a, b) { return (a.autor || '').localeCompare(b.autor || ''); }
+  };
 
   var ERROR_MESSAGES = {
     INVALID_URL: 'Essa URL nao parece ser de um repositorio do GitHub.',
@@ -21,7 +31,30 @@
   document.addEventListener('DOMContentLoaded', function () {
     google.script.run.withSuccessHandler(onSkillsLoaded).withFailureHandler(onLoadFailure).getSkills();
     google.script.run.withSuccessHandler(onCategoriasLoaded).withFailureHandler(onLoadFailure).getCategoriasList();
+    wireSidebarNav();
   });
+
+  function wireSidebarNav() {
+    wireNavGroup('tipoNav', 'tipo', function (value) {
+      activeTipo = value;
+      applyFilters();
+    });
+    wireNavGroup('sortNav', 'sort', function (value) {
+      activeSort = value;
+      applyFilters();
+    });
+  }
+
+  function wireNavGroup(containerId, datasetKey, onSelect) {
+    var items = document.querySelectorAll('#' + containerId + ' li');
+    items.forEach(function (item) {
+      item.onclick = function () {
+        items.forEach(function (i) { i.classList.remove('active'); });
+        item.classList.add('active');
+        onSelect(item.dataset[datasetKey]);
+      };
+    });
+  }
 
   function onLoadFailure(err) {
     showToast('Falha ao carregar dados: ' + (err && err.message ? err.message : err), 'error');
@@ -96,14 +129,18 @@
         .toLowerCase();
       var matchText = !searchTerm || haystack.indexOf(searchTerm) !== -1;
       var matchCategory = selectedCategory === 'ALL' || skill.categoria_primaria === selectedCategory;
+      var matchTipo = activeTipo === 'ALL' || skill.tipo === activeTipo;
 
       var skillTags = (skill.tags || '').split(',').map(function (t) { return t.trim(); });
       var matchTags = activeTags.size === 0 || Array.from(activeTags).every(function (t) {
         return skillTags.indexOf(t) !== -1;
       });
 
-      return matchText && matchCategory && matchTags;
+      return matchText && matchCategory && matchTipo && matchTags;
     });
+
+    var comparator = SORT_COMPARATORS[activeSort] || SORT_COMPARATORS.nome_asc;
+    filtered.sort(comparator);
 
     renderSkillCards(filtered);
   }
