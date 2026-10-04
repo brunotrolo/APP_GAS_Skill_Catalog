@@ -195,6 +195,9 @@
     document.getElementById('fetchError').textContent = '';
     document.getElementById('saveError').textContent = '';
     document.getElementById('saveSkillBtn').disabled = true;
+    document.querySelectorAll('input[name="tipo"]').forEach(function (radio) {
+      radio.checked = false;
+    });
     lastFetchedMetadata = null;
   }
 
@@ -237,10 +240,10 @@
   }
 
   function updatePreviewBox(metadata) {
-    var zipUrl = 'https://github.com/' + metadata.owner + '/' + metadata.repo + '/archive/refs/heads/' + metadata.defaultBranch + '.zip';
-    var cloneCmd = 'git clone https://github.com/' + metadata.owner + '/' + metadata.repo + '.git';
     document.getElementById('previewBox').innerHTML =
-      'ZIP: ' + zipUrl + '<br>CLONE: ' + cloneCmd;
+      'ZIP: ' + escapeHtml(metadata.zipUrl) +
+      '<br>BASH: ' + escapeHtml(metadata.cloneCommands.bash) +
+      '<br>POWERSHELL: ' + escapeHtml(metadata.cloneCommands.powershell);
   }
 
   function saveSkill() {
@@ -258,10 +261,15 @@
       return;
     }
 
-    var tipo = document.querySelector('input[name="tipo"]:checked').value;
+    var tipoChecked = document.querySelector('input[name="tipo"]:checked');
+    if (!tipoChecked) {
+      saveError.textContent = 'Selecione o tipo (Interna ou Curadoria).';
+      return;
+    }
+
     var payload = {
       repoUrl: document.getElementById('repoUrlInput').value.trim(),
-      tipo: tipo,
+      tipo: tipoChecked.value,
       categoria: categoria,
       tags: document.getElementById('skillTags').value.trim(),
       resumoOverride: document.getElementById('skillResumo').value.trim(),

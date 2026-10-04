@@ -28,12 +28,22 @@ function getCategoriasList() {
 
 /**
  * Busca metadados do GitHub para pre-preencher o formulario de cadastro.
+ * Ja devolve zipUrl/cloneCommands computados, para o cliente nunca precisar
+ * reimplementar essa formula (evita divergencia entre preview e card final).
  * @param {string} repoUrl
  * @return {{success: boolean, data?: Object, errorCode?: string, message?: string}}
  */
 function previewGithubRepo(repoUrl) {
   try {
-    return { success: true, data: fetchGithubRepoMetadata(repoUrl) };
+    var metadata = fetchGithubRepoMetadata(repoUrl);
+    var computed = computeRepoArtifacts_(metadata);
+    return {
+      success: true,
+      data: Object.assign({}, metadata, {
+        zipUrl: computed.zipUrl,
+        cloneCommands: computed.cloneCommands
+      })
+    };
   } catch (err) {
     return toErrorResult_(err);
   }
@@ -56,8 +66,9 @@ function registerSkillFromGithub(formPayload) {
     }
 
     var metadata = fetchGithubRepoMetadata(formPayload.repoUrl);
-    var cloneCommands = buildCloneCommands(metadata.owner, metadata.repo);
-    var zipUrl = buildZipUrl(metadata.owner, metadata.repo, metadata.defaultBranch);
+    var computed = computeRepoArtifacts_(metadata);
+    var zipUrl = computed.zipUrl;
+    var cloneCommands = computed.cloneCommands;
 
     var skillObject = {
       nome: formPayload.nomeOverride || metadata.name,
@@ -80,6 +91,21 @@ function registerSkillFromGithub(formPayload) {
   } catch (err) {
     return toErrorResult_(err);
   }
+}
+
+/**
+ * Computa zipUrl e cloneCommands a partir de metadados ja buscados do GitHub.
+ * Unico ponto de calculo, reutilizado por previewGithubRepo e registerSkillFromGithub
+ * para que a previa do modal nunca divirja do que e efetivamente salvo.
+ * @param {{owner: string, repo: string, defaultBranch: string}} metadata
+ * @return {{zipUrl: string, cloneCommands: {bash: string, powershell: string}}}
+ * @private
+ */
+function computeRepoArtifacts_(metadata) {
+  return {
+    zipUrl: buildZipUrl(metadata.owner, metadata.repo, metadata.defaultBranch),
+    cloneCommands: buildCloneCommands(metadata.owner, metadata.repo)
+  };
 }
 
 /**

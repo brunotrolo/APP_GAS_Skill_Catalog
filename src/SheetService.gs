@@ -95,7 +95,7 @@ function getAllSkills() {
       return rowToObject_(headers, row);
     })
     .filter(function (skill) {
-      return skill.ativo === true || skill.ativo === 'TRUE' || skill.ativo === '';
+      return skill.ativo === true || skill.ativo === 'TRUE';
     });
 }
 

@@ -10,19 +10,35 @@ Passos manuais para colocar o Codex Munin (MVP) no ar.
 
 ## 1. Preparar a planilha (Google Sheets)
 
-Na planilha já criada, adicione duas abas:
+Na planilha já criada, adicione duas abas. **Confira item a item** (o app lê o header por posição de coluna, então nome e ordem precisam bater exatamente):
 
 ### Aba `Skills_Catalog`
-Cabeçalho na linha 1 (nessa ordem exata):
+Cabeçalho na linha 1, **exatamente estas 17 colunas, nesta ordem**:
 
-```
-id | nome | tipo | autor | resumo | categoria_primaria | tags | repo_url | owner | repo_name | default_branch | zip_url | clone_bash | clone_powershell | data_registro | registrado_por | ativo
-```
+| Col | Header |
+|---|---|
+| A | `id` |
+| B | `nome` |
+| C | `tipo` |
+| D | `autor` |
+| E | `resumo` |
+| F | `categoria_primaria` |
+| G | `tags` |
+| H | `repo_url` |
+| I | `owner` |
+| J | `repo_name` |
+| K | `default_branch` |
+| L | `zip_url` |
+| M | `clone_bash` |
+| N | `clone_powershell` |
+| O | `data_registro` |
+| P | `registrado_por` |
+| Q | `ativo` |
 
 Pode ficar vazia — as linhas serão preenchidas pelo app.
 
 ### Aba `Categorias`
-Cabeçalho `categoria` na linha 1, seguido das linhas:
+Cabeçalho `categoria` na coluna A, linha 1, seguido das 6 linhas seed:
 
 ```
 Product & Upstream
@@ -32,6 +48,14 @@ Quality & Test Automation
 DevOps & Release
 Architecture & Workflows
 ```
+
+Essa lista é editável depois (o app lê dinamicamente), mas precisa ter pelo menos uma categoria para o formulário de cadastro funcionar.
+
+### Checklist rápido antes de prosseguir
+- [ ] Aba `Skills_Catalog` existe, com as 17 colunas acima na ordem exata (sem colunas extras antes de `id`, sem renomear nenhuma).
+- [ ] Aba `Categorias` existe, header `categoria`, com ao menos as 6 linhas seed.
+
+Depois do `clasp push` (seção 2), você pode confirmar isso de forma automática: no editor do Apps Script, selecione a função `verifySheetSchema` no dropdown ao lado do botão "Run" (ou "Executar") e clique em Run. Ela só lê a planilha (não altera nada) e grava o resultado no "Execution log" — se houver qualquer divergência de nome/ordem de coluna, ela lista exatamente qual.
 
 ## 2. Enviar o código ao Apps Script
 
@@ -75,6 +99,8 @@ No editor (`npx clasp open` ou direto em script.google.com): **Deploy** → **Ne
 Clique em **Deploy** e copie a URL gerada.
 
 ## 5. Validar
+
+Antes de abrir o Web App, rode `verifySheetSchema` no editor do Apps Script (veja seção 1) e confirme `OK` no log.
 
 Abra a URL do Web App e confirme:
 - O banner com sprites animados carrega no topo.
