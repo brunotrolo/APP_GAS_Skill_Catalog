@@ -121,6 +121,30 @@
     }
   }
 
+  .sidebar-tag-search {
+    width: 100%;
+    font-family: 'VT323', monospace;
+    font-size: 16px;
+    padding: 7px 9px;
+    margin-bottom: 8px;
+    background: var(--bg-card);
+    color: var(--text-main);
+    border: 2px solid var(--border-ink);
+    border-radius: var(--radius-s);
+  }
+
+  .sidebar-tag-search:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 8px rgba(255, 216, 74, 0.3);
+  }
+
+  .sidebar-tags {
+    max-height: 260px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
   /* ---- Top bar / search ---- */
   .search-bar {
     margin: 16px;

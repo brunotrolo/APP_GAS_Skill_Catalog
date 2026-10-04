@@ -102,7 +102,13 @@
       });
     });
 
-    Array.from(tagSet).sort().forEach(function (tag) {
+    var searchBox = document.getElementById('tagSearchBox');
+    var tagFilterTerm = searchBox ? searchBox.value.trim().toLowerCase() : '';
+    var visibleTags = Array.from(tagSet).sort().filter(function (tag) {
+      return !tagFilterTerm || tag.toLowerCase().indexOf(tagFilterTerm) !== -1;
+    });
+
+    visibleTags.forEach(function (tag) {
       var pill = document.createElement('span');
       pill.className = 'tag-pill' + (activeTags.has(tag) ? ' active' : '');
       pill.textContent = '#' + tag;
