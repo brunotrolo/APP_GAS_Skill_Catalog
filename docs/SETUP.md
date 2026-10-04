@@ -83,12 +83,14 @@ npx clasp push
 
 ## 3. Configurar Script Properties
 
-Abra o projeto no editor (`npx clasp open`) → **Project Settings** → **Script Properties** e adicione:
+O script detecta automaticamente a planilha ativa quando está **vinculado (bound)** a ela — ou seja, quando foi aberto a partir do menu **Extensões → Apps Script** dentro da própria planilha (é o seu caso). Nesse cenário, **não é preciso configurar `SPREADSHEET_ID`**.
 
-| Propriedade | Valor |
-|---|---|
-| `SPREADSHEET_ID` | `1-H5lMr3q_u9M1CYaqMCikZZRtP3ke4yVtwj7tuatp-0` |
-| `GITHUB_TOKEN` (opcional) | Personal Access Token do GitHub com escopo `repo`, necessário apenas para registrar repositórios **privados** |
+`SPREADSHEET_ID` só é necessário se o script for standalone (criado separado, sem vínculo com uma planilha específica) — nesse caso, abra o projeto no editor (`npx clasp open`) → **Project Settings** → **Script Properties** e adicione:
+
+| Propriedade | Valor | Quando é necessário |
+|---|---|---|
+| `SPREADSHEET_ID` | `1-H5lMr3q_u9M1CYaqMCikZZRtP3ke4yVtwj7tuatp-0` | Só se o script **não** estiver vinculado à planilha |
+| `GITHUB_TOKEN` (opcional) | Personal Access Token do GitHub com escopo `repo` | Só para registrar repositórios **privados** |
 
 ## 4. Publicar como Web App
 

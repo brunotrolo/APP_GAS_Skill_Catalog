@@ -12,16 +12,23 @@ var SKILLS_HEADERS = [
 ];
 
 /**
- * Resolve a planilha a partir de Script Properties.
+ * Resolve a planilha. Se o script estiver vinculado (bound) a uma planilha
+ * (aberto via Extensoes > Apps Script), usa a planilha ativa automaticamente.
+ * Caso contrario (script standalone), exige a Script Property SPREADSHEET_ID.
  * @return {GoogleAppsScript.Spreadsheet.Spreadsheet}
  * @private
  */
 function getSpreadsheet_() {
+  var activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  if (activeSpreadsheet) {
+    return activeSpreadsheet;
+  }
+
   var spreadsheetId = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
   if (!spreadsheetId) {
     throw new SkillCatalogError(
       'MISSING_SPREADSHEET_ID',
-      'Script Property SPREADSHEET_ID nao configurada.'
+      'Script nao esta vinculado a uma planilha e a Script Property SPREADSHEET_ID nao foi configurada.'
     );
   }
   return SpreadsheetApp.openById(spreadsheetId);
