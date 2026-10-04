@@ -375,6 +375,11 @@
   // Stylesheet.html). Fontes proprietarias citadas nas specs de docs/themes/
   // (SF Pro, BMW Type Next, Berkeley Mono) nao sao redistribuiveis via Google
   // Fonts, entao usamos pilhas de fontes de sistema/livres com o mesmo espirito.
+  // Alem de cores/fontes, cada tema controla a "forma" dos componentes:
+  // raio de borda, espessura de borda, sombra (chunky pixel-art vs chata/sem
+  // sombra), tracking/caixa dos titulos e se superficies usam gradiente
+  // (estetica pixel-art) ou cor solida (design flat). Isso e o que faz Apple
+  // e OpenCode parecerem genuinamente diferentes um do outro, nao so a cor.
   var THEMES = {
     dark: {
       label: '🌙 Escuro (padrao)',
@@ -384,7 +389,14 @@
         '--gold': '#ffd84a', '--gold-glow': '#ffe98a', '--purple': '#b06aed',
         '--terminal-green': '#2effa0', '--danger': '#ff5d6c', '--muted': '#b7b9d8',
         '--font-heading': "'Pixelify Sans', monospace", '--font-body': "'Space Mono', monospace",
-        '--font-display': "'Press Start 2P', monospace"
+        '--font-display': "'Press Start 2P', monospace",
+        '--radius-s': '6px', '--radius-m': '10px', '--border-width': '2px',
+        '--shadow-chunky': '4px 6px 0px #000', '--letter-spacing-heading': '0.5px',
+        '--heading-transform': 'none', '--on-accent': '#231a00',
+        '--chrome-gradient': 'linear-gradient(180deg, var(--bg-card-hover), var(--bg-card))',
+        '--chrome-gradient-accent': 'linear-gradient(180deg, var(--gold-glow), var(--gold))',
+        '--chrome-gradient-card': 'linear-gradient(165deg, var(--bg-card-hover) 0%, var(--bg-card) 60%)',
+        '--chrome-gradient-panel': 'linear-gradient(165deg, var(--bg-card-hover), var(--bg-panel) 45%)'
       }
     },
     light: {
@@ -395,12 +407,20 @@
         '--gold': '#c98f00', '--gold-glow': '#e8b23a', '--purple': '#8a3fd6',
         '--terminal-green': '#0f9d64', '--danger': '#c92a3a', '--muted': '#51546f',
         '--font-heading': "'Pixelify Sans', monospace", '--font-body': "'Space Mono', monospace",
-        '--font-display': "'Press Start 2P', monospace"
+        '--font-display': "'Press Start 2P', monospace",
+        '--radius-s': '6px', '--radius-m': '10px', '--border-width': '2px',
+        '--shadow-chunky': '4px 6px 0px #000', '--letter-spacing-heading': '0.5px',
+        '--heading-transform': 'none', '--on-accent': '#231a00',
+        '--chrome-gradient': 'linear-gradient(180deg, var(--bg-card-hover), var(--bg-card))',
+        '--chrome-gradient-accent': 'linear-gradient(180deg, var(--gold-glow), var(--gold))',
+        '--chrome-gradient-card': 'linear-gradient(165deg, var(--bg-card-hover) 0%, var(--bg-card) 60%)',
+        '--chrome-gradient-panel': 'linear-gradient(165deg, var(--bg-card-hover), var(--bg-panel) 45%)'
       }
     },
     apple: {
-      // De docs/themes/DESIGN-apple.md: canvas branco, tipografia SF Pro,
-      // Action Blue como unica cor de interacao.
+      // De docs/themes/DESIGN-apple.md: canvas branco, Action Blue como unica
+      // cor de interacao, "sem gradientes decorativos, sem sombras no chrome",
+      // cantos generosamente arredondados, tracking negativo nos titulos.
       label: '🍎 Apple',
       vars: {
         '--bg-deep': '#ffffff', '--bg-panel': '#fafafc', '--bg-card': '#f5f5f7',
@@ -409,12 +429,18 @@
         '--terminal-green': '#34c759', '--danger': '#ff3b30', '--muted': '#7a7a7a',
         '--font-heading': "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
         '--font-body': "-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif",
-        '--font-display': "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
+        '--font-display': "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+        '--radius-s': '10px', '--radius-m': '18px', '--border-width': '1px',
+        '--shadow-chunky': 'none', '--letter-spacing-heading': '-0.4px',
+        '--heading-transform': 'none', '--on-accent': '#ffffff',
+        '--chrome-gradient': 'var(--bg-card)', '--chrome-gradient-accent': 'var(--gold)',
+        '--chrome-gradient-card': 'var(--bg-card)', '--chrome-gradient-panel': 'var(--bg-panel)'
       }
     },
     bmw: {
       // De docs/themes/DESIGN-bmw-m.md: canvas quase preto, texto branco,
-      // acentos motorsport (vermelho M / azul M).
+      // acentos motorsport (vermelho M), titulos em UPPERCASE confiante,
+      // cantos quase retos, sem gradientes decorativos.
       label: '🏁 BMW M',
       vars: {
         '--bg-deep': '#000000', '--bg-panel': '#0d0d0d', '--bg-card': '#1a1a1a',
@@ -423,12 +449,18 @@
         '--terminal-green': '#0fa336', '--danger': '#e22718', '--muted': '#7e7e7e',
         '--font-heading': "'Arial Black', Arial, sans-serif",
         '--font-body': "Helvetica, Arial, sans-serif",
-        '--font-display': "'Arial Black', Arial, sans-serif"
+        '--font-display': "'Arial Black', Arial, sans-serif",
+        '--radius-s': '2px', '--radius-m': '4px', '--border-width': '1px',
+        '--shadow-chunky': 'none', '--letter-spacing-heading': '0px',
+        '--heading-transform': 'uppercase', '--on-accent': '#ffffff',
+        '--chrome-gradient': 'var(--bg-card)', '--chrome-gradient-accent': 'var(--gold)',
+        '--chrome-gradient-card': 'var(--bg-card)', '--chrome-gradient-panel': 'var(--bg-panel)'
       }
     },
     opencode: {
       // De docs/themes/DESIGN-opencode.ai.md: canvas creme, tudo monoespacado,
-      // visual de terminal/manpage.
+      // "4px-radius rectangles", "sem sombras, sem gradientes", visual de
+      // terminal/manpage com bordas finas (hairline).
       label: '💻 OpenCode',
       vars: {
         '--bg-deep': '#fdfcfc', '--bg-panel': '#f8f7f7', '--bg-card': '#f1eeee',
@@ -437,7 +469,12 @@
         '--terminal-green': '#30d158', '--danger': '#ff3b30', '--muted': '#646262',
         '--font-heading': "'Space Mono', 'Berkeley Mono', monospace",
         '--font-body': "'Space Mono', 'Berkeley Mono', monospace",
-        '--font-display': "'Space Mono', 'Berkeley Mono', monospace"
+        '--font-display': "'Space Mono', 'Berkeley Mono', monospace",
+        '--radius-s': '4px', '--radius-m': '4px', '--border-width': '1px',
+        '--shadow-chunky': 'none', '--letter-spacing-heading': '0px',
+        '--heading-transform': 'none', '--on-accent': '#fdfcfc',
+        '--chrome-gradient': 'var(--bg-card)', '--chrome-gradient-accent': 'var(--gold)',
+        '--chrome-gradient-card': 'var(--bg-card)', '--chrome-gradient-panel': 'var(--bg-panel)'
       }
     }
   };
