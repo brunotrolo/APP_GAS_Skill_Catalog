@@ -5,6 +5,15 @@
     <select id="categoryFilter" onchange="applyFilters()">
       <option value="ALL">TODAS AS CLASSES</option>
     </select>
+
+    <div class="tag-dropdown" id="tagDropdown">
+      <button type="button" class="pixel-button secondary" onclick="toggleTagDropdown()" id="tagDropdownToggle">🏷️ TAGS</button>
+      <div class="tag-dropdown-panel" id="tagDropdownPanel">
+        <input type="text" id="tagSearchBox" class="sidebar-tag-search" placeholder="Buscar tag..." oninput="renderTagPills()">
+        <div class="tag-pills sidebar-tags" id="tagPills"></div>
+      </div>
+    </div>
+
     <button class="pixel-button" onclick="openRegisterModal()">+ CADASTRAR SKILL</button>
   </div>
 </div>
