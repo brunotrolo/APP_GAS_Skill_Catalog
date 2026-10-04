@@ -40,7 +40,7 @@ Este guia reduz essa tradução a um checklist, não a uma reinterpretação.
 | `--chrome-gradient-success` | CTA universal do app (botão "Baixar .ZIP") | ver "O botão de download" |
 | `--chrome-gradient-accent/-card/-panel/-curadoria` | normalmente = `var(--gold)` / `var(--bg-card)` / `var(--bg-panel)` / `var(--purple)` | sem gradiente real se o arquivo disser "no decorative gradients" |
 | `--font-heading/-body/-display` | tipografia | ver "Fontes" |
-| `--radius-s`, `--radius-m` | raio de borda | ver "Forma" |
+| `--radius-s`, `--radius-m`, `--radius-pill` | raio de borda | ver "Forma" |
 | `--border-width` | espessura de borda | geralmente `1px` se o arquivo descreve hairline |
 | `--shadow-chunky` | sombra do app (`inset` 3D) | `none` se o arquivo disser "no shadows"/"flat"; senão, usar a sombra descrita |
 | `--letter-spacing-heading`, `--heading-transform` | tipografia de título | negativo + `none` (ex. Apple) ou `0` + `uppercase` (ex. BMW), conforme o arquivo |
@@ -134,6 +134,16 @@ bug "tag laranja" do OpenCode. Em vez disso:
    zera glows decorativos que dependem do mesmo token em uma lista
    `box-shadow` multi-valor (um `none` nessa posição invalida a declaração
    inteira, voltando ao valor inicial `none` — não precisa de token extra).
+4. `--radius-pill` é um token à parte de `--radius-s`, dedicado só a
+   badges/tags/pills (`.tag-pill`, `.categoria-badge`, `.quadrant-badge`,
+   `.skill-card .tags span`) — esses componentes do app pré-existem a
+   qualquer tema e eram hardcoded em `border-radius: 999px`, ignorando o
+   motor inteiro (bug encontrado na varredura pré-escala). Normalmente
+   `--radius-pill` = `--radius-s` (mesma régua), exceto quando o arquivo
+   proíbe pill explicitamente num componente que não é literalmente um
+   botão (ex. BMW: "Don't use rounded buttons... the rectangular
+   silhouette IS the brand" → `--radius-pill: 0px`, não `9999px`, mesmo
+   badges recebendo o mesmo tratamento retangular dos botões).
 
 ## Checklist para cada tema novo (dos ~20 que virão)
 
@@ -150,3 +160,37 @@ bug "tag laranja" do OpenCode. Em vez disso:
    `<head>` de `src/Index.html`.
 7. Conferir balanceamento de chaves (`{`/`}`) no arquivo novo.
 8. Nunca alterar `font-size` em nenhum token (regra permanente do app).
+
+## Varredura obrigatória: nenhum componente pode ignorar o motor
+
+Antes de escalar para os ~20 temas novos, uma varredura em `src/*.html`
+encontrou dois bugs sistêmicos que não eram "tema errado" — eram
+componentes do app que nunca passaram pelo motor:
+
+1. **Cor hardcoded fora dos arquivos de tema**: o tooltip dos módulos
+   (`.module-nav-item[data-tooltip]`) e a caixa de preview de URL
+   (`.preview-box`) tinham hex fixos (`#16207a`, `#f4f6ff`, `#050608`...)
+   direto no CSS — ficavam com a mesma cor em QUALQUER tema selecionado.
+   Corrigido para usar os tokens (`var(--chrome-gradient-panel)`,
+   `var(--text-main)`, `var(--gold)`, `var(--bg-deep)`, etc.).
+2. **Forma hardcoded fora dos tokens**: badges/tags (`.tag-pill`,
+   `.categoria-badge`, `.quadrant-badge`, `.skill-card .tags span`) tinham
+   `border-radius: 999px` fixo — nunca respeitavam o raio de cada marca.
+   Corrigido com o token `--radius-pill` (ver "Forma" acima).
+
+**Regra permanente**: antes de aplicar um tema novo, rodar esta varredura
+em `src/Stylesheet.html` e em qualquer `<style>` embutido nas views
+(`Banner.html` etc.) para confirmar que não existe nenhum valor de cor,
+raio, sombra, borda ou fonte fora de um `var(--...)`:
+
+```
+grep -nE "#[0-9a-fA-F]{3,6}" src/Stylesheet.html | grep -vE "^[0-9]+:[[:space:]]*--"
+grep -nE "border-radius:\s*[0-9]|box-shadow:\s*[0-9]" src/Stylesheet.html
+```
+
+Qualquer resultado (fora de `rgba(255,255,255,...)` de realce decorativo,
+que já é neutralizado pelo truque do `--shadow-chunky: none`, e fora dos
+sprites do banner em `SpriteEngine.html`, que são arte pixelada
+intencionalmente fixa, não identidade de marca) é um componente que o
+motor de temas ainda não alcança — e precisa virar token antes de
+escalar, senão o mesmo bug se repete em cada tema novo, não só no atual.

@@ -16,6 +16,7 @@
     --muted: #b7b9d8;
     --radius-s: 6px;
     --radius-m: 10px;
+    --radius-pill: 9999px;
     --font-heading: 'Pixelify Sans', monospace;
     --font-body: 'Space Mono', monospace;
     --font-display: 'Press Start 2P', monospace;
@@ -183,11 +184,11 @@
     transform: translateX(-50%);
     width: 240px;
     max-width: 70vw;
-    background: linear-gradient(180deg, #16207a, #0a1152);
-    color: #f4f6ff;
-    border: 3px solid #f4f6ff;
-    border-radius: 4px;
-    box-shadow: 0 0 0 3px #0a1152, 5px 6px 0px rgba(0, 0, 0, 0.6);
+    background: var(--chrome-gradient-panel);
+    color: var(--text-main);
+    border: var(--border-width) solid var(--gold);
+    border-radius: var(--radius-s);
+    box-shadow: var(--shadow-chunky);
     padding: 10px 12px;
     font-family: var(--font-body);
     font-size: 13px;
@@ -208,7 +209,7 @@
     left: 50%;
     transform: translateX(-50%);
     border: 7px solid transparent;
-    border-top-color: #f4f6ff;
+    border-top-color: var(--gold);
     z-index: 81;
     pointer-events: none;
   }
@@ -309,7 +310,7 @@
     font-size: 11px;
     font-weight: 700;
     padding: 3px 9px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     border: 1px solid var(--border-ink);
     margin-bottom: 8px;
   }
@@ -495,7 +496,7 @@
     cursor: pointer;
     background: var(--bg-card);
     border: var(--border-width) solid var(--border-ink);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     color: var(--gold);
     padding: 4px 10px;
     font-size: 11px;
@@ -637,7 +638,7 @@
     font-weight: 700;
     font-family: var(--font-heading);
     padding: 4px 9px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     border: 1px solid var(--border-ink);
     max-width: 100%;
     overflow-wrap: break-word;
@@ -662,7 +663,7 @@
     font-size: 13px;
     background: var(--bg-panel);
     border: 1px solid var(--border-ink);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     padding: 3px 10px;
     max-width: 100%;
     overflow-wrap: break-word;
@@ -774,7 +775,7 @@
   }
 
   .preview-box {
-    background: #050608;
+    background: var(--bg-deep);
     color: var(--gold);
     padding: 10px;
     font-family: var(--font-body);
