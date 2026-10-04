@@ -320,32 +320,9 @@
   .quadrant-badge.q-assess { background: var(--cat-3); color: var(--on-cat); }
   .quadrant-badge.q-hold { background: var(--cat-4); color: var(--on-cat); }
 
-  /* ---- Layout (sidebar + conteudo) ---- */
-  .app-layout {
-    display: flex;
-    align-items: flex-start;
-    gap: 0;
-  }
-
+  /* ---- Layout (conteudo full-width, sem menu lateral) ---- */
   .app-main {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .sidebar {
-    width: 220px;
-    flex-shrink: 0;
-    margin: 16px 0 16px 16px;
-  }
-
-  .sidebar h2 {
-    font-size: 11px;
-    color: var(--gold);
-    margin: 0 0 10px 0;
-  }
-
-  .sidebar h2:not(:first-child) {
-    margin-top: 18px;
+    width: 100%;
   }
 
   .sidebar-nav {
@@ -380,16 +357,6 @@
     font-family: var(--font-display);
     font-size: 9px;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2) inset, var(--shadow-chunky), 0 0 12px rgba(var(--gold-glow-rgb), 0.35);
-  }
-
-  @media (max-width: 720px) {
-    .app-layout {
-      flex-direction: column;
-    }
-    .sidebar {
-      width: auto;
-      margin: 16px;
-    }
   }
 
   .sidebar-tag-search {
