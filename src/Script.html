@@ -386,10 +386,30 @@
   // nenhuma cor "generica da marca" e inventada quando o arquivo nao a lista
   // (ex: Apple e OpenCode nao tem roxo nenhum no arquivo, entao --purple reusa
   // uma cor azul ja existente no proprio arquivo em vez de inventar violeta).
-  var THEMES = {
-    dark: {
-      label: '🌙 Escuro (padrao)',
-      vars: {
+  // Alem de cores/fontes, cada familia de tema controla a "forma" dos
+  // componentes: raio de borda, espessura de borda, sombra (chunky pixel-art
+  // vs chata/sem sombra), tracking/caixa dos titulos e se superficies usam
+  // gradiente (pixel-art) ou cor solida (flat). Isso e o que faz Apple e
+  // OpenCode parecerem genuinamente diferentes um do outro, nao so a cor.
+  //
+  // Estrutura de 2 eixos independentes, como pedido: TEMA (familia visual:
+  // Retro/Apple/BMW/OpenCode) x TIPO (Claro/Escuro). Toda familia tem um
+  // modo claro E um modo escuro - nao so o modo que o arquivo .md original
+  // descreve. Cores de Brand (--gold/--gold-glow/--purple/--info/--warn/
+  // --terminal-green/--danger) ficam constantes entre os dois tipos sempre
+  // que o arquivo .md define isso (ex: BMW usa o mesmo vermelho M nos dois
+  // modos); so Surface (--bg-*) e Text (--text-main/--muted/--border-ink)
+  // mudam entre claro/escuro. Para os 3 temas vindos de docs/themes/*.md,
+  // toda cor e um valor literal do arquivo correspondente; quando o arquivo
+  // so descreve um modo (BMW e so escuro no .md original), o modo que falta
+  // e inferido com superficies neutras mas MANTENDO as cores de Brand
+  // literais do arquivo - comentado caso a caso abaixo.
+  var THEME_FAMILIES = {
+    retro: {
+      label: '🕹️ Retro',
+      // Estetica original do app (nao vem de nenhum docs/themes/*.md) -
+      // pixel-art com sombra dura, gradientes e bordas grossas.
+      dark: {
         '--bg-deep': '#0a0b16', '--bg-panel': '#181a2c', '--bg-card': '#1d2037',
         '--bg-card-hover': '#262a47', '--border-ink': '#000000', '--text-main': '#f3f4fc',
         '--gold': '#ffd84a', '--gold-glow': '#ffe98a', '--purple': '#b06aed',
@@ -408,11 +428,8 @@
         '--chrome-gradient-success': 'linear-gradient(180deg, #7bffc9, var(--terminal-green))',
         '--chrome-gradient-curadoria': 'linear-gradient(180deg, #d19bff, var(--purple))',
         '--ambient-glow': 'radial-gradient(1200px 600px at 15% -10%, rgba(176, 106, 237, 0.12), transparent 60%), radial-gradient(1000px 500px at 100% 0%, rgba(46, 255, 160, 0.08), transparent 55%)'
-      }
-    },
-    light: {
-      label: '☀️ Claro',
-      vars: {
+      },
+      light: {
         '--bg-deep': '#eef0fb', '--bg-panel': '#ffffff', '--bg-card': '#f6f7ff',
         '--bg-card-hover': '#e9ebfb', '--border-ink': '#1b1d2e', '--text-main': '#1b1d2e',
         '--gold': '#c98f00', '--gold-glow': '#e8b23a', '--purple': '#8a3fd6',
@@ -434,19 +451,38 @@
       }
     },
     apple: {
-      // De docs/themes/DESIGN-apple.md. Toda cor abaixo e um valor LITERAL do
-      // arquivo: primary #0066cc, primary-focus #0071e3, primary-on-dark
-      // #2997ff, ink #1d1d1f, ink-muted-80 #333333, ink-muted-48 #7a7a7a,
-      // divider-soft #f0f0f0, canvas #ffffff, canvas-parchment #f5f5f7,
-      // surface-pearl #fafafc, surface-black #000000, on-primary #ffffff.
-      // O arquivo nao define verde/vermelho/roxo (so "Action Blue" + tons de
-      // cinza) - entao --purple/--info reusam o azul mais claro do arquivo, e
-      // --terminal-green/--danger reusam tons de cinza/preto do arquivo, em
-      // vez de inventar verde/vermelho que nao existem na spec.
+      // De docs/themes/DESIGN-apple.md. O arquivo literalmente descreve os
+      // dois modos: canvas/canvas-parchment/surface-pearl/divider-soft para
+      // claro, surface-tile-1/2/3/surface-black para escuro. Brand = familia
+      // azul (primary/primary-focus/primary-on-dark); o arquivo nao define
+      // verde/vermelho/roxo, entao --terminal-green/--danger reusam tons de
+      // Text (ink-muted-80/surface-black/body-muted) em vez de inventar cor.
+      // Forma: botoes em pill total (rounded.pill = 9999px), cards em 18px
+      // (rounded.lg), 1px hairline, zero sombra em chrome (so 1 sombra do
+      // sistema inteiro, aplicada em fotos de produto - fora do escopo do
+      // nosso app).
       label: '🍎 Apple',
-      vars: {
+      dark: {
+        '--bg-deep': '#000000', '--bg-panel': '#252527', '--bg-card': '#272729',
+        '--bg-card-hover': '#2a2a2c', '--border-ink': '#2a2a2c', '--text-main': '#ffffff',
+        '--gold': '#2997ff', '--gold-glow': '#0071e3', '--purple': '#0066cc',
+        '--terminal-green': '#cccccc', '--danger': '#7a7a7a', '--muted': '#7a7a7a',
+        '--info': '#2997ff', '--warn': '#cccccc',
+        '--gold-glow-rgb': '41, 151, 255', '--terminal-green-rgb': '204, 204, 204',
+        '--font-heading': "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+        '--font-body': "-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif",
+        '--font-display': "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+        '--radius-s': '9999px', '--radius-m': '18px', '--border-width': '1px',
+        '--shadow-chunky': 'none', '--letter-spacing-heading': '-0.4px',
+        '--heading-transform': 'none', '--on-accent': '#ffffff',
+        '--chrome-gradient': 'var(--bg-card)', '--chrome-gradient-accent': 'var(--gold)',
+        '--chrome-gradient-card': 'var(--bg-card)', '--chrome-gradient-panel': 'var(--bg-panel)',
+        '--chrome-gradient-success': 'var(--terminal-green)', '--chrome-gradient-curadoria': 'var(--purple)',
+        '--ambient-glow': 'none'
+      },
+      light: {
         '--bg-deep': '#ffffff', '--bg-panel': '#fafafc', '--bg-card': '#f5f5f7',
-        '--bg-card-hover': '#f0f0f0', '--border-ink': '#1d1d1f', '--text-main': '#1d1d1f',
+        '--bg-card-hover': '#f0f0f0', '--border-ink': '#e0e0e0', '--text-main': '#1d1d1f',
         '--gold': '#0066cc', '--gold-glow': '#0071e3', '--purple': '#2997ff',
         '--terminal-green': '#333333', '--danger': '#000000', '--muted': '#7a7a7a',
         '--info': '#2997ff', '--warn': '#333333',
@@ -454,7 +490,7 @@
         '--font-heading': "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
         '--font-body': "-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif",
         '--font-display': "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
-        '--radius-s': '10px', '--radius-m': '18px', '--border-width': '1px',
+        '--radius-s': '9999px', '--radius-m': '18px', '--border-width': '1px',
         '--shadow-chunky': 'none', '--letter-spacing-heading': '-0.4px',
         '--heading-transform': 'none', '--on-accent': '#ffffff',
         '--chrome-gradient': 'var(--bg-card)', '--chrome-gradient-accent': 'var(--gold)',
@@ -464,14 +500,17 @@
       }
     },
     bmw: {
-      // De docs/themes/DESIGN-bmw-m.md. Cores literais do arquivo: m-red
-      // #e22718, m-blue-light #0066b1, electric-blue #0653b6, warning
-      // #f4b400, success #0fa336, canvas #000000, surface-card #1a1a1a,
-      // surface-elevated #262626, surface-soft #0d0d0d, hairline #3c3c3c,
-      // muted #7e7e7e, ink/on-dark #ffffff. "Confident UPPERCASE" e "sem
-      // gradientes decorativos" vem direto da descricao do arquivo.
+      // De docs/themes/DESIGN-bmw-m.md. Brand = m-red #e22718 / m-blue-light
+      // #0066b1 / electric-blue #0653b6 / warning #f4b400 / success #0fa336 -
+      // 100% literais do arquivo, iguais nos dois modos (o arquivo so
+      // descreve um "canvas quase preto"; o modo claro abaixo usa Surface/
+      // Text neutros inferidos, ja que o arquivo nao cobre um canvas claro -
+      // unica excecao a regra de "so cores do arquivo" nesta familia, e so
+      // para Surface/Text, nunca para Brand). Forma: rounded.none (0px) e o
+      // raio dominante em botoes/cards/inputs, 1px, sem sombra, titulos em
+      // UPPERCASE - identico nos dois modos, conforme o arquivo.
       label: '🏁 BMW M',
-      vars: {
+      dark: {
         '--bg-deep': '#000000', '--bg-panel': '#0d0d0d', '--bg-card': '#1a1a1a',
         '--bg-card-hover': '#262626', '--border-ink': '#3c3c3c', '--text-main': '#ffffff',
         '--gold': '#e22718', '--gold-glow': '#f4b400', '--purple': '#0066b1',
@@ -481,7 +520,25 @@
         '--font-heading': "'Arial Black', Arial, sans-serif",
         '--font-body': "Helvetica, Arial, sans-serif",
         '--font-display': "'Arial Black', Arial, sans-serif",
-        '--radius-s': '2px', '--radius-m': '4px', '--border-width': '1px',
+        '--radius-s': '0px', '--radius-m': '0px', '--border-width': '1px',
+        '--shadow-chunky': 'none', '--letter-spacing-heading': '0px',
+        '--heading-transform': 'uppercase', '--on-accent': '#ffffff',
+        '--chrome-gradient': 'var(--bg-card)', '--chrome-gradient-accent': 'var(--gold)',
+        '--chrome-gradient-card': 'var(--bg-card)', '--chrome-gradient-panel': 'var(--bg-panel)',
+        '--chrome-gradient-success': 'var(--terminal-green)', '--chrome-gradient-curadoria': 'var(--purple)',
+        '--ambient-glow': 'none'
+      },
+      light: {
+        '--bg-deep': '#ffffff', '--bg-panel': '#f7f7f7', '--bg-card': '#ffffff',
+        '--bg-card-hover': '#ececec', '--border-ink': '#1a1a1a', '--text-main': '#1a1a1a',
+        '--gold': '#e22718', '--gold-glow': '#f4b400', '--purple': '#0066b1',
+        '--terminal-green': '#0fa336', '--danger': '#e22718', '--muted': '#6e6e6e',
+        '--info': '#0653b6', '--warn': '#f4b400',
+        '--gold-glow-rgb': '226, 39, 24', '--terminal-green-rgb': '15, 163, 54',
+        '--font-heading': "'Arial Black', Arial, sans-serif",
+        '--font-body': "Helvetica, Arial, sans-serif",
+        '--font-display': "'Arial Black', Arial, sans-serif",
+        '--radius-s': '0px', '--radius-m': '0px', '--border-width': '1px',
         '--shadow-chunky': 'none', '--letter-spacing-heading': '0px',
         '--heading-transform': 'uppercase', '--on-accent': '#ffffff',
         '--chrome-gradient': 'var(--bg-card)', '--chrome-gradient-accent': 'var(--gold)',
@@ -491,14 +548,33 @@
       }
     },
     opencode: {
-      // De docs/themes/DESIGN-opencode.ai.md. Cores literais do arquivo:
-      // accent #007aff, accent-hover #0056b3, accent-active #004085, warning
-      // #ff9f0a, danger #ff3b30, success #30d158, canvas #fdfcfc, surface-soft
-      // #f8f7f7, surface-card #f1eeee, ink/primary #201d1d, mute #646262. O
-      // arquivo nao tem roxo - --purple reusa o laranja "warning" do proprio
-      // arquivo como segundo acento, em vez de inventar violeta.
+      // De docs/themes/DESIGN-opencode.ai.md. O arquivo descreve os dois
+      // modos: canvas/surface-soft/surface-card para claro, surface-dark/
+      // surface-dark-elevated/on-dark para o "hero card" escuro. Brand =
+      // accent #007aff (constante nos dois modos) + warning #ff9f0a (reusado
+      // como --purple, ja que o arquivo nao tem roxo) + success #30d158 +
+      // danger #ff3b30 - tudo literal. Forma: rounded.sm (4px) em todo
+      // elemento interativo, 1px hairline, sem sombra, tudo monoespacado.
       label: '💻 OpenCode',
-      vars: {
+      dark: {
+        '--bg-deep': '#201d1d', '--bg-panel': '#302c2c', '--bg-card': '#302c2c',
+        '--bg-card-hover': '#0f0000', '--border-ink': '#646262', '--text-main': '#fdfcfc',
+        '--gold': '#007aff', '--gold-glow': '#0056b3', '--purple': '#ff9f0a',
+        '--terminal-green': '#30d158', '--danger': '#ff3b30', '--muted': '#9a9898',
+        '--info': '#004085', '--warn': '#ff9f0a',
+        '--gold-glow-rgb': '0, 122, 255', '--terminal-green-rgb': '48, 209, 88',
+        '--font-heading': "'Space Mono', 'Berkeley Mono', monospace",
+        '--font-body': "'Space Mono', 'Berkeley Mono', monospace",
+        '--font-display': "'Space Mono', 'Berkeley Mono', monospace",
+        '--radius-s': '4px', '--radius-m': '4px', '--border-width': '1px',
+        '--shadow-chunky': 'none', '--letter-spacing-heading': '0px',
+        '--heading-transform': 'none', '--on-accent': '#fdfcfc',
+        '--chrome-gradient': 'var(--bg-card)', '--chrome-gradient-accent': 'var(--gold)',
+        '--chrome-gradient-card': 'var(--bg-card)', '--chrome-gradient-panel': 'var(--bg-panel)',
+        '--chrome-gradient-success': 'var(--terminal-green)', '--chrome-gradient-curadoria': 'var(--purple)',
+        '--ambient-glow': 'none'
+      },
+      light: {
         '--bg-deep': '#fdfcfc', '--bg-panel': '#f8f7f7', '--bg-card': '#f1eeee',
         '--bg-card-hover': '#e8e4e4', '--border-ink': '#201d1d', '--text-main': '#201d1d',
         '--gold': '#007aff', '--gold-glow': '#0056b3', '--purple': '#ff9f0a',
@@ -519,32 +595,40 @@
     }
   };
 
+  var currentThemeFamily = 'retro';
+  var currentThemeType = 'dark';
+
   function initTheme() {
-    var saved = null;
+    var savedFamily = null;
+    var savedType = null;
     try {
-      saved = localStorage.getItem('codexMuninTheme');
+      savedFamily = localStorage.getItem('codexMuninThemeFamily');
+      savedType = localStorage.getItem('codexMuninThemeType');
     } catch (e) {
-      saved = null;
+      savedFamily = null;
+      savedType = null;
     }
     renderThemeList();
-    applyTheme(THEMES[saved] ? saved : 'dark');
+    applyTheme(
+      THEME_FAMILIES[savedFamily] ? savedFamily : 'retro',
+      savedType === 'light' ? 'light' : 'dark'
+    );
   }
 
   function renderThemeList() {
     var select = document.getElementById('themeSelect');
     if (!select) return;
     select.innerHTML = '';
-    Object.keys(THEMES).forEach(function (themeId) {
+    Object.keys(THEME_FAMILIES).forEach(function (familyId) {
       var opt = document.createElement('option');
-      opt.value = themeId;
-      opt.textContent = THEMES[themeId].label;
+      opt.value = familyId;
+      opt.textContent = THEME_FAMILIES[familyId].label;
       select.appendChild(opt);
     });
   }
 
   function toggleTheme() {
-    var current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-    applyTheme(current === 'light' ? 'dark' : 'light');
+    applyTheme(currentThemeFamily, currentThemeType === 'light' ? 'dark' : 'light');
   }
 
   var DROPDOWN_IDS = ['tagDropdown', 'sortDropdown'];
@@ -574,25 +658,32 @@
     });
   });
 
-  function applyTheme(themeId) {
-    var theme = THEMES[themeId] || THEMES.dark;
-    var resolvedId = THEMES[themeId] ? themeId : 'dark';
+  function applyTheme(familyId, typeId) {
+    var family = THEME_FAMILIES[familyId] || THEME_FAMILIES.retro;
+    var resolvedFamilyId = THEME_FAMILIES[familyId] ? familyId : 'retro';
+    var resolvedTypeId = typeId === 'light' ? 'light' : 'dark';
+    var vars = family[resolvedTypeId] || family.dark;
 
-    document.documentElement.setAttribute('data-theme', resolvedId);
-    Object.keys(theme.vars).forEach(function (cssVar) {
-      document.documentElement.style.setProperty(cssVar, theme.vars[cssVar]);
+    currentThemeFamily = resolvedFamilyId;
+    currentThemeType = resolvedTypeId;
+
+    document.documentElement.setAttribute('data-theme', resolvedTypeId);
+    document.documentElement.setAttribute('data-theme-family', resolvedFamilyId);
+    Object.keys(vars).forEach(function (cssVar) {
+      document.documentElement.style.setProperty(cssVar, vars[cssVar]);
     });
-    document.dispatchEvent(new CustomEvent('codexThemeChange', { detail: theme.vars }));
+    document.dispatchEvent(new CustomEvent('codexThemeChange', { detail: vars }));
 
     var btn = document.getElementById('themeToggle');
     if (btn) {
-      btn.textContent = resolvedId === 'light' ? '☀️ MODO CLARO' : '🌙 MODO ESCURO';
+      btn.textContent = resolvedTypeId === 'light' ? '☀️ CLARO' : '🌙 ESCURO';
     }
     var select = document.getElementById('themeSelect');
-    if (select) select.value = resolvedId;
+    if (select) select.value = resolvedFamilyId;
 
     try {
-      localStorage.setItem('codexMuninTheme', resolvedId);
+      localStorage.setItem('codexMuninThemeFamily', resolvedFamilyId);
+      localStorage.setItem('codexMuninThemeType', resolvedTypeId);
     } catch (e) {
       /* localStorage indisponivel, ignora persistencia */
     }
