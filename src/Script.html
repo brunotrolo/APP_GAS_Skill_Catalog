@@ -364,6 +364,33 @@
     return false;
   }
 
+  // ---- Motor de temas (design system em tempo real) ----
+  // Cada tema e um conjunto de CSS custom properties aplicado diretamente via
+  // style inline em <html> (document.documentElement.style.setProperty), o que
+  // permite trocar em tempo real sem reload e sem precisar de um bloco CSS
+  // estatico por tema. Novos temas vem de arquivos Markdown em docs/themes/
+  // (ver docs/themes/README.md) traduzidos manualmente para uma entrada aqui.
+  var THEMES = {
+    dark: {
+      label: '🌙 Escuro (padrao)',
+      vars: {
+        '--bg-deep': '#0a0b16', '--bg-panel': '#181a2c', '--bg-card': '#1d2037',
+        '--bg-card-hover': '#262a47', '--border-ink': '#000000', '--text-main': '#f3f4fc',
+        '--gold': '#ffd84a', '--gold-glow': '#ffe98a', '--purple': '#b06aed',
+        '--terminal-green': '#2effa0', '--danger': '#ff5d6c', '--muted': '#b7b9d8'
+      }
+    },
+    light: {
+      label: '☀️ Claro',
+      vars: {
+        '--bg-deep': '#eef0fb', '--bg-panel': '#ffffff', '--bg-card': '#f6f7ff',
+        '--bg-card-hover': '#e9ebfb', '--border-ink': '#1b1d2e', '--text-main': '#1b1d2e',
+        '--gold': '#c98f00', '--gold-glow': '#e8b23a', '--purple': '#8a3fd6',
+        '--terminal-green': '#0f9d64', '--danger': '#c92a3a', '--muted': '#51546f'
+      }
+    }
+  };
+
   function initTheme() {
     var saved = null;
     try {
@@ -371,7 +398,20 @@
     } catch (e) {
       saved = null;
     }
-    applyTheme(saved === 'light' ? 'light' : 'dark');
+    renderThemeList();
+    applyTheme(THEMES[saved] ? saved : 'dark');
+  }
+
+  function renderThemeList() {
+    var select = document.getElementById('themeSelect');
+    if (!select) return;
+    select.innerHTML = '';
+    Object.keys(THEMES).forEach(function (themeId) {
+      var opt = document.createElement('option');
+      opt.value = themeId;
+      opt.textContent = THEMES[themeId].label;
+      select.appendChild(opt);
+    });
   }
 
   function toggleTheme() {
@@ -406,14 +446,24 @@
     });
   });
 
-  function applyTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
+  function applyTheme(themeId) {
+    var theme = THEMES[themeId] || THEMES.dark;
+    var resolvedId = THEMES[themeId] ? themeId : 'dark';
+
+    document.documentElement.setAttribute('data-theme', resolvedId);
+    Object.keys(theme.vars).forEach(function (cssVar) {
+      document.documentElement.style.setProperty(cssVar, theme.vars[cssVar]);
+    });
+
     var btn = document.getElementById('themeToggle');
     if (btn) {
-      btn.textContent = theme === 'light' ? '☀️ MODO CLARO' : '🌙 MODO ESCURO';
+      btn.textContent = resolvedId === 'light' ? '☀️ MODO CLARO' : '🌙 MODO ESCURO';
     }
+    var select = document.getElementById('themeSelect');
+    if (select) select.value = resolvedId;
+
     try {
-      localStorage.setItem('codexMuninTheme', theme);
+      localStorage.setItem('codexMuninTheme', resolvedId);
     } catch (e) {
       /* localStorage indisponivel, ignora persistencia */
     }
