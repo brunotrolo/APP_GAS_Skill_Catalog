@@ -40,7 +40,9 @@
     'O': '#ff8c00',
     'N': '#b0b0b0',
     'F': '#ffae00',
-    'E': '#ff69b4'
+    'E': '#ff69b4',
+    'E2': '#ffb3d9',
+    'O2': '#cc6f00'
   };
 
   // ---- Helpers geometricos: cada personagem e montado com varios
@@ -182,6 +184,7 @@
     setPixel(t, 6, 7, 'B'); setPixel(t, 17, 7, 'B'); // brincos azuis
     fillRect(t, 4, 8, 16, 2, 'Y');
     fillRect(t, 4, 10, 16, 8, 'E');
+    fillRect(t, 4, 10, 16, 2, 'E2');                 // sombreado claro no ombro do vestido
     fillRect(t, 2, 15, 3, 3, 'W'); fillRect(t, 19, 15, 3, 3, 'W'); // luvas brancas
     fillRect(t, 2, 18, 20, 3, 'E');
     return { frames: withWalk(t, 'E', 'E'), actionFrame: buildPeachFloat(t) };
@@ -206,6 +209,7 @@
     fillRect(t, 1, 12, 22, 5, 'G');
     setPixel(t, 4, 13, 'K'); setPixel(t, 9, 13, 'K'); setPixel(t, 14, 13, 'K'); setPixel(t, 19, 13, 'K');
     fillRect(t, 6, 17, 12, 3, 'W');
+    fillRect(t, 2, 17, 2, 2, 'W'); fillRect(t, 20, 17, 2, 2, 'W'); // pulseiras brancas nos pulsos
     return { frames: withWalk(t, 'O', 'O', 'D2'), actionFrame: buildBowserFire(t) };
   }
 
@@ -241,10 +245,12 @@
     var t = newGrid();
     fillRect(t, 9, 0, 6, 2, 'G');
     fillRect(t, 6, 2, 12, 3, 'G');
+    fillRect(t, 7, 4, 2, 1, 'Y'); fillRect(t, 15, 4, 2, 1, 'Y'); // cabelo loiro embaixo do gorro
     fillRect(t, 6, 5, 12, 5, 'S');
     addEyeShine(t, 9, 7); addEyeShine(t, 14, 7);
     fillRect(t, 4, 10, 16, 3, 'G');
     fillRect(t, 4, 13, 16, 5, 'G');
+    fillRect(t, 4, 15, 16, 1, 'D');                   // cinto marrom
     fillRect(t, 1, 12, 3, 7, 'N');                 // escudo
     setPixel(t, 2, 14, 'B'); setPixel(t, 2, 16, 'R');
     fillRect(t, 20, 9, 2, 9, 'N');                   // espada
@@ -264,12 +270,14 @@
     var t = newGrid();
     fillRect(t, 6, 0, 12, 4, 'O');
     fillRect(t, 6, 3, 12, 2, 'K');                  // viseira
+    setPixel(t, 8, 3, 'W');                          // reflexo na viseira
     fillRect(t, 4, 5, 16, 3, 'O');
     fillRect(t, 2, 8, 20, 3, 'O');
     setPixel(t, 4, 8, 'Y'); setPixel(t, 19, 8, 'Y');
     fillRect(t, 5, 11, 14, 6, 'O');
+    fillRect(t, 5, 11, 14, 2, 'O2');                 // sombra no peitoral
     fillRect(t, 8, 14, 8, 2, 'Y');
-    return { frames: withWalk(t, 'O', 'O'), actionFrame: buildSamusBall() };
+    return { frames: withWalk(t, 'O', 'O', 'O2'), actionFrame: buildSamusBall() };
   }
 
   function buildSamusBall() {
@@ -290,6 +298,7 @@
     fillRect(t, 4, 11, 16, 2, 'R');                  // gravata
     fillRect(t, 9, 13, 3, 2, 'R'); fillRect(t, 13, 13, 3, 2, 'R'); // no
     fillRect(t, 4, 15, 16, 4, 'D');
+    fillRect(t, 8, 16, 8, 2, 'S2');                 // barriga mais clara (profundidade)
     return { frames: withWalk(t, 'D', 'D'), actionFrame: buildDkBarrel(t) };
   }
 
@@ -305,7 +314,9 @@
   function buildKirby() {
     var idle = newGrid();
     fillCircle(idle, 12, 12, 9, 'E');
+    fillCircle(idle, 10, 7, 3, 'E2');                 // brilho claro no topo (volume)
     fillRect(idle, 3, 17, 4, 3, 'R'); fillRect(idle, 17, 17, 4, 3, 'R');
+    fillRect(idle, 2, 12, 3, 3, 'E'); fillRect(idle, 19, 12, 3, 3, 'E'); // bracinhos
     fillRect(idle, 8, 9, 2, 3, 'K'); setPixel(idle, 8, 9, 'W'); // olho esquerdo com brilho
     fillRect(idle, 15, 9, 2, 3, 'K'); setPixel(idle, 15, 9, 'W'); // olho direito com brilho
     fillRect(idle, 6, 13, 2, 1, 'R'); fillRect(idle, 16, 13, 2, 1, 'R');
