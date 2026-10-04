@@ -1,10 +1,63 @@
 /**
- * Codex Munin - diagnostico de schema da planilha.
- * Rode manualmente pelo editor do Apps Script (selecione a funcao
- * "verifySheetSchema" no dropdown de funcoes e clique em Run) para confirmar
- * que a planilha configurada em SPREADSHEET_ID tem as abas e colunas que o
- * app espera, antes de publicar o Web App.
+ * Codex Munin - setup e diagnostico de schema da planilha.
+ * Rode manualmente pelo editor do Apps Script (selecione a funcao no dropdown
+ * ao lado do botao Run e clique em Run):
+ *   - setupSpreadsheet(): cria as abas/colunas que faltarem (idempotente).
+ *   - verifySheetSchema(): so confere, nao altera nada.
  */
+
+var CATEGORIAS_SEED = [
+  'Product & Upstream',
+  'Software Engineering',
+  'Debugging & Troubleshooting',
+  'Quality & Test Automation',
+  'DevOps & Release',
+  'Architecture & Workflows'
+];
+
+/**
+ * Cria as abas Skills_Catalog e Categorias com os headers/seed esperados,
+ * caso ainda nao existam. Idempotente: nao duplica nem apaga dados se as
+ * abas ja existirem com conteudo.
+ * @return {{created: Array<string>, alreadyExisted: Array<string>}}
+ */
+function setupSpreadsheet() {
+  var spreadsheet = getSpreadsheet_();
+  var created = [];
+  var alreadyExisted = [];
+
+  var skillsSheet = spreadsheet.getSheetByName(SKILLS_SHEET_NAME);
+  if (!skillsSheet) {
+    skillsSheet = spreadsheet.insertSheet(SKILLS_SHEET_NAME);
+    skillsSheet.getRange(1, 1, 1, SKILLS_HEADERS.length).setValues([SKILLS_HEADERS]);
+    skillsSheet.setFrozenRows(1);
+    created.push(SKILLS_SHEET_NAME);
+  } else {
+    alreadyExisted.push(SKILLS_SHEET_NAME);
+  }
+
+  var categoriasSheet = spreadsheet.getSheetByName(CATEGORIAS_SHEET_NAME);
+  if (!categoriasSheet) {
+    categoriasSheet = spreadsheet.insertSheet(CATEGORIAS_SHEET_NAME);
+    categoriasSheet.getRange(1, 1).setValue('categoria');
+    categoriasSheet.getRange(2, 1, CATEGORIAS_SEED.length, 1).setValues(
+      CATEGORIAS_SEED.map(function (categoria) { return [categoria]; })
+    );
+    categoriasSheet.setFrozenRows(1);
+    created.push(CATEGORIAS_SHEET_NAME);
+  } else {
+    alreadyExisted.push(CATEGORIAS_SHEET_NAME);
+  }
+
+  var result = { created: created, alreadyExisted: alreadyExisted };
+  Logger.log(
+    'setupSpreadsheet: criadas [' + created.join(', ') + '], ja existiam [' + alreadyExisted.join(', ') + ']'
+  );
+  if (created.length > 0) {
+    Logger.log('Rode verifySheetSchema() para confirmar que ficou tudo certo.');
+  }
+  return result;
+}
 
 /**
  * Confere que a planilha tem as abas/colunas esperadas por SheetService.gs.

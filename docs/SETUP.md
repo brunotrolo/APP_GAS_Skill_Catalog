@@ -10,7 +10,11 @@ Passos manuais para colocar o Codex Munin (MVP) no ar.
 
 ## 1. Preparar a planilha (Google Sheets)
 
-Na planilha já criada, adicione duas abas. **Confira item a item** (o app lê o header por posição de coluna, então nome e ordem precisam bater exatamente):
+### Opção automática (recomendada)
+Depois do `clasp push` (seção 2), abra o editor do Apps Script, selecione a função `setupSpreadsheet` no dropdown ao lado do botão "Run"/"Executar" e clique em Run. Na primeira execução o Google vai pedir autorização (é o próprio script acessando a planilha onde ele está instalado — aceite). Ela cria as abas `Skills_Catalog` e `Categorias` com os headers e a lista de categorias certos, **sem apagar nada se elas já existirem**. Depois disso pule direto para o checklist abaixo.
+
+### Opção manual (se preferir criar à mão)
+Adicione duas abas. **Confira item a item** (o app lê o header por posição de coluna, então nome e ordem precisam bater exatamente):
 
 ### Aba `Skills_Catalog`
 Cabeçalho na linha 1, **exatamente estas 17 colunas, nesta ordem**:
@@ -55,7 +59,7 @@ Essa lista é editável depois (o app lê dinamicamente), mas precisa ter pelo m
 - [ ] Aba `Skills_Catalog` existe, com as 17 colunas acima na ordem exata (sem colunas extras antes de `id`, sem renomear nenhuma).
 - [ ] Aba `Categorias` existe, header `categoria`, com ao menos as 6 linhas seed.
 
-Depois do `clasp push` (seção 2), você pode confirmar isso de forma automática: no editor do Apps Script, selecione a função `verifySheetSchema` no dropdown ao lado do botão "Run" (ou "Executar") e clique em Run. Ela só lê a planilha (não altera nada) e grava o resultado no "Execution log" — se houver qualquer divergência de nome/ordem de coluna, ela lista exatamente qual.
+Depois de criar as abas (automático ou manual), rode `verifySheetSchema` no mesmo dropdown de funções para confirmar. Ela só lê a planilha (não altera nada) e grava o resultado no "Execution log" — se houver qualquer divergência de nome/ordem de coluna, ela lista exatamente qual.
 
 ## 2. Enviar o código ao Apps Script
 
