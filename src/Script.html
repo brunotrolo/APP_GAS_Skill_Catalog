@@ -33,7 +33,333 @@
     google.script.run.withSuccessHandler(onCategoriasLoaded).withFailureHandler(onLoadFailure).getCategoriasList();
     wireSidebarNav();
     initTheme();
+    wireModuleNav();
   });
+
+  // ---- Navegacao entre modulos (paginas independentes) ----
+
+  var MODULE_VIEWS_LOADED = {};
+
+  function wireModuleNav() {
+    var items = document.querySelectorAll('.module-nav-item');
+    items.forEach(function (item) {
+      item.onclick = function () {
+        items.forEach(function (i) { i.classList.remove('active'); });
+        item.classList.add('active');
+        switchView(item.dataset.view);
+      };
+    });
+  }
+
+  function switchView(viewId) {
+    document.querySelectorAll('.app-view').forEach(function (view) {
+      view.classList.remove('active');
+    });
+    var target = document.getElementById('view-' + viewId);
+    if (target) target.classList.add('active');
+
+    if (!MODULE_VIEWS_LOADED[viewId]) {
+      MODULE_VIEWS_LOADED[viewId] = true;
+      loadModuleView(viewId);
+    }
+  }
+
+  function loadModuleView(viewId) {
+    var loaders = {
+      archive: loadOdinDocs,
+      oracle: loadOracleItems,
+      radar: loadCommunityRadar,
+      prompts: loadGoldenPrompts,
+      fame: loadWallOfFame,
+      board: loadRequestBoard,
+      airadar: loadAiRadarItems
+    };
+    if (loaders[viewId]) loaders[viewId]();
+  }
+
+  function renderModuleList(containerId, items, emptyMessage, itemRenderer) {
+    var container = document.getElementById(containerId);
+    container.innerHTML = '';
+    if (!items || items.length === 0) {
+      container.innerHTML = '<div class="empty-state">' + emptyMessage + '</div>';
+      return;
+    }
+    items.forEach(function (item) {
+      var div = document.createElement('div');
+      div.className = 'module-item';
+      div.innerHTML = itemRenderer(item);
+      container.appendChild(div);
+    });
+  }
+
+  function formatModuleDate(iso) {
+    if (!iso) return '';
+    var date = new Date(iso);
+    return isNaN(date.getTime()) ? '' : date.toLocaleDateString('pt-BR');
+  }
+
+  // ---- Odin Archive ----
+
+  function loadOdinDocs() {
+    google.script.run.withSuccessHandler(function (result) {
+      if (!result.success) { showToast(friendlyMessage(result), 'error'); return; }
+      renderModuleList('archiveList', result.data, 'NENHUM TOMO REGISTRADO AINDA', function (doc) {
+        return '<h3>' + escapeHtml(doc.titulo) + '</h3>' +
+          (doc.categoria ? '<div class="module-meta">' + escapeHtml(doc.categoria) + '</div>' : '') +
+          '<p>' + escapeHtml(doc.resumo || '') + '</p>' +
+          '<div class="module-actions"><a class="pixel-button secondary" href="' + escapeHtml(doc.conteudo_url) + '" target="_blank">ABRIR</a></div>';
+      });
+    }).withFailureHandler(onLoadFailure).getOdinDocs();
+  }
+
+  function submitOdinDoc(event) {
+    event.preventDefault();
+    var payload = {
+      titulo: document.getElementById('archiveTitulo').value.trim(),
+      categoria: document.getElementById('archiveCategoria').value.trim(),
+      conteudo_url: document.getElementById('archiveUrl').value.trim(),
+      resumo: document.getElementById('archiveResumo').value.trim()
+    };
+    google.script.run.withSuccessHandler(function (result) {
+      if (!result.success) { showToast(friendlyMessage(result), 'error'); return; }
+      showToast('Tomo adicionado!', 'success');
+      event.target.reset();
+      loadOdinDocs();
+    }).withFailureHandler(onLoadFailure).addOdinDoc(payload);
+    return false;
+  }
+
+  // ---- Oracle Weekly ----
+
+  function loadOracleItems() {
+    google.script.run.withSuccessHandler(function (result) {
+      if (!result.success) { showToast(friendlyMessage(result), 'error'); return; }
+      renderModuleList('oracleList', result.data, 'NENHUM ACHADO AINDA', function (item) {
+        return '<h3>' + escapeHtml(item.titulo) + '</h3>' +
+          '<div class="module-meta">' + escapeHtml(item.fonte || '') + ' · ' + formatModuleDate(item.data) + '</div>' +
+          '<p>' + escapeHtml(item.resumo || '') + '</p>' +
+          '<div class="module-actions"><a class="pixel-button secondary" href="' + escapeHtml(item.url) + '" target="_blank">LER</a></div>';
+      });
+    }).withFailureHandler(onLoadFailure).getOracleItems();
+  }
+
+  function submitOracleItem(event) {
+    event.preventDefault();
+    var payload = {
+      titulo: document.getElementById('oracleTitulo').value.trim(),
+      url: document.getElementById('oracleUrl').value.trim(),
+      fonte: document.getElementById('oracleFonte').value.trim(),
+      resumo: document.getElementById('oracleResumo').value.trim()
+    };
+    google.script.run.withSuccessHandler(function (result) {
+      if (!result.success) { showToast(friendlyMessage(result), 'error'); return; }
+      showToast('Achado adicionado!', 'success');
+      event.target.reset();
+      loadOracleItems();
+    }).withFailureHandler(onLoadFailure).addOracleItem(payload);
+    return false;
+  }
+
+  // ---- Community Radar ----
+
+  function loadCommunityRadar() {
+    google.script.run.withSuccessHandler(function (result) {
+      if (!result.success) { showToast(friendlyMessage(result), 'error'); return; }
+      renderModuleList('radarList', result.data, 'NENHUMA SUGESTAO AINDA', function (item) {
+        return '<h3>' + escapeHtml(item.nome_ferramenta) + '</h3>' +
+          '<p>' + escapeHtml(item.descricao || '') + '</p>' +
+          '<div class="module-meta">sugerido por ' + escapeHtml(item.sugerido_por || '') + '</div>' +
+          '<div class="module-actions">' +
+          '<a class="pixel-button secondary" href="' + escapeHtml(item.url) + '" target="_blank">VER</a>' +
+          '<button class="pixel-button" data-upvote="' + escapeHtml(item.id) + '">👍 ' + (Number(item.votos) || 0) + '</button>' +
+          '</div>';
+      });
+      document.querySelectorAll('#radarList [data-upvote]').forEach(function (btn) {
+        btn.onclick = function () {
+          google.script.run.withSuccessHandler(function () { loadCommunityRadar(); })
+            .withFailureHandler(onLoadFailure).upvoteCommunityTool(btn.dataset.upvote);
+        };
+      });
+    }).withFailureHandler(onLoadFailure).getCommunityRadarItems();
+  }
+
+  function submitRadarItem(event) {
+    event.preventDefault();
+    var payload = {
+      nome_ferramenta: document.getElementById('radarNome').value.trim(),
+      url: document.getElementById('radarUrl').value.trim(),
+      descricao: document.getElementById('radarDescricao').value.trim()
+    };
+    google.script.run.withSuccessHandler(function (result) {
+      if (!result.success) { showToast(friendlyMessage(result), 'error'); return; }
+      showToast('Ferramenta sugerida!', 'success');
+      event.target.reset();
+      loadCommunityRadar();
+    }).withFailureHandler(onLoadFailure).suggestCommunityTool(payload);
+    return false;
+  }
+
+  // ---- Golden Prompts ----
+
+  function loadGoldenPrompts() {
+    google.script.run.withSuccessHandler(function (result) {
+      if (!result.success) { showToast(friendlyMessage(result), 'error'); return; }
+      renderModuleList('promptsList', result.data, 'NENHUM PROMPT AINDA', function (item) {
+        return '<h3>' + escapeHtml(item.titulo) + '</h3>' +
+          (item.categoria ? '<div class="module-meta">' + escapeHtml(item.categoria) + '</div>' : '') +
+          '<div class="preview-box">' + escapeHtml(item.prompt_texto) + '</div>' +
+          '<div class="module-actions"><button class="pixel-button secondary" data-copy-prompt="' + escapeHtml(item.id) + '">COPIAR</button></div>';
+      });
+      document.querySelectorAll('#promptsList [data-copy-prompt]').forEach(function (btn) {
+        btn.onclick = function () {
+          var promptBox = btn.closest('.module-item').querySelector('.preview-box');
+          copyToClipboard(promptBox.textContent);
+          google.script.run.withFailureHandler(function () {}).registerPromptUse(btn.dataset.copyPrompt);
+        };
+      });
+    }).withFailureHandler(onLoadFailure).getGoldenPrompts();
+  }
+
+  function submitGoldenPrompt(event) {
+    event.preventDefault();
+    var payload = {
+      titulo: document.getElementById('promptTitulo').value.trim(),
+      prompt_texto: document.getElementById('promptTexto').value.trim(),
+      variaveis: document.getElementById('promptVariaveis').value.trim(),
+      categoria: document.getElementById('promptCategoria').value.trim()
+    };
+    google.script.run.withSuccessHandler(function (result) {
+      if (!result.success) { showToast(friendlyMessage(result), 'error'); return; }
+      showToast('Prompt adicionado!', 'success');
+      event.target.reset();
+      loadGoldenPrompts();
+    }).withFailureHandler(onLoadFailure).addGoldenPrompt(payload);
+    return false;
+  }
+
+  // ---- Sandbox ----
+
+  function submitSandboxPrompt(event) {
+    event.preventDefault();
+    var btn = document.getElementById('sandboxSubmitBtn');
+    var output = document.getElementById('sandboxOutput');
+    var payload = {
+      skillNome: document.getElementById('sandboxSkillNome').value.trim(),
+      inputTexto: document.getElementById('sandboxInput').value.trim()
+    };
+    btn.disabled = true;
+    btn.textContent = 'RODANDO...';
+    google.script.run.withSuccessHandler(function (result) {
+      btn.disabled = false;
+      btn.textContent = '▶️ RODAR TESTE';
+      output.style.display = 'block';
+      if (!result.success) {
+        output.textContent = friendlyMessage(result);
+        return;
+      }
+      output.textContent = result.data.outputTexto;
+    }).withFailureHandler(function (err) {
+      btn.disabled = false;
+      btn.textContent = '▶️ RODAR TESTE';
+      output.style.display = 'block';
+      output.textContent = err && err.message ? err.message : 'Erro ao rodar o sandbox.';
+    }).runSandboxPrompt(payload);
+    return false;
+  }
+
+  // ---- Wall of Fame ----
+
+  function loadWallOfFame() {
+    google.script.run.withSuccessHandler(function (result) {
+      if (!result.success) { showToast(friendlyMessage(result), 'error'); return; }
+      renderModuleList('fameList', result.data, 'NENHUM IMPACTO REGISTRADO AINDA', function (item) {
+        return '<h3>' + escapeHtml(item.skill_nome) + '</h3>' +
+          (item.time ? '<div class="module-meta">' + escapeHtml(item.time) + '</div>' : '') +
+          '<p>' + escapeHtml(item.impacto) + '</p>';
+      });
+    }).withFailureHandler(onLoadFailure).getWallOfFameEntries();
+  }
+
+  function submitFameEntry(event) {
+    event.preventDefault();
+    var payload = {
+      skill_nome: document.getElementById('fameSkillNome').value.trim(),
+      time: document.getElementById('fameTime').value.trim(),
+      impacto: document.getElementById('fameImpacto').value.trim()
+    };
+    google.script.run.withSuccessHandler(function (result) {
+      if (!result.success) { showToast(friendlyMessage(result), 'error'); return; }
+      showToast('Impacto registrado!', 'success');
+      event.target.reset();
+      loadWallOfFame();
+    }).withFailureHandler(onLoadFailure).addWallOfFameEntry(payload);
+    return false;
+  }
+
+  // ---- Odin Request Board ----
+
+  function loadRequestBoard() {
+    google.script.run.withSuccessHandler(function (result) {
+      if (!result.success) { showToast(friendlyMessage(result), 'error'); return; }
+      renderModuleList('boardList', result.data, 'NENHUMA MISSAO ABERTA', function (item) {
+        return '<h3>' + escapeHtml(item.titulo) + '</h3>' +
+          '<p>' + escapeHtml(item.descricao || '') + '</p>' +
+          '<div class="module-meta">' + escapeHtml(item.status) + ' · pedido por ' + escapeHtml(item.solicitante || '') + '</div>' +
+          '<div class="module-actions"><button class="pixel-button" data-upvote-board="' + escapeHtml(item.id) + '">👍 ' + (Number(item.votos) || 0) + '</button></div>';
+      });
+      document.querySelectorAll('#boardList [data-upvote-board]').forEach(function (btn) {
+        btn.onclick = function () {
+          google.script.run.withSuccessHandler(function () { loadRequestBoard(); })
+            .withFailureHandler(onLoadFailure).upvoteRequestBoardItem(btn.dataset.upvoteBoard);
+        };
+      });
+    }).withFailureHandler(onLoadFailure).getRequestBoardItems();
+  }
+
+  function submitBoardItem(event) {
+    event.preventDefault();
+    var payload = {
+      titulo: document.getElementById('boardTitulo').value.trim(),
+      descricao: document.getElementById('boardDescricao').value.trim()
+    };
+    google.script.run.withSuccessHandler(function (result) {
+      if (!result.success) { showToast(friendlyMessage(result), 'error'); return; }
+      showToast('Missao aberta!', 'success');
+      event.target.reset();
+      loadRequestBoard();
+    }).withFailureHandler(onLoadFailure).addRequestBoardItem(payload);
+    return false;
+  }
+
+  // ---- AI Tech Radar ----
+
+  function loadAiRadarItems() {
+    google.script.run.withSuccessHandler(function (result) {
+      if (!result.success) { showToast(friendlyMessage(result), 'error'); return; }
+      renderModuleList('airadarList', result.data, 'NENHUMA TECNOLOGIA CLASSIFICADA AINDA', function (item) {
+        var quadClass = 'q-' + String(item.quadrante || '').toLowerCase();
+        return '<span class="quadrant-badge ' + quadClass + '">' + escapeHtml(item.quadrante) + '</span>' +
+          '<h3>' + escapeHtml(item.nome) + '</h3>' +
+          '<p>' + escapeHtml(item.descricao || '') + '</p>';
+      });
+    }).withFailureHandler(onLoadFailure).getAiRadarItems();
+  }
+
+  function submitAiRadarItem(event) {
+    event.preventDefault();
+    var payload = {
+      nome: document.getElementById('airadarNome').value.trim(),
+      quadrante: document.getElementById('airadarQuadrante').value,
+      descricao: document.getElementById('airadarDescricao').value.trim()
+    };
+    google.script.run.withSuccessHandler(function (result) {
+      if (!result.success) { showToast(friendlyMessage(result), 'error'); return; }
+      showToast('Tecnologia classificada!', 'success');
+      event.target.reset();
+      loadAiRadarItems();
+    }).withFailureHandler(onLoadFailure).addAiRadarItem(payload);
+    return false;
+  }
 
   function initTheme() {
     var saved = null;
@@ -248,10 +574,13 @@
       .join('');
 
     var clones = Number(skill.clones) || 0;
+    var healthDot = skill.status_saude === 'VERDE' ? '🟢' :
+      skill.status_saude === 'AMARELO' ? '🟡' :
+      skill.status_saude === 'VERMELHO' ? '🔴' : '';
 
     card.innerHTML =
       '<span class="badge ' + badgeClass + '">' + badgeLabel + '</span>' +
-      '<h3>' + escapeHtml(skill.nome) + '</h3>' +
+      '<h3>' + (healthDot ? healthDot + ' ' : '') + escapeHtml(skill.nome) + '</h3>' +
       '<div class="meta">por ' + escapeHtml(skill.autor) + '</div>' +
       '<span class="categoria-badge ' + categoriaClass + '">' + escapeHtml(skill.categoria_primaria || '') + '</span>' +
       '<div class="resumo">' + escapeHtml(skill.resumo || '') + '</div>' +

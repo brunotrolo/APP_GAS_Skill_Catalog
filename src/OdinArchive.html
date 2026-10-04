@@ -1,0 +1,16 @@
+<div id="view-archive" class="app-view">
+  <div class="pixel-panel module-panel">
+    <h2>🗄️ ODIN ARCHIVE — TOMOS DE CONHECIMENTO</h2>
+    <p class="module-desc">Documentos, manuais e guias internos do time.</p>
+
+    <form class="module-form" onsubmit="return submitOdinDoc(event)">
+      <input type="text" id="archiveTitulo" placeholder="Titulo do documento" required>
+      <input type="text" id="archiveCategoria" placeholder="Categoria (opcional)">
+      <input type="text" id="archiveUrl" placeholder="URL do documento (Drive, Confluence, etc.)" required>
+      <input type="text" id="archiveResumo" placeholder="Resumo curto (opcional)">
+      <button type="submit" class="pixel-button">+ ADICIONAR TOMO</button>
+    </form>
+
+    <div id="archiveList" class="module-list"></div>
+  </div>
+</div>
