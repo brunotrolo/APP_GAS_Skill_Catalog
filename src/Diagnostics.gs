@@ -34,6 +34,12 @@ function setupSpreadsheet() {
     created.push(SKILLS_SHEET_NAME);
   } else {
     alreadyExisted.push(SKILLS_SHEET_NAME);
+    var existingHeaders = skillsSheet.getRange(1, 1, 1, Math.max(skillsSheet.getLastColumn(), 1)).getValues()[0];
+    if (existingHeaders.indexOf('clones') === -1) {
+      var nextCol = skillsSheet.getLastColumn() + 1;
+      skillsSheet.getRange(1, nextCol).setValue('clones');
+      Logger.log('setupSpreadsheet: coluna "clones" adicionada em ' + SKILLS_SHEET_NAME + '.');
+    }
   }
 
   var categoriasSheet = spreadsheet.getSheetByName(CATEGORIAS_SHEET_NAME);

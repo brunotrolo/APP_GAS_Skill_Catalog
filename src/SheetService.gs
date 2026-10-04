@@ -8,7 +8,8 @@ var CATEGORIAS_SHEET_NAME = 'Categorias';
 var SKILLS_HEADERS = [
   'id', 'nome', 'tipo', 'autor', 'resumo', 'categoria_primaria', 'tags',
   'repo_url', 'owner', 'repo_name', 'default_branch', 'zip_url',
-  'clone_bash', 'clone_powershell', 'data_registro', 'registrado_por', 'ativo'
+  'clone_bash', 'clone_powershell', 'data_registro', 'registrado_por', 'ativo',
+  'clones'
 ];
 
 /**
@@ -140,7 +141,32 @@ function appendSkillRow(skillObject) {
   completeSkill.data_registro = completeSkill.data_registro || new Date().toISOString();
   completeSkill.registrado_por = completeSkill.registrado_por || Session.getActiveUser().getEmail();
   completeSkill.ativo = completeSkill.ativo === undefined ? true : completeSkill.ativo;
+  completeSkill.clones = completeSkill.clones || 0;
 
   sheet.appendRow(objectToRow_(completeSkill));
   return completeSkill;
+}
+
+/**
+ * Incrementa o contador de clones/downloads de uma skill em 1.
+ * @param {string} id
+ * @return {number} o novo valor do contador.
+ */
+function incrementSkillClones(id) {
+  var sheet = getSkillsSheet_();
+  var values = sheet.getDataRange().getValues();
+  var headers = values[0];
+  var idCol = headers.indexOf('id');
+  var clonesCol = headers.indexOf('clones');
+
+  for (var i = 1; i < values.length; i++) {
+    if (values[i][idCol] === id) {
+      var current = Number(values[i][clonesCol]) || 0;
+      var updated = current + 1;
+      sheet.getRange(i + 1, clonesCol + 1).setValue(updated);
+      return updated;
+    }
+  }
+
+  throw new SkillCatalogError('NOT_FOUND', 'Skill nao encontrada: ' + id);
 }

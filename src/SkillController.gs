@@ -94,6 +94,22 @@ function registerSkillFromGithub(formPayload) {
 }
 
 /**
+ * Registra 1 clone/download de uma skill (clique em ZIP, Git Bash ou PowerShell).
+ * @param {string} skillId
+ * @return {{success: boolean, data?: number, errorCode?: string, message?: string}}
+ */
+function registerSkillClone(skillId) {
+  try {
+    if (!skillId) {
+      throw new SkillCatalogError('INVALID_PAYLOAD', 'skillId e obrigatorio.');
+    }
+    return { success: true, data: incrementSkillClones(skillId) };
+  } catch (err) {
+    return toErrorResult_(err);
+  }
+}
+
+/**
  * Computa zipUrl e cloneCommands a partir de metadados ja buscados do GitHub.
  * Unico ponto de calculo, reutilizado por previewGithubRepo e registerSkillFromGithub
  * para que a previa do modal nunca divirja do que e efetivamente salvo.
