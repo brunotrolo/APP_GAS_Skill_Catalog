@@ -1,0 +1,111 @@
+<style>
+  /* De docs/themes/DESIGN-miro.md. Brand = #1c1c1e (preto), literal bg do
+       button-primary - diferente do caso BMW: aqui o Do explicito diz
+       "Use {colors.primary} (black) as the dominant CTA on ALL surfaces",
+       nao um botao-fantasma/outline. O amarelo canario e "signature" so
+       no sentido de reconhecimento de marca (wordmark) - Don't explicito
+       "Don't use brand-yellow on standard CTAs or large background
+       surfaces... reserve for wordmark/promo-banner/tag-chips only".
+       Por isso --gold inverte por modo (branco/preto), igual Nike/Uber,
+       e o amarelo fica de fora do Brand generico, usado apenas e
+       estritamente em --warn. O modo escuro usa footer-bg (#1c1c1e,
+       literal) como --bg-deep - nao totalmente extrapolado. cat-1..6 usa
+       a paleta pastel de sticky-note real do produto (coral/teal/rosa/
+       laranja-claro/azul/verde) - descrita no proprio arquivo como
+       "echo the actual sticky-note color palette used on the live
+       whiteboard", encaixe literal perfeito para tags/categorias.
+       --terminal-green=success-accent (literal). --danger usa coral-dark
+       (#600000, literalmente "coral-tag text color", o vermelho mais
+       forte disponivel). Forma: rounded.full (9999px) em botoes/badges,
+       rounded.xl (16px) em cards. --shadow-chunky usa a sombra "card"
+       literal (nao "sem sombra" - o arquivo tem elevacao real).
+       Fonte: Roobert PRO e proprietaria; o proprio fallback do arquivo
+       lista Noto Sans primeiro. */
+  :root[data-theme-family="miro"][data-theme="dark"] {
+    --cat-1: #ff9999;
+    --cat-2: #0fbcb0;
+    --cat-3: #ffd8f4;
+    --cat-4: #ffe6cd;
+    --cat-5: #4262ff;
+    --cat-6: #00b473;
+    --on-cat: #1c1c1e;
+    --bg-deep: #1c1c1e;
+    --bg-panel: #2c2c34;
+    --bg-card: #2c2c34;
+    --bg-card-hover: #555a6a;
+    --border-ink: #6b6f7e;
+    --text-main: #ffffff;
+    --gold: #ffffff;
+    --gold-glow: #555a6a;
+    --purple: #4262ff;
+    --terminal-green: #00b473;
+    --danger: #600000;
+    --muted: #a5a8b5;
+    --info: #4262ff;
+    --warn: #ffd02f;
+    --gold-glow-rgb: 85, 90, 106;
+    --terminal-green-rgb: 0, 180, 115;
+    --font-heading: 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-display: 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --radius-s: 9999px;
+    --radius-m: 16px;
+    --radius-pill: 9999px;
+    --border-width: 1px;
+    --shadow-chunky: 0 4px 12px rgba(5, 0, 56, 0.3);
+    --letter-spacing-heading: -0.5px;
+    --heading-transform: none;
+    --on-accent: #1c1c1e;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="miro"][data-theme="light"] {
+    --cat-1: #ff9999;
+    --cat-2: #0fbcb0;
+    --cat-3: #ffd8f4;
+    --cat-4: #ffe6cd;
+    --cat-5: #4262ff;
+    --cat-6: #00b473;
+    --on-cat: #1c1c1e;
+    --bg-deep: #ffffff;
+    --bg-panel: #f7f8fa;
+    --bg-card: #ffffff;
+    --bg-card-hover: #fafbfc;
+    --border-ink: #e0e2e8;
+    --text-main: #1c1c1e;
+    --gold: #1c1c1e;
+    --gold-glow: #2c2c34;
+    --purple: #4262ff;
+    --terminal-green: #00b473;
+    --danger: #600000;
+    --muted: #6b6f7e;
+    --info: #4262ff;
+    --warn: #ffd02f;
+    --gold-glow-rgb: 44, 44, 52;
+    --terminal-green-rgb: 0, 180, 115;
+    --font-heading: 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-display: 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --radius-s: 9999px;
+    --radius-m: 16px;
+    --radius-pill: 9999px;
+    --border-width: 1px;
+    --shadow-chunky: 0 4px 12px rgba(5, 0, 56, 0.06);
+    --letter-spacing-heading: -0.5px;
+    --heading-transform: none;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>

@@ -1,0 +1,110 @@
+<style>
+  /* De docs/themes/DESIGN-posthog.md. Brand = #f7a501 (laranja-amarelo),
+       literal bg do button-primary, unico acento saturado do sistema,
+       igual nos dois modos. O modo escuro usa surface-dark (#23251d,
+       mesmo hex de ink - "the brand uses one olive-near-black for both
+       text and dark code surfaces") como --bg-deep - um neutro escuro
+       LITERAL do arquivo (code-block), nao totalmente inventado, mesmo
+       sem o arquivo documentar um "modo escuro" formal (ele e
+       explicitamente cream-only: "never substitute pure white or
+       full-bleed dark hero bands"). cat-1..6 usa os 4 accent-* reais
+       (blue/red/green/purple, literalmente os callouts de doc "tip/
+       warning/success/note") + link-teal/link-blue para completar 6.
+       --terminal-green=accent-green (literalmente "Success" no callout),
+       --danger=accent-red (literalmente "Warning"), --info=accent-blue
+       (literalmente "Tip/Info") - os 3 semanticos mais literais que
+       tivemos ate agora. Forma: rounded.md (6px) em botoes E cards
+       (mesmo valor para os dois, literal), rounded.full (9999px) em
+       badges (literal, badge-promo usa o mesmo). --shadow-chunky: none
+       ("no drop shadow elevation... flat with thin olive borders only").
+       Fonte: IBM Plex Sans Variable e open-source e hospedada no Google
+       Fonts - carregada direto, sem precisar de substituto (unico tema
+       ate agora onde a fonte literal esta disponivel de verdade). */
+  :root[data-theme-family="posthog"][data-theme="dark"] {
+    --cat-1: #2c84e0;
+    --cat-2: #cd4239;
+    --cat-3: #2c8c66;
+    --cat-4: #7c44a6;
+    --cat-5: #1078a3;
+    --cat-6: #1d4ed8;
+    --on-cat: #ffffff;
+    --bg-deep: #23251d;
+    --bg-panel: #33342d;
+    --bg-card: #33342d;
+    --bg-card-hover: #6c6e63;
+    --border-ink: #9b9c92;
+    --text-main: #ffffff;
+    --gold: #f7a501;
+    --gold-glow: #dd9001;
+    --purple: #7c44a6;
+    --terminal-green: #2c8c66;
+    --danger: #cd4239;
+    --muted: #9b9c92;
+    --info: #2c84e0;
+    --warn: #b17816;
+    --gold-glow-rgb: 221, 144, 1;
+    --terminal-green-rgb: 44, 140, 102;
+    --font-heading: 'IBM Plex Sans', -apple-system, system-ui, sans-serif;
+    --font-body: 'IBM Plex Sans', -apple-system, system-ui, sans-serif;
+    --font-display: 'IBM Plex Sans', -apple-system, system-ui, sans-serif;
+    --radius-s: 6px;
+    --radius-m: 6px;
+    --radius-pill: 9999px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: -0.5px;
+    --heading-transform: none;
+    --on-accent: #23251d;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="posthog"][data-theme="light"] {
+    --cat-1: #2c84e0;
+    --cat-2: #cd4239;
+    --cat-3: #2c8c66;
+    --cat-4: #7c44a6;
+    --cat-5: #1078a3;
+    --cat-6: #1d4ed8;
+    --on-cat: #ffffff;
+    --bg-deep: #eeefe9;
+    --bg-panel: #e5e7e0;
+    --bg-card: #ffffff;
+    --bg-card-hover: #fcfcfa;
+    --border-ink: #bfc1b7;
+    --text-main: #23251d;
+    --gold: #f7a501;
+    --gold-glow: #dd9001;
+    --purple: #7c44a6;
+    --terminal-green: #2c8c66;
+    --danger: #cd4239;
+    --muted: #4d4f46;
+    --info: #2c84e0;
+    --warn: #b17816;
+    --gold-glow-rgb: 221, 144, 1;
+    --terminal-green-rgb: 44, 140, 102;
+    --font-heading: 'IBM Plex Sans', -apple-system, system-ui, sans-serif;
+    --font-body: 'IBM Plex Sans', -apple-system, system-ui, sans-serif;
+    --font-display: 'IBM Plex Sans', -apple-system, system-ui, sans-serif;
+    --radius-s: 6px;
+    --radius-m: 6px;
+    --radius-pill: 9999px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: -0.5px;
+    --heading-transform: none;
+    --on-accent: #23251d;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>
