@@ -539,7 +539,7 @@
     card.className = 'skill-card';
 
     var badgeClass = skill.tipo === 'INTERNA' ? 'interna' : 'curadoria';
-    var badgeLabel = skill.tipo === 'INTERNA' ? 'INTERNA - ODIN' : 'CURADORIA';
+    var badgeLabel = skill.tipo === 'INTERNA' ? 'INTERNA' : 'CURADORIA';
     var categoriaClass = CATEGORY_COLORS[skill.categoria_primaria] || 'cat-default';
 
     var tagsHtml = (skill.tags || '')
