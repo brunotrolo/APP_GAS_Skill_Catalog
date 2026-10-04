@@ -1,0 +1,151 @@
+<script>
+(function () {
+  var canvas = document.getElementById('retroBanner');
+  var ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+
+  var PALETTE = {
+    '.': 'transparent',
+    'K': '#000000',
+    'W': '#ffffff',
+    'R': '#e52521',
+    'B': '#0026ff',
+    'G': '#00b140',
+    'Y': '#fbd000',
+    'S': '#f8b878',
+    'D': '#663931',
+    'P': '#9b59b6'
+  };
+
+  // Homenagens estilizadas, nao copias de assets originais.
+  var SPRITES = {
+    plumber: [
+      "..RRR...",
+      ".RRRRRR.",
+      ".DDSWK..",
+      ".SDSSSK.",
+      "..RRBB..",
+      ".RRRRRR.",
+      ".BBBBBB.",
+      "..D..D.."
+    ],
+    elf: [
+      "..GGG...",
+      ".GGGG...",
+      ".GSSSK..",
+      ".SSSSK..",
+      "..GGGW..",
+      ".GGGG...",
+      "..DD....",
+      "..DD...."
+    ],
+    spark: [
+      "K.YY..K.",
+      ".YYYYYY.",
+      "YYYYYYYY",
+      "YRYYYRYK",
+      "YYYYYYYY",
+      ".YY..YY.",
+      ".YY..YY.",
+      ".KK..KK."
+    ],
+    valkyrie: [
+      "..PPP...",
+      ".WPPPW..",
+      "..SSSK..",
+      ".DDDDDK.",
+      ".DPPPD..",
+      "..DDD...",
+      "..D.D...",
+      "..K.K..."
+    ]
+  };
+
+  function parseSprite(matrix) {
+    var imgData = ctx.createImageData(8, 8);
+    for (var y = 0; y < 8; y++) {
+      for (var x = 0; x < 8; x++) {
+        var char = matrix[y][x];
+        var hex = PALETTE[char] || 'transparent';
+        var i = (y * 8 + x) * 4;
+        if (hex !== 'transparent') {
+          imgData.data[i] = parseInt(hex.slice(1, 3), 16);
+          imgData.data[i + 1] = parseInt(hex.slice(3, 5), 16);
+          imgData.data[i + 2] = parseInt(hex.slice(5, 7), 16);
+          imgData.data[i + 3] = 255;
+        }
+      }
+    }
+    return imgData;
+  }
+
+  var parsedSprites = Object.keys(SPRITES).map(function (k) { return parseSprite(SPRITES[k]); });
+
+  var heroes = [
+    { x: 30, speed: 0.6, sprite: parsedSprites[0], bob: 0 },
+    { x: 130, speed: 0.5, sprite: parsedSprites[1], bob: 1 },
+    { x: 250, speed: 0.7, sprite: parsedSprites[2], bob: 2 },
+    { x: 380, speed: 0.55, sprite: parsedSprites[3], bob: 0 }
+  ];
+
+  var bgOffset = 0;
+  var SCALE = 4;
+
+  function drawSprite(imgData, x, y) {
+    for (var sy = 0; sy < 8; sy++) {
+      for (var sx = 0; sx < 8; sx++) {
+        var i = (sy * 8 + sx) * 4;
+        var alpha = imgData.data[i + 3];
+        if (alpha === 0) continue;
+        ctx.fillStyle = 'rgb(' + imgData.data[i] + ',' + imgData.data[i + 1] + ',' + imgData.data[i + 2] + ')';
+        ctx.fillRect(x + sx * SCALE, y + sy * SCALE, SCALE, SCALE);
+      }
+    }
+  }
+
+  function render() {
+    ctx.fillStyle = '#121826';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = '#ffffff';
+    for (var i = 0; i < 20; i++) {
+      var sx = (i * 35 + bgOffset * 0.1) % canvas.width;
+      var sy = 5 + (i * 7) % 45;
+      ctx.fillRect(sx, sy, 1, 1);
+    }
+
+    ctx.fillStyle = '#1e293b';
+    for (var m = 0; m < 8; m++) {
+      var mx = (m * 90 - bgOffset * 0.2) % (canvas.width + 90) - 45;
+      ctx.beginPath();
+      ctx.moveTo(mx, 80);
+      ctx.lineTo(mx + 45, 36);
+      ctx.lineTo(mx + 90, 80);
+      ctx.fill();
+    }
+
+    ctx.fillStyle = '#334155';
+    ctx.fillRect(0, 80, canvas.width, 16);
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 84, canvas.width, 2);
+
+    heroes.forEach(function (h) {
+      h.x += h.speed;
+      h.bob = (h.bob + 0.1) % (Math.PI * 2);
+      var bobY = Math.sin(h.bob) * 2;
+
+      drawSprite(h.sprite, Math.floor(h.x), Math.floor(48 + bobY));
+
+      if (h.x > canvas.width) {
+        h.x = -32;
+        h.sprite = parsedSprites[Math.floor(Math.random() * parsedSprites.length)];
+      }
+    });
+
+    bgOffset += 0.5;
+    requestAnimationFrame(render);
+  }
+
+  render();
+})();
+</script>

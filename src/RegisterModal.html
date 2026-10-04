@@ -1,0 +1,63 @@
+<div class="modal-overlay" id="registerModal">
+  <div class="modal-box">
+    <h2>CADASTRAR SKILL</h2>
+
+    <div class="form-field">
+      <label>URL DO REPOSITORIO (GITHUB)</label>
+      <div style="display:flex; gap:6px;">
+        <input type="text" id="repoUrlInput" placeholder="https://github.com/owner/repo" style="flex:1;">
+        <button class="pixel-button secondary" onclick="fetchRepoInfo()">FETCH</button>
+      </div>
+      <div class="error-text" id="fetchError"></div>
+    </div>
+
+    <div id="formFields" style="display:none;">
+      <div class="form-field">
+        <label>NOME</label>
+        <input type="text" id="skillNome">
+      </div>
+
+      <div class="form-field">
+        <label>AUTOR / OWNER</label>
+        <input type="text" id="skillAutor" disabled>
+      </div>
+
+      <div class="form-field">
+        <label>RESUMO</label>
+        <textarea id="skillResumo" rows="3"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>TIPO</label>
+        <div class="radio-group">
+          <label><input type="radio" name="tipo" value="INTERNA"> INTERNA [ODIN]</label>
+          <label><input type="radio" name="tipo" value="CURADORIA"> CURADORIA</label>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label>CATEGORIA PRIMARIA</label>
+        <select id="skillCategoria">
+          <option value="">Selecione uma categoria...</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label>TAGS (separadas por virgula)</label>
+        <input type="text" id="skillTags">
+      </div>
+
+      <div class="form-field">
+        <label>PREVIEW</label>
+        <div class="preview-box" id="previewBox"></div>
+      </div>
+    </div>
+
+    <div class="error-text" id="saveError"></div>
+
+    <div class="search-row" style="margin-top: 12px;">
+      <button class="pixel-button success" id="saveSkillBtn" onclick="saveSkill()" disabled>SALVAR</button>
+      <button class="pixel-button secondary" onclick="closeRegisterModal()">CANCELAR</button>
+    </div>
+  </div>
+</div>

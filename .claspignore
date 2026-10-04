@@ -1,0 +1,10 @@
+**/**
+!src/**/*.gs
+!src/**/*.html
+!src/appsscript.json
+node_modules/**
+.git/**
+docs/**
+README.md
+package.json
+package-lock.json

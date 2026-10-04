@@ -1,0 +1,16 @@
+{
+  "name": "codex-munin-skill-catalog",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Codex Munin - Catalogo de Skills do Odin (Google Apps Script + Google Sheets)",
+  "devDependencies": {
+    "@google/clasp": "^2.4.2"
+  },
+  "scripts": {
+    "login": "clasp login",
+    "create": "clasp create --type webapp --title \"Codex Munin\" --rootDir ./src",
+    "push": "clasp push",
+    "open": "clasp open",
+    "deploy": "clasp deploy"
+  }
+}

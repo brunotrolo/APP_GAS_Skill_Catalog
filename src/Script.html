@@ -1,0 +1,300 @@
+<script>
+  var allSkills = [];
+  var activeTags = new Set();
+  var lastFetchedMetadata = null;
+
+  var ERROR_MESSAGES = {
+    INVALID_URL: 'Essa URL nao parece ser de um repositorio do GitHub.',
+    PRIVATE_OR_NOT_FOUND: 'Repositorio nao encontrado ou privado. Se for privado, configure GITHUB_TOKEN.',
+    PRIVATE_REPO_NO_ACCESS: 'Sem acesso a este repositorio privado.',
+    RATE_LIMITED: 'Limite de requisicoes do GitHub atingido. Tente novamente mais tarde.',
+    GITHUB_API_ERROR: 'Erro inesperado ao consultar o GitHub.',
+    INVALID_PAYLOAD: 'Preencha tipo e categoria antes de salvar.',
+    MISSING_SPREADSHEET_ID: 'Configuracao pendente: SPREADSHEET_ID nao definido.',
+    UNKNOWN_ERROR: 'Erro inesperado. Tente novamente.'
+  };
+
+  function friendlyMessage(result) {
+    return (result && result.message) || ERROR_MESSAGES[result && result.errorCode] || ERROR_MESSAGES.UNKNOWN_ERROR;
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    google.script.run.withSuccessHandler(onSkillsLoaded).withFailureHandler(onLoadFailure).getSkills();
+    google.script.run.withSuccessHandler(onCategoriasLoaded).withFailureHandler(onLoadFailure).getCategoriasList();
+  });
+
+  function onLoadFailure(err) {
+    showToast('Falha ao carregar dados: ' + (err && err.message ? err.message : err), 'error');
+  }
+
+  function onSkillsLoaded(result) {
+    if (!result.success) {
+      showToast(friendlyMessage(result), 'error');
+      allSkills = [];
+    } else {
+      allSkills = result.data;
+    }
+    renderTagPills();
+    applyFilters();
+  }
+
+  function onCategoriasLoaded(result) {
+    var select = document.getElementById('categoryFilter');
+    var modalSelect = document.getElementById('skillCategoria');
+    if (!result.success) {
+      showToast(friendlyMessage(result), 'error');
+      return;
+    }
+    result.data.forEach(function (categoria) {
+      var opt1 = document.createElement('option');
+      opt1.value = categoria;
+      opt1.textContent = categoria;
+      select.appendChild(opt1);
+
+      var opt2 = document.createElement('option');
+      opt2.value = categoria;
+      opt2.textContent = categoria;
+      modalSelect.appendChild(opt2);
+    });
+  }
+
+  function renderTagPills() {
+    var container = document.getElementById('tagPills');
+    container.innerHTML = '';
+    var tagSet = new Set();
+    allSkills.forEach(function (skill) {
+      (skill.tags || '').split(',').forEach(function (tag) {
+        var trimmed = tag.trim();
+        if (trimmed) tagSet.add(trimmed);
+      });
+    });
+
+    Array.from(tagSet).sort().forEach(function (tag) {
+      var pill = document.createElement('span');
+      pill.className = 'tag-pill' + (activeTags.has(tag) ? ' active' : '');
+      pill.textContent = '#' + tag;
+      pill.onclick = function () {
+        if (activeTags.has(tag)) {
+          activeTags.delete(tag);
+        } else {
+          activeTags.add(tag);
+        }
+        renderTagPills();
+        applyFilters();
+      };
+      container.appendChild(pill);
+    });
+  }
+
+  function applyFilters() {
+    var searchTerm = document.getElementById('searchBox').value.toLowerCase();
+    var selectedCategory = document.getElementById('categoryFilter').value;
+
+    var filtered = allSkills.filter(function (skill) {
+      var haystack = [skill.nome, skill.resumo, skill.autor, skill.tags]
+        .join(' ')
+        .toLowerCase();
+      var matchText = !searchTerm || haystack.indexOf(searchTerm) !== -1;
+      var matchCategory = selectedCategory === 'ALL' || skill.categoria_primaria === selectedCategory;
+
+      var skillTags = (skill.tags || '').split(',').map(function (t) { return t.trim(); });
+      var matchTags = activeTags.size === 0 || Array.from(activeTags).every(function (t) {
+        return skillTags.indexOf(t) !== -1;
+      });
+
+      return matchText && matchCategory && matchTags;
+    });
+
+    renderSkillCards(filtered);
+  }
+
+  function renderSkillCards(skills) {
+    var grid = document.getElementById('skill-grid');
+    grid.innerHTML = '';
+
+    if (skills.length === 0) {
+      grid.innerHTML = '<div class="empty-state">NENHUMA SKILL ENCONTRADA</div>';
+      return;
+    }
+
+    skills.forEach(function (skill) {
+      grid.appendChild(buildCardElement(skill));
+    });
+  }
+
+  function buildCardElement(skill) {
+    var card = document.createElement('div');
+    card.className = 'skill-card';
+
+    var badgeClass = skill.tipo === 'INTERNA' ? 'interna' : 'curadoria';
+    var badgeLabel = skill.tipo === 'INTERNA' ? 'INTERNA - ODIN' : 'CURADORIA';
+
+    var tagsHtml = (skill.tags || '')
+      .split(',')
+      .map(function (t) { return t.trim(); })
+      .filter(Boolean)
+      .map(function (t) { return '<span>#' + escapeHtml(t) + '</span>'; })
+      .join('');
+
+    card.innerHTML =
+      '<span class="badge ' + badgeClass + '">' + badgeLabel + '</span>' +
+      '<h3>' + escapeHtml(skill.nome) + '</h3>' +
+      '<div class="meta">por ' + escapeHtml(skill.autor) + '</div>' +
+      '<div class="categoria">' + escapeHtml(skill.categoria_primaria || '') + '</div>' +
+      '<div class="resumo">' + escapeHtml(skill.resumo || '') + '</div>' +
+      '<div class="tags">' + tagsHtml + '</div>' +
+      '<div class="actions">' +
+      '  <a class="pixel-button success" href="' + escapeHtml(skill.zip_url) + '" target="_blank">BAIXAR .ZIP</a>' +
+      '  <button class="pixel-button secondary" data-clone="bash">GIT BASH</button>' +
+      '  <button class="pixel-button secondary" data-clone="powershell">POWERSHELL</button>' +
+      '</div>';
+
+    card.querySelector('[data-clone="bash"]').onclick = function () {
+      copyToClipboard(skill.clone_bash);
+    };
+    card.querySelector('[data-clone="powershell"]').onclick = function () {
+      copyToClipboard(skill.clone_powershell);
+    };
+
+    return card;
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function () {
+      showToast('Comando copiado!', 'success');
+    }, function () {
+      showToast('Nao foi possivel copiar.', 'error');
+    });
+  }
+
+  function showToast(message, type) {
+    var toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'toast show ' + type;
+    setTimeout(function () {
+      toast.className = 'toast';
+    }, 3000);
+  }
+
+  // ---- Modal de cadastro ----
+
+  function openRegisterModal() {
+    document.getElementById('registerModal').classList.add('open');
+  }
+
+  function closeRegisterModal() {
+    document.getElementById('registerModal').classList.remove('open');
+    document.getElementById('repoUrlInput').value = '';
+    document.getElementById('formFields').style.display = 'none';
+    document.getElementById('fetchError').textContent = '';
+    document.getElementById('saveError').textContent = '';
+    document.getElementById('saveSkillBtn').disabled = true;
+    document.querySelectorAll('input[name="tipo"]').forEach(function (radio) {
+      radio.checked = false;
+    });
+    lastFetchedMetadata = null;
+  }
+
+  function fetchRepoInfo() {
+    var repoUrl = document.getElementById('repoUrlInput').value.trim();
+    var errorBox = document.getElementById('fetchError');
+    errorBox.textContent = '';
+
+    if (!repoUrl) {
+      errorBox.textContent = 'Informe a URL do repositorio.';
+      return;
+    }
+
+    google.script.run
+      .withSuccessHandler(function (result) {
+        if (!result.success) {
+          errorBox.textContent = friendlyMessage(result);
+          document.getElementById('formFields').style.display = 'none';
+          document.getElementById('saveSkillBtn').disabled = true;
+          return;
+        }
+        prefillForm(result.data);
+      })
+      .withFailureHandler(function (err) {
+        errorBox.textContent = err && err.message ? err.message : 'Erro ao consultar o GitHub.';
+      })
+      .previewGithubRepo(repoUrl);
+  }
+
+  function prefillForm(metadata) {
+    lastFetchedMetadata = metadata;
+    document.getElementById('skillNome').value = metadata.name;
+    document.getElementById('skillAutor').value = metadata.owner;
+    document.getElementById('skillResumo').value = metadata.description;
+    document.getElementById('skillTags').value = metadata.topics.join(', ');
+    document.getElementById('skillCategoria').value = '';
+    document.getElementById('formFields').style.display = 'block';
+    document.getElementById('saveSkillBtn').disabled = false;
+    updatePreviewBox(metadata);
+  }
+
+  function updatePreviewBox(metadata) {
+    document.getElementById('previewBox').innerHTML =
+      'ZIP: ' + escapeHtml(metadata.zipUrl) +
+      '<br>BASH: ' + escapeHtml(metadata.cloneCommands.bash) +
+      '<br>POWERSHELL: ' + escapeHtml(metadata.cloneCommands.powershell);
+  }
+
+  function saveSkill() {
+    var saveError = document.getElementById('saveError');
+    saveError.textContent = '';
+
+    if (!lastFetchedMetadata) {
+      saveError.textContent = 'Busque as informacoes do repositorio antes de salvar.';
+      return;
+    }
+
+    var categoria = document.getElementById('skillCategoria').value;
+    if (!categoria) {
+      saveError.textContent = 'Selecione uma categoria.';
+      return;
+    }
+
+    var tipoChecked = document.querySelector('input[name="tipo"]:checked');
+    if (!tipoChecked) {
+      saveError.textContent = 'Selecione o tipo (Interna ou Curadoria).';
+      return;
+    }
+
+    var payload = {
+      repoUrl: document.getElementById('repoUrlInput').value.trim(),
+      tipo: tipoChecked.value,
+      categoria: categoria,
+      tags: document.getElementById('skillTags').value.trim(),
+      resumoOverride: document.getElementById('skillResumo').value.trim(),
+      nomeOverride: document.getElementById('skillNome').value.trim()
+    };
+
+    document.getElementById('saveSkillBtn').disabled = true;
+
+    google.script.run
+      .withSuccessHandler(function (result) {
+        document.getElementById('saveSkillBtn').disabled = false;
+        if (!result.success) {
+          saveError.textContent = friendlyMessage(result);
+          return;
+        }
+        allSkills.push(result.data);
+        renderTagPills();
+        applyFilters();
+        closeRegisterModal();
+        showToast('Skill cadastrada com sucesso!', 'success');
+      })
+      .withFailureHandler(function (err) {
+        document.getElementById('saveSkillBtn').disabled = false;
+        saveError.textContent = err && err.message ? err.message : 'Erro ao salvar.';
+      })
+      .registerSkillFromGithub(payload);
+  }
+</script>

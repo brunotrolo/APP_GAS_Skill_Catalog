@@ -1,0 +1,33 @@
+<div class="banner-container">
+  <canvas id="retroBanner" width="480" height="96"></canvas>
+  <div class="banner-overlay-title">CODEX MUNIN // ODIN REALM</div>
+</div>
+
+<style>
+  .banner-container {
+    width: 100%;
+    height: 96px;
+    background: #0f101d;
+    border-bottom: 4px solid #000;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #retroBanner {
+    width: 100%;
+    height: 100%;
+    display: block;
+    image-rendering: pixelated;
+  }
+
+  .banner-overlay-title {
+    position: absolute;
+    bottom: 6px;
+    left: 12px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: #ffd700;
+    text-shadow: 2px 2px 0px #000;
+    pointer-events: none;
+  }
+</style>
