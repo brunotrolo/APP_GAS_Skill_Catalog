@@ -1,0 +1,21 @@
+<div id="view-airadar" class="app-view">
+  <div class="pixel-panel module-panel">
+    <h2>🛰️ AI TECH RADAR</h2>
+    <p class="module-desc">Classificacao Adopt / Trial / Assess / Hold das tecnologias de IA avaliadas pelo time.</p>
+
+    <form class="module-form" onsubmit="return submitAiRadarItem(event)">
+      <input type="text" id="airadarNome" placeholder="Nome da tecnologia/ferramenta" required>
+      <select id="airadarQuadrante" required>
+        <option value="">Quadrante...</option>
+        <option value="ADOPT">ADOPT</option>
+        <option value="TRIAL">TRIAL</option>
+        <option value="ASSESS">ASSESS</option>
+        <option value="HOLD">HOLD</option>
+      </select>
+      <input type="text" id="airadarDescricao" placeholder="Por que esse quadrante? (opcional)">
+      <button type="submit" class="pixel-button">+ CLASSIFICAR</button>
+    </form>
+
+    <div id="airadarList" class="module-list"></div>
+  </div>
+</div>

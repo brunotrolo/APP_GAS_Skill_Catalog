@@ -1,0 +1,14 @@
+<div id="view-board" class="app-view">
+  <div class="pixel-panel module-panel">
+    <h2>📜 MURAL DE MISSOES DE ODIN</h2>
+    <p class="module-desc">Peça uma skill que ainda nao existe. Vote nas missoes que voce tambem precisa.</p>
+
+    <form class="module-form" onsubmit="return submitBoardItem(event)">
+      <input type="text" id="boardTitulo" placeholder="Titulo da missao" required>
+      <input type="text" id="boardDescricao" placeholder="Descricao (opcional)">
+      <button type="submit" class="pixel-button">+ ABRIR MISSAO</button>
+    </form>
+
+    <div id="boardList" class="module-list"></div>
+  </div>
+</div>
