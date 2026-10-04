@@ -91,7 +91,7 @@
    * (linhas 0-17). Devolve 2 frames: perna esquerda a frente / direita a
    * frente - uma caminhada de verdade, nao so um balanco vertical.
    */
-  function withWalk(torso, legColor, legColor2) {
+  function withWalk(torso, legColor, legColor2, shoeColor) {
     var walkA = cloneGrid(torso);
     fillRect(walkA, 7, 18, 4, 6, legColor);
     fillRect(walkA, 13, 18, 4, 5, legColor2 || legColor);
@@ -100,7 +100,20 @@
     fillRect(walkB, 7, 18, 4, 5, legColor);
     fillRect(walkB, 13, 18, 4, 6, legColor2 || legColor);
 
+    if (shoeColor) {
+      fillRect(walkA, 6, 22, 6, 2, shoeColor);
+      fillRect(walkA, 13, 21, 6, 2, shoeColor);
+      fillRect(walkB, 6, 21, 6, 2, shoeColor);
+      fillRect(walkB, 13, 22, 6, 2, shoeColor);
+    }
+
     return [walkA, walkB];
+  }
+
+  /** Brilho N64: um pontinho branco dentro do olho preto, dando vida ao rosto. */
+  function addEyeShine(grid, x, y) {
+    setPixel(grid, x, y, 'K');
+    setPixel(grid, x + 1, y, 'W');
   }
 
   // --- Os 10 personagens mais marcantes: torso/cabeca com detalhe real
@@ -114,17 +127,16 @@
     fillRect(t, 5, 3, 14, 2, 'R');              // aba do bone
     fillRect(t, 6, 5, 12, 5, 'S');               // rosto
     fillRect(t, 6, 8, 3, 2, 'S2');                // sombra lateral do rosto
-    setPixel(t, 9, 7, 'K'); setPixel(t, 9, 8, 'K'); // olho esquerdo
-    setPixel(t, 14, 7, 'K'); setPixel(t, 14, 8, 'K'); // olho direito
+    addEyeShine(t, 9, 7); addEyeShine(t, 14, 7);   // olhos com brilho
     fillRect(t, 7, 9, 10, 2, 'S2');                // nariz/base
     fillRect(t, 5, 10, 14, 3, 'D');                 // bigode largo
     fillRect(t, 7, 13, 2, 1, 'S'); fillRect(t, 15, 13, 2, 1, 'S'); // bochechas
     fillRect(t, 4, 14, 16, 4, 'R');                  // camisa
-    fillRect(t, 2, 15, 3, 3, 'S'); fillRect(t, 19, 15, 3, 3, 'S'); // maos
+    fillRect(t, 2, 15, 3, 3, 'W'); fillRect(t, 19, 15, 3, 3, 'W'); // luvas brancas
     fillRect(t, 4, 18, 16, 4, 'B');                   // macacao
     fillRect(t, 7, 18, 2, 2, 'R2'); fillRect(t, 15, 18, 2, 2, 'R2'); // alcas
     fillRect(t, 9, 20, 2, 2, 'Y'); fillRect(t, 13, 20, 2, 2, 'Y');   // botoes
-    return { frames: withWalk(t, 'B2', 'B2'), actionFrame: buildMarioJump(t) };
+    return { frames: withWalk(t, 'B2', 'B2', 'D2'), actionFrame: buildMarioJump(t) };
   }
 
   function buildMarioJump(t) {
@@ -142,15 +154,14 @@
     fillRect(t, 5, 4, 14, 2, 'G');
     fillRect(t, 6, 6, 12, 5, 'S');
     fillRect(t, 6, 9, 3, 2, 'S2');
-    setPixel(t, 9, 8, 'K'); setPixel(t, 9, 9, 'K');
-    setPixel(t, 14, 8, 'K'); setPixel(t, 14, 9, 'K');
+    addEyeShine(t, 9, 8); addEyeShine(t, 14, 8);
     fillRect(t, 7, 10, 10, 2, 'S2');
     fillRect(t, 5, 11, 14, 3, 'D2');
     fillRect(t, 4, 15, 16, 4, 'G');
-    fillRect(t, 2, 16, 3, 3, 'S'); fillRect(t, 19, 16, 3, 3, 'S');
+    fillRect(t, 2, 16, 3, 3, 'W'); fillRect(t, 19, 16, 3, 3, 'W'); // luvas brancas
     fillRect(t, 4, 19, 16, 4, 'B');
     fillRect(t, 7, 19, 2, 2, 'B2'); fillRect(t, 15, 19, 2, 2, 'B2');
-    return { frames: withWalk(t, 'B2', 'B2'), actionFrame: buildLuigiJump(t) };
+    return { frames: withWalk(t, 'B2', 'B2', 'D2'), actionFrame: buildLuigiJump(t) };
   }
 
   function buildLuigiJump(t) {
@@ -167,7 +178,8 @@
     setPixel(t, 9, 0, 'N'); setPixel(t, 12, 0, 'N'); setPixel(t, 15, 0, 'N');
     fillRect(t, 7, 1, 10, 3, 'Y');
     fillRect(t, 6, 4, 12, 4, 'S');
-    setPixel(t, 9, 6, 'K'); setPixel(t, 14, 6, 'K');
+    addEyeShine(t, 9, 6); addEyeShine(t, 14, 6);
+    setPixel(t, 6, 7, 'B'); setPixel(t, 17, 7, 'B'); // brincos azuis
     fillRect(t, 4, 8, 16, 2, 'Y');
     fillRect(t, 4, 10, 16, 8, 'E');
     fillRect(t, 2, 15, 3, 3, 'W'); fillRect(t, 19, 15, 3, 3, 'W'); // luvas brancas
@@ -187,14 +199,14 @@
     var t = newGrid();
     fillRect(t, 5, 0, 3, 3, 'D'); fillRect(t, 16, 0, 3, 3, 'D'); // chifres
     fillRect(t, 6, 2, 12, 5, 'O');
-    setPixel(t, 9, 4, 'R'); setPixel(t, 14, 4, 'R');
+    setPixel(t, 9, 4, 'R'); setPixel(t, 14, 4, 'R'); setPixel(t, 10, 4, 'W'); setPixel(t, 15, 4, 'W'); // brilho nos olhos
     fillRect(t, 8, 5, 8, 2, 'W');                 // dentes
     fillRect(t, 4, 7, 16, 3, 'O');
-    fillRect(t, 2, 10, 20, 2, 'G');
+    fillRect(t, 2, 10, 20, 2, 'G2');                // topo do casco (sombra)
     fillRect(t, 1, 12, 22, 5, 'G');
     setPixel(t, 4, 13, 'K'); setPixel(t, 9, 13, 'K'); setPixel(t, 14, 13, 'K'); setPixel(t, 19, 13, 'K');
     fillRect(t, 6, 17, 12, 3, 'W');
-    return { frames: withWalk(t, 'O', 'O'), actionFrame: buildBowserFire(t) };
+    return { frames: withWalk(t, 'O', 'O', 'D2'), actionFrame: buildBowserFire(t) };
   }
 
   function buildBowserFire(t) {
@@ -230,14 +242,14 @@
     fillRect(t, 9, 0, 6, 2, 'G');
     fillRect(t, 6, 2, 12, 3, 'G');
     fillRect(t, 6, 5, 12, 5, 'S');
-    setPixel(t, 9, 7, 'K'); setPixel(t, 14, 7, 'K');
+    addEyeShine(t, 9, 7); addEyeShine(t, 14, 7);
     fillRect(t, 4, 10, 16, 3, 'G');
     fillRect(t, 4, 13, 16, 5, 'G');
     fillRect(t, 1, 12, 3, 7, 'N');                 // escudo
     setPixel(t, 2, 14, 'B'); setPixel(t, 2, 16, 'R');
     fillRect(t, 20, 9, 2, 9, 'N');                   // espada
     setPixel(t, 20, 8, 'N');
-    return { frames: withWalk(t, 'D', 'D'), actionFrame: buildLinkSlash(t) };
+    return { frames: withWalk(t, 'D', 'D', 'D2'), actionFrame: buildLinkSlash(t) };
   }
 
   function buildLinkSlash(t) {
@@ -273,7 +285,7 @@
     fillRect(t, 6, 0, 12, 4, 'D');
     fillRect(t, 4, 3, 3, 3, 'D'); fillRect(t, 17, 3, 3, 3, 'D'); // orelhas
     fillRect(t, 7, 4, 10, 4, 'S');
-    setPixel(t, 10, 6, 'K'); setPixel(t, 14, 6, 'K');
+    addEyeShine(t, 10, 6); addEyeShine(t, 14, 6);
     fillRect(t, 4, 8, 16, 3, 'D');
     fillRect(t, 4, 11, 16, 2, 'R');                  // gravata
     fillRect(t, 9, 13, 3, 2, 'R'); fillRect(t, 13, 13, 3, 2, 'R'); // no
@@ -294,8 +306,8 @@
     var idle = newGrid();
     fillCircle(idle, 12, 12, 9, 'E');
     fillRect(idle, 3, 17, 4, 3, 'R'); fillRect(idle, 17, 17, 4, 3, 'R');
-    setPixel(idle, 8, 10, 'K'); setPixel(idle, 9, 10, 'K');
-    setPixel(idle, 15, 10, 'K'); setPixel(idle, 16, 10, 'K');
+    fillRect(idle, 8, 9, 2, 3, 'K'); setPixel(idle, 8, 9, 'W'); // olho esquerdo com brilho
+    fillRect(idle, 15, 9, 2, 3, 'K'); setPixel(idle, 15, 9, 'W'); // olho direito com brilho
     fillRect(idle, 6, 13, 2, 1, 'R'); fillRect(idle, 16, 13, 2, 1, 'R');
     var inhale = cloneGrid(idle);
     fillCircle(inhale, 12, 13, 4, 'K');
@@ -309,11 +321,12 @@
     fillRect(t, 2, 0, 5, 4, 'B'); fillRect(t, 17, 0, 5, 4, 'B'); // espinhos
     fillRect(t, 4, 1, 4, 3, 'B'); fillRect(t, 16, 1, 4, 3, 'B');
     fillRect(t, 7, 6, 10, 3, 'S');
-    setPixel(t, 9, 6, 'W'); setPixel(t, 14, 6, 'W');
+    fillRect(t, 8, 5, 2, 2, 'W'); setPixel(t, 9, 6, 'K');   // olho esquerdo (branco+pupila)
+    fillRect(t, 14, 5, 2, 2, 'W'); setPixel(t, 15, 6, 'K'); // olho direito
     fillRect(t, 4, 9, 16, 3, 'B');
     fillRect(t, 2, 12, 20, 5, 'B');
     fillRect(t, 7, 14, 10, 3, 'S');
-    return { frames: withWalk(t, 'R', 'R'), actionFrame: buildSonicSpin() };
+    return { frames: withWalk(t, 'R', 'R', 'W'), actionFrame: buildSonicSpin() };
   }
 
   function buildSonicSpin() {
