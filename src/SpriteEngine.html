@@ -18,438 +18,85 @@
   resizeCanvasToDisplaySize_();
   window.addEventListener('resize', resizeCanvasToDisplaySize_);
 
-  var SPRITE_SIZE = 24;
-  var SCALE = 64 / 24; // personagens com 64px de altura (o dobro dos 32px originais)
+  var TILE_SRC_SIZE = 24;
+  var SCALE = 3; // 24px -> 72px, upscale nitido (nearest-neighbor) para visual "pixel art moderno"
 
-  var PALETTE = {
-    '.': 'transparent',
-    'K': '#000000',
-    'W': '#ffffff',
-    'R': '#e52521',
-    'R2': '#a81f1c',
-    'B': '#0026ff',
-    'B2': '#001a99',
-    'G': '#00b140',
-    'G2': '#007a2b',
-    'Y': '#fbd000',
-    'S': '#f8b878',
-    'S2': '#d99a65',
-    'D': '#663931',
-    'D2': '#4a2920',
-    'P': '#9b59b6',
-    'O': '#ff8c00',
-    'N': '#b0b0b0',
-    'F': '#ffae00',
-    'E': '#ff69b4',
-    'E2': '#ffb3d9',
-    'O2': '#cc6f00',
-    'R3': '#ff8a87',
-    'G3': '#4dd98a',
-    'B3': '#4d6fff',
-    'O3': '#ffb366',
-    'D3': '#8a5a45'
-  };
+  // Sprites do pack "Pixel Platformer" by Kenney (kenney.nl), licenca CC0
+  // (dominio publico, sem necessidade de atribuicao). Embutidos como data URI
+  // porque o Google Apps Script (HtmlService) nao serve arquivos estaticos de
+  // pasta. Cada tile e 24x24px; carregados como Image() e desenhados via
+  // drawImage com suavizacao desligada, pra manter o pixel nitido ao ampliar.
+  var TILE_DATA_URIS = [
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAANJleQ0pfhva7////WtKMNGVHvt7xFlk/CQAAAAF0Uk5TAEDm2GYAAACESURBVBjTbdAxDsIwDAXQTGXuwgF6BSROgOQTODMIxV0ZrPr62P7xUMSf8mQr+klrP7HMPOvDQ6mLUgyUPgHCmgasEHtqh3h2o4RkgENuHtmBd+BeYE9hBPpfbLwVDMirjbCWDbybDxjdTq1P72kLWj8BXDAh6/W1yvwQ4T64sIw+cusLm7JKEh9ouLwAAAAASUVORK5CYII=",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAANJleQ0pfhva7////WtKMNGVHvt7xFlk/CQAAAAF0Uk5TAEDm2GYAAAB/SURBVBjTbc+9CYBADAXgVLqBA7iC4ARCJoi1IsbWIpj1zY8pDnzFwUfC8QIAoBGIqCwWDPWCPhC8HZhr4tCC74k+bLkUAxxJPDxZ+EocjrlAlsLpWH8x0ljQRHytmGvRwLrZgLJb07q5B7psvSV2/2D4QAPzTgW/oMDb9zR5AYBQSul8Tz3JAAAAAElFTkSuQmCC",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAAeKbeQ0pf1er/////Ql5/msT3vt7xUqksxwAAAAF0Uk5TAEDm2GYAAACCSURBVBjTdZA9CoAwDEa7iLODF/AK4g2ErIqknqCdHSK5vvlpRQXf1Ec+wpeG8IGN8qZZALOWQAcEhwqcKOykwoAGaY5OHAXcwWRTmapkoUpUSbcMv/KMDTIqwi4M1sBj1qAF1gVs3V6tX/eExi9dXHxBEez6tcPyIZhTzFWamKKlLpm8SFfOJyH7AAAAAElFTkSuQmCC",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAAeKbeQ0pf1er/////msT3Ql5/vt7xtfn8bQAAAAF0Uk5TAEDm2GYAAACCSURBVBjTdc9BCoQwDAXQrPQGHsArDHgCISeoa0VMt7MI5vqTn7aDXfgXhUdC+SEisghFTFcPh0ZlDJS/AN/iyQoYS0Sxp7d8PJI5cAJLQ/I0XMD2x/yK59rsoworMI4GZS0ajGz4wKJb17q7h4Zy6V5w4IOpIk0iR2rAbQ2y16fLD49zSOvf5t5lAAAAAElFTkSuQmCC",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAA7ISlQ0pf/8va/////5q6h0lcvt7xn0q8JwAAAAF0Uk5TAEDm2GYAAACISURBVBjTbdA9DsIwDAXgTGXuwgF6BSROUOQL4MxUyO7KYNXXxz/xUMSb8imW9ZLWfqKRcZbVAqGLgF8IfByQY+LQgs+JHmzZFQIcSRx8s/CeeDvuBbQUCFfEXnguj7/QHIvVCuQLejSwbrggZrdT69N72pStX4lcMMDzdZt5fAhjJyxM1CmmvqSDSjTPEqAUAAAAAElFTkSuQmCC",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAA7ISlQ0pf/8va/////5q6h0lcvt7xn0q8JwAAAAF0Uk5TAEDm2GYAAACFSURBVBjTbc89CoRADAXgVHoDD+AVFjyBSy5grBUxtlsEc/3NjykGfMXAx4TwAgCgEYiozBYM9YL+IfhzYI6JQws+J3qz5VIMcCRx88fCV+JwTAWyFE6aidbCMn5foTkWqxVPX7BGA+tGI1F2a1o390CXrbfE7guGBzQw71TwCwq8PU+TP4rbSwt9sddlAAAAAElFTkSuQmCC",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAAQ0pf15kF/uSB////9LQbbz5Dvt7xQDZ6gQAAAAF0Uk5TAEDm2GYAAACESURBVBjThdA9CsMwDAVgT+mcK3joBQo9QUAnkOfQImXNIKzrRz/2kC59kz8kzLNL+YlGxlk2C4QeAj4QOB2Qa+LQCd8T7Ww5FAIcSXR+WfhIfB3vCbRMkKP9g9KKK7a4WiEn0cC62QCz26317T1lydZ7Ii8Y4Pr8VB4fwtgIJxZqFFsXwc9KeJwJ+bIAAAAASUVORK5CYII=",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAA15kFQ0pf/uSB////9LQbbz5Dvt7xDSpIxAAAAAF0Uk5TAEDm2GYAAAB/SURBVBjThc+9CYBADAXgVLqBA7iC4ARCJoi1IsbWIpj1zY8prvIVBx8JxwsAgEYgorJYMNQL+kDwdmCuiUMLvif6sOVSDHAk8fBk4StxOOYCWQqnY/2DniONtMbXijmJBtbNBpTdmtbNPdBl6y2x+wfDBxqYdyr4BQXevqfJC7wUS08QztUPAAAAAElFTkSuQmCC",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABJQTFRFAAAA////dHqQ3OHnlZqxQ0pfj3fqTAAAAAF0Uk5TAEDm2GYAAACJSURBVBjTVVDBEcMgDOPDADyyAHSCQBdoxJ9e0f6rxMbQHHpZJ50s2zkF6f7wZHtIr+0Rel2SmGJcRjILZgYvJYXmygW48vD5n8zC3k2FRUQiEwZOiSASdA9OGKm9diNMUV1RbRKAbwgHNEBagiEQo6unpVk5vnT+zG5arsyi2wnbcfvZ+0PWq26acDCuysUYqwAAAABJRU5ErkJggg==",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAA7qFgQ0pf//bi////n1pS9Myhvt7xdAsuNQAAAAF0Uk5TAEDm2GYAAACBSURBVBjThdAxCoAwDAXQLuLs4AV6BfEGQlZFEk/Qzg6RXN8kbQdF8E99NJSfhvCKeOqZFw24ega7YDgNcKHmYIMAetjm+MJJgwc4dsPckDUNZEj/iDF+QsqYgDegHBXeoAexG/Fuj9aPfUJXNl0LymsVOIzbgPVDMCfKDR0l8qkblkhIV/lgAvAAAAAASUVORK5CYII=",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAA7qFgQ0pf//bi////9Myhn1pSvt7xvuI4HgAAAAF0Uk5TAEDm2GYAAAB+SURBVBjThc/BCYAwDAXQnHQDB+gKghMImaCeFTFePQSzvvmpPRQE/6HwSAo/REQWoYjp7OFQr4yB8gXwLZ5TAWOJKPb0ltEjJwd2YKrInooDWP6RUvqElTXjaHDk5IgGPRsmFt2a1s091JVL14INf4YXeRDZcgVuq5D1fZo8jNxI62pd0QcAAAAASUVORK5CYII=",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABJQTFRFAAAA////y4Fe/uSB9LQbbz5DuJLEvwAAAAF0Uk5TAEDm2GYAAABESURBVBjTY2AgFoRCAYjNCuMEgDjBxmBgiskJcQEDVwhHCcRWwsZBUebiGuIagp2DoswlNBRJj6BgCGn2IHsBxXNEAQD8rCyy8NxEYAAAAABJRU5ErkJggg==",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABJQTFRFAAAAy4Fe/////uSB9LQbbz5D7N5EzgAAAAF0Uk5TAEDm2GYAAABTSURBVBjTY2AgFoRCAYjNCuMEgDjBxmBgiskJcQEDVwhHEMQWxMZBUeYSGuIaCue4hriGuGBVFqSkpIrQo6QE1yMCknGEcUBaHLEYgOwFFM8RBQCbzywIlKpD5AAAAABJRU5ErkJggg==",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAAA9QTFRFAAAAy4Fe/uSB9LQbbz5DCYK37QAAAAF0Uk5TAEDm2GYAAABSSURBVBjTY2CgBnBxcHGAsVlcgAAu4QSEMCkXJRUlFThH2dgYwTE2MTbBwTFG4jgbG8NNY3ERFHFBuAChioHF2dDYBcFxcXbB6jYWoKtdyPUxADjBERVebL/mAAAAAElFTkSuQmCC",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAAA9QTFRFAAAAy4Fe/uSB9LQbbz5DCYK37QAAAAF0Uk5TAEDm2GYAAABRSURBVBjTY2CgBmBxcUFwXFxcHBASKipwKRYnFSU4x8XZ2BiuzsXYxNgEB8cYiYOsh8VFUARhqwtCFQOLs6ExwlJnF2cXJHe6IHEckJ1NGgAAHFIP1W6obIUAAAAASUVORK5CYII=",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAAdHqQ3UQs3OHnlZqx/Gg7fjElQ0pfINnsXgAAAAF0Uk5TAEDm2GYAAABkSURBVBjTY2CgPigvQLDZy8uROMVInPJiJHXlLubYOWnlguJlCRA2W5qLsYlbGlQiNTQ0VCkNIpWmCuKoEeKUGxebGxtDDS93KXF3cXGHcoxdXIwRnHIQgnIgAOqgcvYCIAIyAMp7JHUPMKRYAAAAAElFTkSuQmCC",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAAdHqQ3UQs3OHnlZqx/Gg7fjElQ0pfINnsXgAAAAF0Uk5TAEDm2GYAAABmSURBVBjTY2CgCigvQLDZy8uROMVInPJiJHXlLubYOWnlguJlCRA2W5qLsYlbGlQiNTQ0VCkNIpWmCuKoEeKUGxebGxtDDS93KXF3cXGHcUAAxjEuByEsHKBvysvhzi5nLwAiIAMAuPkm2f1RtUsAAAAASUVORK5CYII=",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAAdHqQ3UQs3OHn/Gg7fjEllZqxQ0pfydfpIAAAAAF0Uk5TAEDm2GYAAABWSURBVBjTY2CgMWAvR+KUlxcgccwLkFSZI9SxlyVj57CGFwqWh0I5oWHJxmmhARCJUBcXFydViBRrEIijRIjDXpZmnJZmDDGcvdgsLdksDRunHALQOAAKCyB1YcSIrQAAAABJRU5ErkJggg==",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAA////lZqx3OHnFJDDLMX2Q0pf2sUTPQAAAAF0Uk5TAEDm2GYAAABQSURBVBjTY2AYdIAtDQSgHDA7LQEqERgqGuIGkWJLCRQUDXGBcUJDQ4ngJJsZJxsbQzlJakpJSkowGSMlZSM4xywNiNKQXANzD1tCGhABGQBypBwtRDaFEgAAAABJRU5ErkJggg==",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAA////3OHnFJDDlZqxLMX2Q0pf3t9WmgAAAAF0Uk5TAEDm2GYAAABOSURBVBjTY2AYDIAtDQSgHDA7LQEqERgqGmwGkWJLDhQUDTaGcUJDQ4ngJKkpJSkpQTkpbi4pLi4wjgsIwJWlAREWDtQ5MIcmpAERkAEA5nweWb6YIE0AAAAASUVORK5CYII=",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAA////3OHnFJDDlZqxLMX2Q0pf3t9WmgAAAAF0Uk5TAEDm2GYAAAA/SURBVBjTY2AY3IAtDQSgHDA7LQEqERgqGmwGkWJLDhQUDTaGcUJDQ4ngpLgoubgoQTlJKi5OKi7YOBBL0TkA/Cca5xMdMBsAAAAASUVORK5CYII=",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAA////3OHnlZqxLMX2FJDDQ0pfA+xphwAAAAF0Uk5TAEDm2GYAAABwSURBVBjTjdBNCoAgEIbhWbkXOoFBB0hoH9gNsrUUzf2P0OfkX9Gid8Dh2alEP+MSkaoIxKfTGOf9xsQ+w9/QDWbdVUhfWKWERUooAcYwJgZYy5jYG6YHRpNwYE8Zcn05gQFrT2h6vhSfQPH1QQW6AGiCSseb47LcAAAAAElFTkSuQmCC",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAA////3OHnlZqxLMX2FJDDQ0pfA+xphwAAAAF0Uk5TAEDm2GYAAABtSURBVBjTfdDBCYAwDIXhnHovOEEEB7ATCHUD47kIZv8RfI21FVH/QMt3a0P0ndaIXEMi3aPHRJFVSeWCnPA3TL5rsN6wWAWzVVADmBWTA0JQTO4X3OMeucCeb+cTA66t4P7T+m2XbCOUV5GAA11FTiolutkHAAAAAElFTkSuQmCC",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAA////3OHnLMX2lZqxFJDDQ0pflObjkgAAAAF0Uk5TAEDm2GYAAABiSURBVBjTY2AgB6TBAQMDG4KTwJCWaiwIhMahoWFpDGmhME4ohCOIxDEUFEZwwAAbJxgMoBxTMIBy4ADIUYIDIMcFDtA5SipA2kkJykkB0m4wDtj5YBLIUQNSSVAOEkDxKQAqf0eGBflJawAAAABJRU5ErkJggg==",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAA3/b1n1pS9Kxm3OHny4FelZqxbz5DQ0pfVzg3AAAAAAF0Uk5TAEDm2GYAAAB1SURBVBjTY2AgD3R0QDAIcEA4DRCJNhAnAyLVkdYBJUCqoByQOo4Wl47y8g4XD0xOW5qysbFRWgaEkwLiuEE4HW6qoaFBKRCLOtpURUWDoPZwtIM4FRAXMLSXhoaGV0Adyl4OBAUwZ4M4SJ7gaEBwODhI8T8A84IrsRgQFZAAAAAASUVORK5CYII=",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAA////n1pS9KxmlZqx3OHny4Febz5DQ0pfIZjQwQAAAAF0Uk5TAEDm2GYAAABdSURBVBjTY2CgE+gAgfJyMIXGcQ0JUTY2NnJ1DQFyWmGciA4Gjo6WCLW0tKRW144GsAlqYmJJIC0g89pBnAqQBBCwl6WlpRdArWIvBwIYhwHEQXIGRwOCw8FBtncAcNQnFfE2YYMAAAAASUVORK5CYII=",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAA////n1pS9Kxm3OHny4FelZqxbz5DQ0pfpTePCAAAAAF0Uk5TAEDm2GYAAABtSURBVBjTY2CgKWgvB4IKCJsDwmkAczralI2NjTI6wBIdbiBOSgdIiqMtRTU0NMgtA8JJUxUVDUqDcFrcQZwSDyinNDQ0HMrpSAcZXQY2gKEjDcRJ64Da09HB0QGxB6iugwOIIS5g6OiAYLIAAKqZKM15jypjAAAAAElFTkSuQmCC"
+  ];
 
-  // ---- Helpers geometricos: cada personagem e montado com varios
-  // fillRect/fillCircle proprios, em resolucao 24x24 (mais espaco para
-  // sombreado e detalhe que a versao anterior de 16x16). Homenagens
-  // estilizadas, pesquisadas para bater com cores/silhueta reais - nao
-  // reproducoes pixel-a-pixel dos sprites oficiais protegidos.
-  function newGrid() {
-    var grid = [];
-    for (var y = 0; y < SPRITE_SIZE; y++) {
-      grid.push(new Array(SPRITE_SIZE).fill('.'));
-    }
-    return grid;
-  }
-
-  function cloneGrid(grid) {
-    return grid.map(function (row) { return row.slice(); });
-  }
-
-  function fillRect(grid, x0, y0, w, h, color) {
-    for (var y = y0; y < y0 + h; y++) {
-      for (var x = x0; x < x0 + w; x++) {
-        if (grid[y] && x >= 0 && x < SPRITE_SIZE) grid[y][x] = color;
-      }
-    }
-  }
-
-  function fillCircle(grid, cx, cy, r, color) {
-    for (var y = 0; y < SPRITE_SIZE; y++) {
-      for (var x = 0; x < SPRITE_SIZE; x++) {
-        var dx = x - cx + 0.5;
-        var dy = y - cy + 0.5;
-        if (dx * dx + dy * dy <= r * r) grid[y][x] = color;
-      }
-    }
-  }
-
-  function setPixel(grid, x, y, color) {
-    if (grid[y] && x >= 0 && x < SPRITE_SIZE) grid[y][x] = color;
-  }
-
-  /**
-   * Retangulo com os 4 cantos cortados - visual "renderizado"/arredondado
-   * (estilo retratos chibi do N64), sem o risco de recalcular geometria de
-   * circulo pra cada personagem. Corta mais no canto se o retangulo for
-   * grande o suficiente.
-   */
-  function fillRoundedRect(grid, x0, y0, w, h, color) {
-    fillRect(grid, x0, y0, w, h, color);
-    var cut = Math.min(2, Math.floor(Math.min(w, h) / 3));
-    if (cut < 1) return;
-    for (var i = 0; i < cut; i++) {
-      var span = cut - i;
-      clearRect(grid, x0, y0 + i, span, 1);
-      clearRect(grid, x0 + w - span, y0 + i, span, 1);
-      clearRect(grid, x0, y0 + h - 1 - i, span, 1);
-      clearRect(grid, x0 + w - span, y0 + h - 1 - i, span, 1);
-    }
-  }
-
-  function clearRect(grid, x0, y0, w, h) {
-    fillRect(grid, x0, y0, w, h, '.');
-  }
-
-  /**
-   * Aplica o ciclo de caminhada (pernas alternando) num torso ja pronto
-   * (linhas 0-17). Devolve 2 frames: perna esquerda a frente / direita a
-   * frente - uma caminhada de verdade, nao so um balanco vertical.
-   */
-  function withWalk(torso, legColor, legColor2, shoeColor) {
-    var walkA = cloneGrid(torso);
-    fillRect(walkA, 7, 18, 4, 6, legColor);
-    fillRect(walkA, 13, 18, 4, 5, legColor2 || legColor);
-
-    var walkB = cloneGrid(torso);
-    fillRect(walkB, 7, 18, 4, 5, legColor);
-    fillRect(walkB, 13, 18, 4, 6, legColor2 || legColor);
-
-    if (shoeColor) {
-      fillRect(walkA, 6, 22, 6, 2, shoeColor);
-      fillRect(walkA, 13, 21, 6, 2, shoeColor);
-      fillRect(walkB, 6, 21, 6, 2, shoeColor);
-      fillRect(walkB, 13, 22, 6, 2, shoeColor);
-    }
-
-    return [walkA, walkB];
-  }
-
-  /** Brilho N64: um pontinho branco dentro do olho preto, dando vida ao rosto. */
-  function addEyeShine(grid, x, y) {
-    setPixel(grid, x, y, 'K');
-    setPixel(grid, x + 1, y, 'W');
-  }
-
-  // --- Os 10 personagens mais marcantes: torso/cabeca com detalhe real
-  // (sombreado, proporcao, acessorio que identifica), ciclo de caminhada
-  // de verdade (pernas alternando) + 1 frame da ACAO caracteristica do
-  // jogo original. ---
-
-  function buildMario() {
-    var t = newGrid();
-    fillRoundedRect(t, 7, 0, 10, 3, 'R');       // bone arredondado (estilo "renderizado")
-    fillRect(t, 8, 0, 3, 1, 'R3');                // brilho no topo do bone
-    fillRect(t, 5, 3, 14, 2, 'R');              // aba do bone
-    fillRoundedRect(t, 6, 5, 12, 5, 'S');        // rosto arredondado
-    fillRect(t, 6, 8, 3, 2, 'S2');                // sombra lateral do rosto
-    addEyeShine(t, 9, 7); addEyeShine(t, 14, 7);   // olhos com brilho
-    fillRect(t, 7, 9, 10, 2, 'S2');                // nariz/base
-    fillRect(t, 5, 10, 14, 3, 'D');                 // bigode largo
-    fillRect(t, 7, 13, 2, 1, 'S'); fillRect(t, 15, 13, 2, 1, 'S'); // bochechas
-    fillRect(t, 4, 14, 16, 4, 'R');                  // camisa
-    fillRect(t, 2, 15, 3, 3, 'W'); fillRect(t, 19, 15, 3, 3, 'W'); // luvas brancas
-    fillRect(t, 4, 18, 16, 4, 'B');                   // macacao
-    fillRect(t, 7, 18, 2, 2, 'R2'); fillRect(t, 15, 18, 2, 2, 'R2'); // alcas
-    fillRect(t, 9, 20, 2, 2, 'Y'); fillRect(t, 13, 20, 2, 2, 'Y');   // botoes
-    return { frames: withWalk(t, 'B2', 'B2', 'D2'), actionFrame: buildMarioJump(t) };
-  }
-
-  function buildMarioJump(t) {
-    var jump = cloneGrid(t);
-    clearRect(jump, 0, 18, SPRITE_SIZE, 6);
-    fillRect(jump, 17, 6, 3, 5, 'S');   // braco erguido
-    fillRect(jump, 6, 18, 5, 4, 'B');    // pernas dobradas (salto)
-    fillRect(jump, 13, 18, 5, 4, 'B');
-    return jump;
-  }
-
-  function buildLuigi() {
-    var t = newGrid();
-    fillRoundedRect(t, 7, 0, 10, 4, 'G');
-    fillRect(t, 8, 0, 3, 1, 'G3');                // brilho no topo do bone
-    fillRect(t, 5, 4, 14, 2, 'G');
-    fillRoundedRect(t, 6, 6, 12, 5, 'S');
-    fillRect(t, 6, 9, 3, 2, 'S2');
-    addEyeShine(t, 9, 8); addEyeShine(t, 14, 8);
-    fillRect(t, 7, 10, 10, 2, 'S2');
-    fillRect(t, 5, 11, 14, 3, 'D2');
-    fillRect(t, 4, 15, 16, 4, 'G');
-    fillRect(t, 2, 16, 3, 3, 'W'); fillRect(t, 19, 16, 3, 3, 'W'); // luvas brancas
-    fillRect(t, 4, 19, 16, 4, 'B');
-    fillRect(t, 7, 19, 2, 2, 'B2'); fillRect(t, 15, 19, 2, 2, 'B2');
-    return { frames: withWalk(t, 'B2', 'B2', 'D2'), actionFrame: buildLuigiJump(t) };
-  }
-
-  function buildLuigiJump(t) {
-    var jump = cloneGrid(t);
-    clearRect(jump, 0, 19, SPRITE_SIZE, 5);
-    fillRect(jump, 18, 5, 3, 6, 'S');
-    fillRect(jump, 6, 19, 5, 4, 'B');
-    fillRect(jump, 13, 19, 5, 4, 'B');
-    return jump;
-  }
-
-  function buildPeach() {
-    var t = newGrid();
-    setPixel(t, 9, 0, 'N'); setPixel(t, 12, 0, 'N'); setPixel(t, 15, 0, 'N');
-    fillRoundedRect(t, 7, 1, 10, 3, 'Y');
-    fillRoundedRect(t, 6, 4, 12, 4, 'S');
-    addEyeShine(t, 9, 6); addEyeShine(t, 14, 6);
-    setPixel(t, 6, 7, 'B'); setPixel(t, 17, 7, 'B'); // brincos azuis
-    fillRect(t, 4, 8, 16, 2, 'Y');
-    fillRect(t, 4, 10, 16, 8, 'E');
-    fillRect(t, 4, 10, 16, 2, 'E2');                 // sombreado claro no ombro do vestido
-    fillRect(t, 2, 15, 3, 3, 'W'); fillRect(t, 19, 15, 3, 3, 'W'); // luvas brancas
-    fillRect(t, 2, 18, 20, 3, 'E');
-    return { frames: withWalk(t, 'E', 'E'), actionFrame: buildPeachFloat(t) };
-  }
-
-  function buildPeachFloat(t) {
-    var f = cloneGrid(t);
-    clearRect(f, 2, 18, 20, 6);
-    fillRect(f, 0, 10, 24, 2, 'E');
-    fillRect(f, 2, 18, 20, 4, 'E');
-    return f;
-  }
-
-  function buildBowser() {
-    var t = newGrid();
-    fillRect(t, 5, 0, 3, 3, 'D'); fillRect(t, 16, 0, 3, 3, 'D'); // chifres
-    fillRoundedRect(t, 6, 2, 12, 5, 'O');
-    fillRect(t, 7, 2, 3, 1, 'O3');                  // brilho na testa
-    setPixel(t, 9, 4, 'R'); setPixel(t, 14, 4, 'R'); setPixel(t, 10, 4, 'W'); setPixel(t, 15, 4, 'W'); // brilho nos olhos
-    fillRect(t, 8, 5, 8, 2, 'W');                 // dentes
-    fillRoundedRect(t, 4, 7, 16, 3, 'O');
-    fillRect(t, 2, 10, 20, 2, 'G2');                // topo do casco (sombra)
-    fillRect(t, 1, 12, 22, 5, 'G');
-    setPixel(t, 4, 13, 'K'); setPixel(t, 9, 13, 'K'); setPixel(t, 14, 13, 'K'); setPixel(t, 19, 13, 'K');
-    fillRect(t, 6, 17, 12, 3, 'W');
-    fillRect(t, 2, 17, 2, 2, 'W'); fillRect(t, 20, 17, 2, 2, 'W'); // pulseiras brancas nos pulsos
-    return { frames: withWalk(t, 'O', 'O', 'D2'), actionFrame: buildBowserFire(t) };
-  }
-
-  function buildBowserFire(t) {
-    var f = cloneGrid(t);
-    clearRect(f, 8, 5, 8, 2);
-    fillRect(f, 8, 5, 8, 3, 'K');
-    fillRect(f, 16, 5, 6, 4, 'F');
-    fillRect(f, 21, 6, 3, 2, 'R');
-    return f;
-  }
-
-  function buildYoshi() {
-    var t = newGrid();
-    fillRoundedRect(t, 6, 2, 12, 5, 'G');
-    fillRect(t, 7, 2, 3, 1, 'G3');                   // brilho na cabeca
-    setPixel(t, 9, 4, 'W'); setPixel(t, 9, 5, 'K');
-    setPixel(t, 14, 4, 'W'); setPixel(t, 14, 5, 'K');
-    fillRoundedRect(t, 7, 6, 9, 2, 'O');            // focinho
-    fillRect(t, 4, 8, 16, 3, 'G');
-    fillRect(t, 2, 11, 20, 2, 'R');                 // sela
-    fillRect(t, 2, 13, 20, 4, 'G');
-    fillRect(t, 6, 16, 12, 3, 'W');
-    return { frames: withWalk(t, 'O', 'O'), actionFrame: buildYoshiTongue(t) };
-  }
-
-  function buildYoshiTongue(t) {
-    var f = cloneGrid(t);
-    fillRect(f, 16, 6, 7, 2, 'E');
-    return f;
-  }
-
-  function buildLink() {
-    var t = newGrid();
-    fillRect(t, 9, 0, 6, 2, 'G');
-    fillRoundedRect(t, 6, 2, 12, 3, 'G');
-    fillRect(t, 7, 4, 2, 1, 'Y'); fillRect(t, 15, 4, 2, 1, 'Y'); // cabelo loiro embaixo do gorro
-    fillRoundedRect(t, 6, 5, 12, 5, 'S');
-    addEyeShine(t, 9, 7); addEyeShine(t, 14, 7);
-    fillRect(t, 4, 10, 16, 3, 'G');
-    fillRect(t, 4, 13, 16, 5, 'G');
-    fillRect(t, 4, 15, 16, 1, 'D');                   // cinto marrom
-    fillRect(t, 1, 12, 3, 7, 'N');                 // escudo
-    setPixel(t, 2, 14, 'B'); setPixel(t, 2, 16, 'R');
-    fillRect(t, 20, 9, 2, 9, 'N');                   // espada
-    setPixel(t, 20, 8, 'N');
-    return { frames: withWalk(t, 'D', 'D', 'D2'), actionFrame: buildLinkSlash(t) };
-  }
-
-  function buildLinkSlash(t) {
-    var f = cloneGrid(t);
-    clearRect(f, 20, 9, 2, 9);
-    fillRect(f, 19, 5, 2, 2, 'N'); setPixel(f, 21, 7, 'N'); setPixel(f, 22, 9, 'N');
-    fillRect(f, 20, 4, 3, 1, 'W'); fillRect(f, 22, 7, 1, 3, 'W');
-    return f;
-  }
-
-  function buildSamus() {
-    var t = newGrid();
-    fillRoundedRect(t, 6, 0, 12, 4, 'O');
-    fillRect(t, 7, 0, 3, 1, 'O3');                   // brilho no capacete
-    fillRect(t, 6, 3, 12, 2, 'K');                  // viseira
-    setPixel(t, 8, 3, 'W');                          // reflexo na viseira
-    fillRect(t, 4, 5, 16, 3, 'O');
-    fillRect(t, 2, 8, 20, 3, 'O');
-    setPixel(t, 4, 8, 'Y'); setPixel(t, 19, 8, 'Y');
-    fillRect(t, 5, 11, 14, 6, 'O');
-    fillRect(t, 5, 11, 14, 2, 'O2');                 // sombra no peitoral
-    fillRect(t, 8, 14, 8, 2, 'Y');
-    return { frames: withWalk(t, 'O', 'O', 'O2'), actionFrame: buildSamusBall() };
-  }
-
-  function buildSamusBall() {
-    var f = newGrid();
-    fillCircle(f, 12, 16, 7, 'O');
-    fillCircle(f, 12, 16, 3, 'Y');
-    setPixel(f, 7, 11, 'K'); setPixel(f, 17, 11, 'K');
-    return f;
-  }
-
-  function buildDonkeyKong() {
-    var t = newGrid();
-    fillRoundedRect(t, 6, 0, 12, 4, 'D');
-    fillRect(t, 7, 0, 3, 1, 'D3');                   // brilho na cabeca
-    fillCircle(t, 5, 4, 2, 'D'); fillCircle(t, 18, 4, 2, 'D'); // orelhas arredondadas
-    fillRoundedRect(t, 7, 4, 10, 4, 'S');
-    addEyeShine(t, 10, 6); addEyeShine(t, 14, 6);
-    fillRect(t, 4, 8, 16, 3, 'D');
-    fillRect(t, 4, 11, 16, 2, 'R');                  // gravata
-    fillRect(t, 9, 13, 3, 2, 'R'); fillRect(t, 13, 13, 3, 2, 'R'); // no
-    fillRect(t, 4, 15, 16, 4, 'D');
-    fillRect(t, 8, 16, 8, 2, 'S2');                 // barriga mais clara (profundidade)
-    return { frames: withWalk(t, 'D', 'D'), actionFrame: buildDkBarrel(t) };
-  }
-
-  function buildDkBarrel(t) {
-    var f = cloneGrid(t);
-    fillRect(f, 2, 1, 5, 4, 'D');
-    fillCircle(f, 12, 1, 4, 'D');
-    setPixel(f, 9, 0, 'K'); setPixel(f, 15, 0, 'K');
-    fillRect(f, 17, 1, 5, 4, 'D');
-    return f;
-  }
-
-  function buildKirby() {
-    var idle = newGrid();
-    fillCircle(idle, 12, 12, 9, 'E');
-    fillCircle(idle, 10, 7, 3, 'E2');                 // brilho claro no topo (volume)
-    fillRect(idle, 3, 17, 4, 3, 'R'); fillRect(idle, 17, 17, 4, 3, 'R');
-    fillRect(idle, 2, 12, 3, 3, 'E'); fillRect(idle, 19, 12, 3, 3, 'E'); // bracinhos
-    fillRect(idle, 8, 9, 2, 3, 'K'); setPixel(idle, 8, 9, 'W'); // olho esquerdo com brilho
-    fillRect(idle, 15, 9, 2, 3, 'K'); setPixel(idle, 15, 9, 'W'); // olho direito com brilho
-    fillRect(idle, 6, 13, 2, 1, 'R'); fillRect(idle, 16, 13, 2, 1, 'R');
-    var inhale = cloneGrid(idle);
-    fillCircle(inhale, 12, 13, 4, 'K');
-    setPixel(inhale, 2, 13, 'W'); setPixel(inhale, 1, 11, 'W');
-    return { frames: [idle, idle], actionFrame: inhale, float: true };
-  }
-
-  function buildSonic() {
-    var t = newGrid();
-    fillRoundedRect(t, 6, 3, 12, 5, 'B');
-    fillRect(t, 7, 3, 3, 1, 'B3');                   // brilho na cabeca
-    fillRect(t, 2, 0, 5, 4, 'B'); fillRect(t, 17, 0, 5, 4, 'B'); // espinhos
-    fillRect(t, 4, 1, 4, 3, 'B'); fillRect(t, 16, 1, 4, 3, 'B');
-    fillRoundedRect(t, 7, 6, 10, 3, 'S');
-    fillRect(t, 8, 5, 2, 2, 'W'); setPixel(t, 9, 6, 'K');   // olho esquerdo (branco+pupila)
-    fillRect(t, 14, 5, 2, 2, 'W'); setPixel(t, 15, 6, 'K'); // olho direito
-    fillRect(t, 4, 9, 16, 3, 'B');
-    fillRect(t, 2, 12, 20, 5, 'B');
-    fillRect(t, 7, 14, 10, 3, 'S');
-    return { frames: withWalk(t, 'R', 'R', 'W'), actionFrame: buildSonicSpin() };
-  }
-
-  function buildSonicSpin() {
-    var f = newGrid();
-    fillCircle(f, 12, 15, 9, 'B');
-    setPixel(f, 3, 9, 'B'); setPixel(f, 2, 15, 'B'); setPixel(f, 3, 21, 'B');
-    setPixel(f, 21, 9, 'B'); setPixel(f, 22, 15, 'B'); setPixel(f, 21, 21, 'B');
-    fillRect(f, 9, 21, 6, 3, 'R');
-    return f;
-  }
-
-  // Homenagens estilizadas, com atencao redobrada ao design/cores
-  // originais dentro do que e seguro (nao e uma copia dos sprites
-  // oficiais protegidos). 10 personagens mais marcantes de Nintendo
-  // (NES/SNES/N64) e Sega Master System (Sonic).
-  var SPRITES = {};
-  function register(key, built, jumpHeight) {
-    SPRITES[key] = {
-      frames: built.frames,
-      actionFrame: built.actionFrame,
-      float: !!built.float,
-      jumpHeight: jumpHeight || 0
-    };
-  }
-  register('mario', buildMario(), 12);
-  register('luigi', buildLuigi(), 18);
-  register('peach', buildPeach());
-  register('bowser', buildBowser());
-  register('yoshi', buildYoshi());
-  register('link', buildLink());
-  register('samus', buildSamus());
-  register('donkeykong', buildDonkeyKong());
-  register('kirby', buildKirby());
-  register('sonic', buildSonic());
-
-  var SPRITE_KEYS = Object.keys(SPRITES);
-
-  function parseFrame(matrix) {
-    var imgData = ctx.createImageData(SPRITE_SIZE, SPRITE_SIZE);
-    for (var y = 0; y < SPRITE_SIZE; y++) {
-      for (var x = 0; x < SPRITE_SIZE; x++) {
-        var char = matrix[y][x];
-        var hex = PALETTE[char] || 'transparent';
-        var i = (y * SPRITE_SIZE + x) * 4;
-        if (hex !== 'transparent') {
-          imgData.data[i] = parseInt(hex.slice(1, 3), 16);
-          imgData.data[i + 1] = parseInt(hex.slice(3, 5), 16);
-          imgData.data[i + 2] = parseInt(hex.slice(5, 7), 16);
-          imgData.data[i + 3] = 255;
-        }
-      }
-    }
-    return imgData;
-  }
-
-  var PARSED_SPRITES = {};
-  SPRITE_KEYS.forEach(function (key) {
-    var s = SPRITES[key];
-    PARSED_SPRITES[key] = {
-      walkFrames: s.frames.map(parseFrame),
-      actionFrame: parseFrame(s.actionFrame),
-      float: s.float,
-      jumpHeight: s.jumpHeight
-    };
+  var tileImages = TILE_DATA_URIS.map(function (uri) {
+    var img = new Image();
+    img.src = uri;
+    return img;
   });
 
-  function randomSpriteKey() {
-    return SPRITE_KEYS[Math.floor(Math.random() * SPRITE_KEYS.length)];
+  // Personagens derivados dos 27 tiles do pack: cada um usa 2-3 frames reais
+  // (boca abrindo/fechando, propulsor piscando) para uma animacao de verdade,
+  // nao so um balanco vertical. 'walk' anda no chao, 'fly' sobrevoa o ceu.
+  var CHARACTERS = [
+    { key: 'astroGreen', frames: [0, 1], type: 'walk' },
+    { key: 'astroBlue', frames: [2, 3], type: 'walk' },
+    { key: 'astroPink', frames: [4, 5], type: 'walk' },
+    { key: 'astroYellow', frames: [6, 7], type: 'walk' },
+    { key: 'moonMascot', frames: [8, 8], type: 'walk' },
+    { key: 'astroBrown', frames: [9, 10], type: 'walk' },
+    { key: 'crateBot', frames: [11, 12], type: 'walk' },
+    { key: 'trophy', frames: [13, 14], type: 'walk' },
+    { key: 'rocket', frames: [15, 16, 17], type: 'fly' },
+    { key: 'ufo', frames: [18, 19, 20], type: 'fly' },
+    { key: 'bigship', frames: [21, 22, 23], type: 'fly' },
+    { key: 'alienIcon', frames: [24, 25, 26], type: 'fly' }
+  ];
+
+  function randomCharacter() {
+    return CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
   }
 
   function spawnHero(x) {
     return {
       x: x,
-      speed: 0.45 + Math.random() * 0.3,
-      key: randomSpriteKey(),
-      tick: Math.floor(Math.random() * 60)
+      speed: 0.45 + Math.random() * 0.35,
+      character: randomCharacter(),
+      tick: Math.floor(Math.random() * 60),
+      bob: Math.random() * Math.PI * 2
     };
   }
 
-  var HERO_SPACING_PX = 110;
-  var numHeroes = Math.min(10, Math.max(5, Math.round(canvas.width / HERO_SPACING_PX)));
+  var DISPLAY_SIZE = TILE_SRC_SIZE * SCALE;
+  var HERO_SPACING_PX = 100;
+  var numHeroes = Math.min(14, Math.max(7, Math.round(canvas.width / HERO_SPACING_PX)));
   var heroes = [];
   for (var h = 0; h < numHeroes; h++) {
     heroes.push(spawnHero((h / numHeroes) * (canvas.width + 200) - 100));
@@ -457,18 +104,6 @@
 
   var bgOffset = 0;
   var GROUND_Y = 80; // banner mantem 96px de altura total
-
-  function drawFrame(imgData, x, y) {
-    for (var sy = 0; sy < SPRITE_SIZE; sy++) {
-      for (var sx = 0; sx < SPRITE_SIZE; sx++) {
-        var i = (sy * SPRITE_SIZE + sx) * 4;
-        var alpha = imgData.data[i + 3];
-        if (alpha === 0) continue;
-        ctx.fillStyle = 'rgb(' + imgData.data[i] + ',' + imgData.data[i + 1] + ',' + imgData.data[i + 2] + ')';
-        ctx.fillRect(x + sx * SCALE, y + sy * SCALE, SCALE, SCALE);
-      }
-    }
-  }
 
   function render() {
     ctx.fillStyle = '#121826';
@@ -500,39 +135,30 @@
       h.x += h.speed;
       h.tick++;
 
-      var sprite = PARSED_SPRITES[h.key];
-      var cyclePos = h.tick % 100;
-      var showAction = cyclePos >= 70 && cyclePos < 85;
-      var y = GROUND_Y - SPRITE_SIZE * SCALE + 6;
-      var frame;
+      var frames = h.character.frames;
+      var frameIndex = Math.floor(h.tick / 14) % frames.length;
+      var img = tileImages[frames[frameIndex]];
+      var y;
 
-      if (sprite.jumpHeight > 0) {
-        // Mario/Luigi: pulam periodicamente em vez de so andar.
-        var jumpCycle = h.tick % 70;
-        if (jumpCycle < 25) {
-          var jt = jumpCycle / 25;
-          y -= Math.sin(jt * Math.PI) * sprite.jumpHeight;
-          frame = jt > 0.15 && jt < 0.85 ? sprite.actionFrame : sprite.walkFrames[0];
-        } else {
-          frame = sprite.walkFrames[Math.floor(h.tick / 8) % 2];
-        }
-      } else if (sprite.float) {
-        y -= Math.sin(h.tick * 0.05) * 5;
-        frame = showAction ? sprite.actionFrame : sprite.walkFrames[0];
+      if (h.character.type === 'fly') {
+        y = 10;
       } else {
-        frame = showAction ? sprite.actionFrame : sprite.walkFrames[Math.floor(h.tick / 8) % 2];
+        h.bob = (h.bob + 0.08) % (Math.PI * 2);
+        y = GROUND_Y - DISPLAY_SIZE + 6 + Math.sin(h.bob) * 3;
       }
 
-      drawFrame(frame, Math.floor(h.x), Math.floor(y));
+      if (img.complete && img.naturalWidth > 0) {
+        ctx.drawImage(img, Math.floor(h.x), Math.floor(y), DISPLAY_SIZE, DISPLAY_SIZE);
+      }
 
       if (h.x > canvas.width) {
-        h.x = -SPRITE_SIZE * SCALE;
-        h.key = randomSpriteKey();
+        h.x = -DISPLAY_SIZE;
+        h.character = randomCharacter();
         h.tick = 0;
       }
     });
 
-    bgOffset += 0.6;
+    bgOffset += 0.5;
     requestAnimationFrame(render);
   }
 
