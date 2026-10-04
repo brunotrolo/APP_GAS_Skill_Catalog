@@ -1,0 +1,109 @@
+<style>
+  /* De docs/themes/DESIGN-figma.md. Sistema estritamente monocromatico:
+       components.button-primary.backgroundColor = {colors.primary} = preto,
+       nao ha nenhum hue nomeado como "marca" (accent-magenta e descrito
+       como "single-shot", "use scarcely", "nao e uma cor de secao" - o
+       oposto de "signature"). Por isso Brand (--gold) e literalmente
+       neutro, igual ao OpenCode: invertido por modo so para contraste
+       (branco no escuro, preto no claro), nunca um hue novo. cat-1..6 usa
+       os 6 blocos pastel literais do arquivo (lime/lilac/cream/mint/pink/
+       coral) - a paleta narrativa explicita de "color-block sections",
+       encaixe perfeito para tags/categorias. --purple reusa accent-magenta
+       (unico acento "especial e raro" do arquivo, mesmo espirito de
+       Curadoria = conteudo externo em destaque). --terminal-green usa
+       semantic-success (unico verde literal). O arquivo probe
+       explicitamente texto cinza-medio ("Don't introduce mid-gray text -
+       hierarchy comes from weight, not opacity") - por isso --muted reusa
+       ink/inverse-ink cheios em vez de inventar um cinza intermediario.
+       Forma: rounded.pill (50px, nao rounded.full/9999px) e o raio de
+       TODO botao/pill/badge do sistema - --radius-s e --radius-pill usam
+       o mesmo valor. Fonte: figmaSans/figmaMono sao proprietarias; o
+       proprio arquivo recomenda Inter/JetBrains Mono como substitutas. */
+  :root[data-theme-family="figma"][data-theme="dark"] {
+    --cat-1: #dceeb1;
+    --cat-2: #c5b0f4;
+    --cat-3: #f4ecd6;
+    --cat-4: #c8e6cd;
+    --cat-5: #efd4d4;
+    --cat-6: #f3c9b6;
+    --on-cat: #000000;
+    --bg-deep: #0d0d0d;
+    --bg-panel: #1a1a1a;
+    --bg-card: #1a1a1a;
+    --bg-card-hover: #262626;
+    --border-ink: #333333;
+    --text-main: #ffffff;
+    --gold: #ffffff;
+    --gold-glow: #e6e6e6;
+    --purple: #ff3d8b;
+    --terminal-green: #1ea64a;
+    --danger: #ff3d8b;
+    --muted: #ffffff;
+    --info: #c5b0f4;
+    --warn: #f3c9b6;
+    --gold-glow-rgb: 230, 230, 230;
+    --terminal-green-rgb: 30, 166, 74;
+    --font-heading: 'Inter', 'SF Pro Display', system-ui, sans-serif;
+    --font-body: 'Inter', 'SF Pro Display', system-ui, sans-serif;
+    --font-display: 'Inter', 'SF Pro Display', system-ui, sans-serif;
+    --radius-s: 50px;
+    --radius-m: 24px;
+    --radius-pill: 50px;
+    --border-width: 1px;
+    --shadow-chunky: 0 4px 16px rgba(0, 0, 0, 0.3);
+    --letter-spacing-heading: -0.26px;
+    --heading-transform: none;
+    --on-accent: #000000;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="figma"][data-theme="light"] {
+    --cat-1: #dceeb1;
+    --cat-2: #c5b0f4;
+    --cat-3: #f4ecd6;
+    --cat-4: #c8e6cd;
+    --cat-5: #efd4d4;
+    --cat-6: #f3c9b6;
+    --on-cat: #000000;
+    --bg-deep: #ffffff;
+    --bg-panel: #f7f7f5;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f1f1f1;
+    --border-ink: #e6e6e6;
+    --text-main: #000000;
+    --gold: #000000;
+    --gold-glow: #000000;
+    --purple: #ff3d8b;
+    --terminal-green: #1ea64a;
+    --danger: #ff3d8b;
+    --muted: #000000;
+    --info: #c5b0f4;
+    --warn: #f3c9b6;
+    --gold-glow-rgb: 0, 0, 0;
+    --terminal-green-rgb: 30, 166, 74;
+    --font-heading: 'Inter', 'SF Pro Display', system-ui, sans-serif;
+    --font-body: 'Inter', 'SF Pro Display', system-ui, sans-serif;
+    --font-display: 'Inter', 'SF Pro Display', system-ui, sans-serif;
+    --radius-s: 50px;
+    --radius-m: 24px;
+    --radius-pill: 50px;
+    --border-width: 1px;
+    --shadow-chunky: 0 4px 16px rgba(0, 0, 0, 0.06);
+    --letter-spacing-heading: -0.26px;
+    --heading-transform: none;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>

@@ -1,0 +1,107 @@
+<style>
+  /* De docs/themes/DESIGN-nike.md. Brand e literalmente neutro: "Nike
+       Black ({colors.ink} - #111111): The brand's only 'color'... When
+       Nike wants to assert anything, it goes black" + Don't explicito:
+       "Don't use any of the category accent colors for primary chrome".
+       Igual ao OpenCode/Figma: --gold inverte por modo so por contraste
+       (branco no escuro, preto no claro), nunca um hue novo. cat-1..6 usa
+       exatamente a paleta "Category Accents (sport/collection chips)" do
+       arquivo - secao criada para swatch dots e chips, o uso mais literal
+       possivel para nossa ladder de categorias. --terminal-green/--danger/
+       --info usam success/sale/info literais (o arquivo tem os 3). Surface/
+       Text escuro extrapolado reusa a propria escada de cinzas do arquivo
+       (ink/charcoal/ash/mute/stone), ja um degrade pronto de 5 tons.
+       Forma: rounded.lg (30px, "every CTA pill") no --radius-s/--radius-pill
+       (badge-promo tambem usa rounded.lg), rounded.none (0px) nos cards -
+       "zero radius, zero shadow" explicito, igual ao BMW. --shadow-chunky:
+       none ("no drop-shadow elevation... cards do not lift"). Fonte:
+       Nike Futura ND/Helvetica Now sao proprietarias; o proprio arquivo
+       recomenda Inter como "the safest substitute" para texto de UI. */
+  :root[data-theme-family="nike"][data-theme="dark"] {
+    --cat-1: #ed1aa0;
+    --cat-2: #beaffd;
+    --cat-3: #0a7281;
+    --cat-4: #d30005;
+    --cat-5: #007d48;
+    --cat-6: #1151ff;
+    --on-cat: #ffffff;
+    --bg-deep: #111111;
+    --bg-panel: #39393b;
+    --bg-card: #4b4b4d;
+    --bg-card-hover: #707072;
+    --border-ink: #9e9ea0;
+    --text-main: #ffffff;
+    --gold: #ffffff;
+    --gold-glow: #e5e5e5;
+    --purple: #beaffd;
+    --terminal-green: #007d48;
+    --danger: #d30005;
+    --muted: #9e9ea0;
+    --info: #1151ff;
+    --warn: #ffb0dd;
+    --gold-glow-rgb: 229, 229, 229;
+    --terminal-green-rgb: 0, 125, 72;
+    --font-heading: 'Inter', 'Helvetica Now Display Medium', Helvetica, Arial, sans-serif;
+    --font-body: 'Inter', 'Helvetica Now Text', Helvetica, Arial, sans-serif;
+    --font-display: 'Inter', 'Helvetica Now Display Medium', Helvetica, Arial, sans-serif;
+    --radius-s: 30px;
+    --radius-m: 0px;
+    --radius-pill: 30px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0px;
+    --heading-transform: none;
+    --on-accent: #111111;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="nike"][data-theme="light"] {
+    --cat-1: #ed1aa0;
+    --cat-2: #beaffd;
+    --cat-3: #0a7281;
+    --cat-4: #d30005;
+    --cat-5: #007d48;
+    --cat-6: #1151ff;
+    --on-cat: #ffffff;
+    --bg-deep: #ffffff;
+    --bg-panel: #f5f5f5;
+    --bg-card: #ffffff;
+    --bg-card-hover: #e5e5e5;
+    --border-ink: #cacacb;
+    --text-main: #111111;
+    --gold: #111111;
+    --gold-glow: #39393b;
+    --purple: #beaffd;
+    --terminal-green: #007d48;
+    --danger: #d30005;
+    --muted: #707072;
+    --info: #1151ff;
+    --warn: #ffb0dd;
+    --gold-glow-rgb: 57, 57, 59;
+    --terminal-green-rgb: 0, 125, 72;
+    --font-heading: 'Inter', 'Helvetica Now Display Medium', Helvetica, Arial, sans-serif;
+    --font-body: 'Inter', 'Helvetica Now Text', Helvetica, Arial, sans-serif;
+    --font-display: 'Inter', 'Helvetica Now Display Medium', Helvetica, Arial, sans-serif;
+    --radius-s: 30px;
+    --radius-m: 0px;
+    --radius-pill: 30px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0px;
+    --heading-transform: none;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>

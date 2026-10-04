@@ -1,0 +1,110 @@
+<style>
+  /* De docs/themes/DESIGN-spotify.md. Brand = Spotify Green #1ed760 (secao
+       "Quick Color Reference" chama literalmente de "Accent"; Do's diz
+       "apply only for play controls, active states, and primary CTAs" -
+       igual nos dois modos, unico acento, nunca decorativo). --gold-glow
+       usa Spotify Green Border #1db954 (variante literal do verde). Todos
+       os 4 semanticos existem literalmente no arquivo (negative red
+       #f3727f, warning orange #ffa42b, announcement blue #539df5) - raro
+       nao precisar reusar nada. cat-6 reusa light-border/muted-link #7c7c7c
+       como neutro (nao ha um 6o hue). --purple reusa announcement blue (nao
+       ha roxo). O arquivo pede explicitamente ausencia de borda visivel
+       ("Don't expose raw gray borders - use shadow-based or inset borders
+       instead") - por isso --border-ink fica bem proximo do proprio fundo
+       do card, quase invisivel, e --shadow-chunky usa a sombra "Medium"
+       pesada (0.3 opacidade) que o arquivo pede no lugar de bordas finas.
+       O modo claro so tem UMA excecao documentada ("Light Pill": bg
+       #eeeeee, texto #181818) - usada aqui como base do Surface/Text
+       claro extrapolado; Brand nao muda. Fonte: SpotifyMixUI/CircularSp
+       sao proprietarias, sem substituto explicito no arquivo - usa a
+       mesma familia neutra de sistema (Helvetica Neue, citada na propria
+       pilha de fallback do arquivo) que ja usamos noutros temas sem fonte
+       aberta recomendada. */
+  :root[data-theme-family="spotify"][data-theme="dark"] {
+    --cat-1: #1ed760;
+    --cat-2: #539df5;
+    --cat-3: #f3727f;
+    --cat-4: #ffa42b;
+    --cat-5: #1db954;
+    --cat-6: #7c7c7c;
+    --on-cat: #ffffff;
+    --bg-deep: #121212;
+    --bg-panel: #181818;
+    --bg-card: #252525;
+    --bg-card-hover: #272727;
+    --border-ink: #252525;
+    --text-main: #ffffff;
+    --gold: #1ed760;
+    --gold-glow: #1db954;
+    --purple: #539df5;
+    --terminal-green: #1db954;
+    --danger: #f3727f;
+    --muted: #b3b3b3;
+    --info: #539df5;
+    --warn: #ffa42b;
+    --gold-glow-rgb: 29, 185, 84;
+    --terminal-green-rgb: 29, 185, 84;
+    --font-heading: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-display: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --radius-s: 9999px;
+    --radius-m: 8px;
+    --radius-pill: 9999px;
+    --border-width: 1px;
+    --shadow-chunky: 0 8px 8px rgba(0, 0, 0, 0.3);
+    --letter-spacing-heading: 0px;
+    --heading-transform: none;
+    --on-accent: #000000;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="spotify"][data-theme="light"] {
+    --cat-1: #1ed760;
+    --cat-2: #539df5;
+    --cat-3: #f3727f;
+    --cat-4: #ffa42b;
+    --cat-5: #1db954;
+    --cat-6: #7c7c7c;
+    --on-cat: #ffffff;
+    --bg-deep: #ffffff;
+    --bg-panel: #eeeeee;
+    --bg-card: #ffffff;
+    --bg-card-hover: #eeeeee;
+    --border-ink: #eeeeee;
+    --text-main: #181818;
+    --gold: #1ed760;
+    --gold-glow: #1db954;
+    --purple: #539df5;
+    --terminal-green: #1db954;
+    --danger: #f3727f;
+    --muted: #4d4d4d;
+    --info: #539df5;
+    --warn: #ffa42b;
+    --gold-glow-rgb: 29, 185, 84;
+    --terminal-green-rgb: 29, 185, 84;
+    --font-heading: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-display: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --radius-s: 9999px;
+    --radius-m: 8px;
+    --radius-pill: 9999px;
+    --border-width: 1px;
+    --shadow-chunky: 0 8px 8px rgba(0, 0, 0, 0.15);
+    --letter-spacing-heading: 0px;
+    --heading-transform: none;
+    --on-accent: #000000;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>
