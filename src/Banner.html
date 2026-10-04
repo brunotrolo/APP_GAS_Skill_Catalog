@@ -1,5 +1,5 @@
 <div class="banner-container">
-  <canvas id="retroBanner" width="480" height="96"></canvas>
+  <canvas id="hiBitBanner" width="480" height="96"></canvas>
   <div class="banner-overlay-title">CODEX MUNIN // ODIN REALM</div>
 </div>
 
@@ -13,11 +13,13 @@
     overflow: hidden;
   }
 
-  #retroBanner {
+  #hiBitBanner {
     width: 100%;
     height: 100%;
     display: block;
     image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
   }
 
   .banner-overlay-title {
