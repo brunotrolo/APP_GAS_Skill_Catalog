@@ -35,14 +35,16 @@
     'O': '#ff8c00',
     'C': '#00e5ff',
     'N': '#b0b0b0',
-    'F': '#ffae00'
+    'F': '#ffae00',
+    'E': '#ff69b4'
   };
 
-  // ---- Helpers geometricos para montar sprites 16x16 por codigo, em vez de
-  // matrizes de texto manuais (menos repeticao, zero risco de linha com
-  // tamanho errado). Homenagens estilizadas a classicos de Nintendo
-  // (NES/SNES/N64/Game Boy) e Master System, nao reproducoes dos sprites
-  // originais.
+  // ---- Helpers geometricos: cada personagem e montado com varios
+  // fillRect/fillCircle proprios (nao um template compartilhado), para que
+  // os detalhes que tornam cada um reconhecivel (bone, bigode, orelhas,
+  // casco, crista) fiquem no codigo e nao se percam numa silhueta generica.
+  // Homenagens estilizadas, pesquisadas para bater com o design original de
+  // cada personagem - nao sao copias pixel-a-pixel dos sprites oficiais.
   function newGrid() {
     var grid = [];
     for (var y = 0; y < SPRITE_SIZE; y++) {
@@ -73,25 +75,193 @@
     }
   }
 
+  function setPixel(grid, x, y, color) {
+    if (grid[y] && x >= 0 && x < SPRITE_SIZE) grid[y][x] = color;
+  }
+
   /**
-   * Gera um boneco humanoide generico com 2 frames de caminhada (pernas
-   * juntas / pernas abertas). A identidade de cada personagem vem da
-   * combinacao de cores, nao da silhueta (mantem o codigo pequeno e sem
-   * repeticao para as dezenas de "classes" humanoides do banner).
+   * Aplica pernas (linhas 12-15) num torso ja desenhado (linhas 0-11),
+   * gerando os 2 frames do ciclo de caminhada (juntas / abertas). A
+   * identidade de cada personagem esta toda no torso/cabeca, desenhados a
+   * mao por personagem; as pernas sao o unico elemento compartilhado.
    */
-  function buildHumanoid(headColor, bodyColor, legColor) {
-    var base = newGrid();
-    fillRect(base, 6, 1, 4, 4, headColor);
-    fillRect(base, 4, 5, 8, 6, bodyColor);
-    fillRect(base, 2, 5, 2, 5, bodyColor);
-    fillRect(base, 12, 5, 2, 5, bodyColor);
+  function withWalkCycle(torso, legColor) {
+    var frameA = cloneGrid(torso);
+    fillRect(frameA, 6, 12, 4, 4, legColor);
 
-    var frameA = cloneGrid(base);
-    fillRect(frameA, 6, 11, 4, 5, legColor);
+    var frameB = cloneGrid(torso);
+    fillRect(frameB, 4, 12, 4, 4, legColor);
+    fillRect(frameB, 8, 12, 4, 4, legColor);
 
-    var frameB = cloneGrid(base);
-    fillRect(frameB, 4, 11, 4, 5, legColor);
-    fillRect(frameB, 8, 11, 4, 5, legColor);
+    return [frameA, frameB];
+  }
+
+  function buildMario() {
+    var t = newGrid();
+    fillRect(t, 5, 0, 6, 2, 'R');             // bone (topo)
+    fillRect(t, 4, 2, 8, 2, 'R');             // aba do bone
+    fillRect(t, 4, 4, 8, 3, 'S');             // rosto
+    setPixel(t, 6, 5, 'K'); setPixel(t, 9, 5, 'K'); // olhos
+    fillRect(t, 4, 6, 8, 2, 'D');             // bigode largo
+    fillRect(t, 5, 8, 6, 1, 'S');             // queixo
+    fillRect(t, 3, 9, 10, 2, 'R');            // camisa vermelha
+    fillRect(t, 3, 11, 10, 1, 'B');           // faixa do macacao
+    fillRect(t, 5, 11, 2, 1, 'Y');            // botao esquerdo
+    fillRect(t, 9, 11, 2, 1, 'Y');            // botao direito
+    return withWalkCycle(t, 'B');
+  }
+
+  function buildLuigi() {
+    var t = newGrid();
+    fillRect(t, 5, 0, 6, 3, 'G');             // bone mais alto (Luigi e mais alto que Mario)
+    fillRect(t, 4, 3, 8, 2, 'G');
+    fillRect(t, 4, 5, 8, 3, 'S');
+    setPixel(t, 6, 6, 'K'); setPixel(t, 9, 6, 'K');
+    fillRect(t, 4, 7, 8, 2, 'D');
+    fillRect(t, 5, 9, 6, 1, 'S');
+    fillRect(t, 3, 10, 10, 1, 'G');
+    fillRect(t, 3, 11, 10, 1, 'B');
+    return withWalkCycle(t, 'B');
+  }
+
+  function buildPeach() {
+    var t = newGrid();
+    setPixel(t, 6, 0, 'N'); setPixel(t, 8, 0, 'N'); setPixel(t, 10, 0, 'N'); // pontas da coroa
+    fillRect(t, 5, 1, 7, 2, 'Y');              // cabelo loiro / coroa
+    fillRect(t, 4, 3, 8, 3, 'S');               // rosto
+    setPixel(t, 6, 4, 'K'); setPixel(t, 9, 4, 'K');
+    fillRect(t, 3, 6, 10, 1, 'Y');              // cabelo caindo nos ombros
+    fillRect(t, 3, 7, 10, 5, 'E');              // vestido rosa
+    fillRect(t, 2, 11, 12, 1, 'E');             // barra do vestido larga
+    return withWalkCycle(t, 'E');
+  }
+
+  function buildBowser() {
+    var t = newGrid();
+    setPixel(t, 4, 0, 'W'); setPixel(t, 11, 0, 'W'); // chifres
+    fillRect(t, 4, 1, 8, 3, 'O');                // cabeca laranja
+    setPixel(t, 6, 2, 'R'); setPixel(t, 9, 2, 'R'); // olhos vermelhos
+    fillRect(t, 5, 3, 6, 1, 'W');                 // dentes
+    fillRect(t, 3, 4, 10, 2, 'O');                // pescoco/ombros
+    fillRect(t, 2, 6, 12, 1, 'G');                // topo do casco
+    fillRect(t, 1, 7, 14, 3, 'G');                // casco verde largo
+    setPixel(t, 3, 8, 'K'); setPixel(t, 6, 8, 'K'); setPixel(t, 9, 8, 'K'); setPixel(t, 12, 8, 'K'); // pontas do casco
+    fillRect(t, 4, 10, 8, 2, 'W');                // barriga branca
+    return withWalkCycle(t, 'O');
+  }
+
+  function buildYoshi() {
+    var t = newGrid();
+    fillRect(t, 4, 1, 8, 3, 'G');                // cabeca verde
+    setPixel(t, 6, 2, 'W'); setPixel(t, 9, 2, 'W'); // olhos brancos
+    fillRect(t, 5, 4, 6, 1, 'O');                 // focinho/boca laranja
+    fillRect(t, 3, 5, 10, 2, 'G');                // pescoco
+    fillRect(t, 2, 7, 12, 1, 'R');                 // sela vermelha
+    fillRect(t, 2, 8, 12, 2, 'G');                 // corpo
+    fillRect(t, 4, 10, 8, 2, 'W');                 // barriga branca
+    return withWalkCycle(t, 'O');
+  }
+
+  function buildLink() {
+    var t = newGrid();
+    fillRect(t, 6, 0, 4, 1, 'G');                 // ponta do gorro
+    fillRect(t, 4, 1, 8, 2, 'G');                 // gorro
+    fillRect(t, 4, 3, 8, 3, 'S');                 // rosto
+    setPixel(t, 6, 4, 'K'); setPixel(t, 9, 4, 'K');
+    fillRect(t, 3, 6, 10, 2, 'G');                 // tunica ombros
+    fillRect(t, 3, 8, 10, 3, 'G');                 // tunica
+    fillRect(t, 1, 8, 2, 4, 'N');                  // escudo (prata) a esquerda
+    setPixel(t, 1, 9, 'B');                        // detalhe azul no escudo
+    fillRect(t, 13, 7, 1, 5, 'N');                 // espada a direita
+    return withWalkCycle(t, 'D');
+  }
+
+  function buildSamus() {
+    var t = newGrid();
+    fillRect(t, 4, 0, 8, 3, 'O');                  // capacete laranja
+    fillRect(t, 4, 2, 8, 1, 'K');                  // viseira
+    fillRect(t, 3, 3, 10, 2, 'O');                 // capacete largo
+    fillRect(t, 2, 5, 12, 2, 'O');                 // ombreiras largas
+    setPixel(t, 3, 5, 'Y'); setPixel(t, 12, 5, 'Y'); // detalhe amarelo nas ombreiras
+    fillRect(t, 4, 7, 8, 4, 'O');                   // peitoral/traje
+    fillRect(t, 6, 9, 4, 1, 'Y');                   // faixa amarela na cintura
+    return withWalkCycle(t, 'O');
+  }
+
+  function buildDonkeyKong() {
+    var t = newGrid();
+    fillRect(t, 4, 0, 8, 3, 'D');                  // cabeca peluda
+    fillRect(t, 3, 2, 2, 2, 'D'); fillRect(t, 11, 2, 2, 2, 'D'); // orelhas
+    fillRect(t, 5, 3, 6, 2, 'S');                   // rosto
+    setPixel(t, 6, 4, 'K'); setPixel(t, 9, 4, 'K');
+    fillRect(t, 3, 5, 10, 2, 'D');                  // pescoco/ombros peludos
+    fillRect(t, 3, 7, 10, 1, 'R');                  // topo da gravata
+    fillRect(t, 5, 8, 2, 1, 'R'); fillRect(t, 9, 8, 2, 1, 'R'); // no da gravata
+    fillRect(t, 3, 9, 10, 3, 'D');                  // peito peludo
+    return withWalkCycle(t, 'D');
+  }
+
+  function buildMegaman() {
+    var t = newGrid();
+    fillRect(t, 4, 0, 8, 3, 'B');                   // capacete azul
+    fillRect(t, 3, 1, 1, 2, 'B'); fillRect(t, 12, 1, 1, 2, 'B'); // "orelhas" do capacete
+    fillRect(t, 5, 3, 6, 2, 'W');                    // viseira branca
+    setPixel(t, 7, 4, 'R'); setPixel(t, 8, 4, 'R');  // joia vermelha
+    fillRect(t, 3, 5, 10, 2, 'B');                   // pescoco/ombros
+    fillRect(t, 2, 7, 12, 3, 'B');                   // armadura do peito
+    fillRect(t, 5, 8, 6, 1, 'N');                    // detalhe prata no peito
+    fillRect(t, 1, 10, 3, 2, 'N');                   // buster (canhao) no braco
+    return withWalkCycle(t, 'B');
+  }
+
+  function buildSonic() {
+    var t = newGrid();
+    fillRect(t, 4, 2, 8, 3, 'B');                    // cabeca azul
+    fillRect(t, 2, 0, 3, 3, 'B'); fillRect(t, 11, 0, 3, 3, 'B'); // espinhos atras da cabeca
+    fillRect(t, 5, 4, 6, 2, 'S');                     // focinho bege
+    setPixel(t, 6, 4, 'W'); setPixel(t, 9, 4, 'W');   // olhos
+    fillRect(t, 3, 6, 10, 2, 'B');                    // pescoco/ombros
+    fillRect(t, 2, 8, 12, 3, 'B');                    // corpo
+    fillRect(t, 5, 9, 6, 2, 'S');                     // barriga bege
+    return withWalkCycle(t, 'R');
+  }
+
+  function buildWario() {
+    var t = newGrid();
+    fillRect(t, 5, 0, 6, 3, 'Y');                     // bone amarelo
+    fillRect(t, 4, 3, 8, 3, 'S');                      // rosto largo
+    setPixel(t, 6, 4, 'K'); setPixel(t, 9, 4, 'K');
+    fillRect(t, 3, 6, 10, 2, 'D');                     // bigode grande e largo
+    setPixel(t, 2, 6, 'D'); setPixel(t, 13, 6, 'D');   // pontas do bigode
+    fillRect(t, 5, 8, 6, 1, 'S');
+    fillRect(t, 3, 9, 10, 2, 'Y');                      // camisa amarela
+    fillRect(t, 3, 11, 10, 1, 'P');                     // macacao roxo
+    return withWalkCycle(t, 'P');
+  }
+
+  function buildAlexKidd() {
+    var t = newGrid();
+    fillRect(t, 5, 0, 6, 2, 'D');                       // cabelo castanho
+    fillRect(t, 2, 2, 2, 2, 'S'); fillRect(t, 12, 2, 2, 2, 'S'); // orelhas grandes
+    fillRect(t, 4, 2, 8, 4, 'S');                        // rosto grande (cabeca grande)
+    setPixel(t, 6, 4, 'K'); setPixel(t, 9, 4, 'K');
+    fillRect(t, 3, 7, 10, 2, 'R');                       // gi vermelho ombros
+    fillRect(t, 3, 9, 10, 1, 'W');                       // faixa branca
+    fillRect(t, 3, 10, 10, 2, 'R');                      // gi
+    return withWalkCycle(t, 'R');
+  }
+
+  function buildKirby() {
+    var frameA = newGrid();
+    fillCircle(frameA, 8, 8, 6, 'E');
+    fillRect(frameA, 2, 11, 3, 2, 'R');
+    fillRect(frameA, 11, 11, 3, 2, 'R');
+    setPixel(frameA, 5, 7, 'K'); setPixel(frameA, 10, 7, 'K');
+    setPixel(frameA, 4, 9, 'R'); setPixel(frameA, 11, 9, 'R');
+
+    var frameB = cloneGrid(frameA);
+    fillRect(frameB, 1, 10, 3, 3, 'R');
+    fillRect(frameB, 12, 10, 3, 3, 'R');
 
     return [frameA, frameB];
   }
@@ -101,40 +271,13 @@
     fillCircle(frameA, 8, 9, 6, 'Y');
     fillRect(frameA, 3, 4, 2, 4, 'Y');
     fillRect(frameA, 11, 4, 2, 4, 'Y');
+    setPixel(frameA, 3, 3, 'K'); setPixel(frameA, 12, 3, 'K');
     fillRect(frameA, 5, 9, 2, 1, 'R');
     fillRect(frameA, 9, 9, 2, 1, 'R');
 
     var frameB = cloneGrid(frameA);
     fillRect(frameB, 5, 9, 2, 2, 'R');
     fillRect(frameB, 9, 9, 2, 2, 'R');
-
-    return [frameA, frameB];
-  }
-
-  /** Personagem "bolha" redonda com animacao de pulo (achatado / esticado). */
-  function buildBlob(color) {
-    var frameSquash = newGrid();
-    fillCircle(frameSquash, 8, 10, 6, color);
-
-    var frameStretch = newGrid();
-    fillCircle(frameStretch, 8, 7, 5, color);
-    fillRect(frameStretch, 6, 12, 4, 2, color);
-
-    return [frameSquash, frameStretch];
-  }
-
-  function buildTetrisBlock() {
-    var frameA = newGrid();
-    fillRect(frameA, 4, 4, 4, 4, 'C');
-    fillRect(frameA, 8, 4, 4, 4, 'C');
-    fillRect(frameA, 4, 8, 4, 4, 'C');
-    fillRect(frameA, 8, 8, 4, 4, 'C');
-
-    var frameB = newGrid();
-    fillRect(frameB, 4, 4, 4, 4, 'B');
-    fillRect(frameB, 8, 4, 4, 4, 'B');
-    fillRect(frameB, 4, 8, 4, 4, 'B');
-    fillRect(frameB, 8, 8, 4, 4, 'B');
 
     return [frameA, frameB];
   }
@@ -170,91 +313,27 @@
     return [frameA, frameB];
   }
 
-  function buildBike() {
-    var base = newGrid();
-    fillRect(base, 6, 3, 4, 5, 'S');
-    fillRect(base, 5, 8, 6, 3, 'D');
-    var frameA = cloneGrid(base);
-    fillCircle(frameA, 4, 12, 2, 'K');
-    fillCircle(frameA, 12, 12, 2, 'K');
-
-    var frameB = cloneGrid(base);
-    fillCircle(frameB, 4, 12, 2, 'N');
-    fillCircle(frameB, 12, 12, 2, 'N');
-
-    return [frameA, frameB];
-  }
-
-  // Homenagens estilizadas a 50 classicos de Nintendo (NES/Nintendinho,
-  // SNES, N64, Game Boy) e Master System - nao sao copias dos sprites
-  // originais. Cada entrada define o tipo de movimento no banner: 'walk'
-  // anda no chao com balanco vertical, 'fly' sobrevoa a parte alta do
-  // cenario, 'drive' roda no chao sem balanco (rodas giram), 'hop' pula
-  // com efeito de achatar/esticar.
-  var HUMANOID_DEFS = [
-    // --- NES / Nintendinho ---
-    ['mario', 'S', 'R', 'B', 'walk'],
-    ['luigi', 'S', 'G', 'B', 'walk'],
-    ['link', 'S', 'G', 'D', 'walk'],
-    ['samus', 'O', 'O', 'K', 'walk'],
-    ['megaman', 'B', 'B', 'W', 'walk'],
-    ['simon', 'S', 'D', 'W', 'walk'],
-    ['commando', 'S', 'G', 'G', 'walk'],
-    ['donkeykong', 'D', 'D', 'K', 'walk'],
-    ['duckhunt', 'W', 'D', 'K', 'walk'],
-    ['littlemac', 'S', 'R', 'K', 'walk'],
-    ['iceclimber', 'S', 'C', 'B', 'walk'],
-    ['balloonfighter', 'S', 'R', 'W', 'fly'],
-    ['kidicarus', 'S', 'W', 'G', 'fly'],
-    // --- SNES ---
-    ['marioworld', 'S', 'R', 'W', 'walk'],
-    ['zelda_alttp', 'S', 'G', 'P', 'walk'],
-    ['supermetroid', 'O', 'O', 'W', 'walk'],
-    ['ryu', 'S', 'W', 'K', 'walk'],
-    ['dkc', 'D', 'D', 'R', 'walk'],
-    ['chrono', 'S', 'R', 'K', 'walk'],
-    ['ff6', 'S', 'B', 'C', 'walk'],
-    ['castlevania4', 'S', 'D', 'K', 'walk'],
-    ['metaknight', 'P', 'P', 'K', 'walk'],
-    ['megamanx', 'B', 'C', 'W', 'walk'],
-    ['ness', 'S', 'Y', 'B', 'walk'],
-    // --- N64 ---
-    ['mario64', 'S', 'R', 'B', 'walk'],
-    ['ocarina', 'S', 'G', 'D', 'walk'],
-    ['goldeneye', 'S', 'K', 'K', 'walk'],
-    ['banjokazooie', 'D', 'O', 'Y', 'walk'],
-    ['dk64', 'D', 'D', 'B', 'walk'],
-    ['smashbros', 'S', 'R', 'W', 'walk'],
-    // --- Game Boy ---
-    ['warioland', 'Y', 'Y', 'P', 'walk'],
-    ['metroid2', 'O', 'K', 'O', 'walk'],
-    // --- Master System ---
-    ['sonicms', 'B', 'B', 'R', 'walk'],
-    ['alexkidd', 'S', 'R', 'K', 'walk'],
-    ['phantasystar', 'S', 'P', 'W', 'walk'],
-    ['wonderboy', 'S', 'Y', 'G', 'walk'],
-    ['shinobi', 'K', 'K', 'R', 'walk'],
-    ['goldenaxe', 'S', 'D', 'K', 'walk']
-  ];
-
+  // Homenagens estilizadas, pesquisadas uma a uma para manter as cores e
+  // detalhes que tornam cada personagem reconhecivel. Foco em Nintendo
+  // (NES/SNES/N64) e Sega Master System, por pedido.
   var SPRITES = {
-    pokemonstadium: { frames: buildSpark(), type: 'walk' },          // Pokemon (N64/Game Boy)
-    tetris: { frames: buildTetrisBlock(), type: 'fly' },              // Tetris (Game Boy)
-    excitebike: { frames: buildBike(), type: 'drive' },                // Excitebike (NES)
-    kirby64: { frames: buildBlob('P'), type: 'hop' },                  // Kirby 64 (N64)
-    kirbydreamland: { frames: buildBlob('P'), type: 'hop' },           // Kirby's Dream Land (Game Boy)
-    fzero: { frames: buildCar('C'), type: 'drive' },                   // F-Zero (SNES)
-    fzerox: { frames: buildCar('P'), type: 'drive' },                  // F-Zero X (N64)
-    mariokart: { frames: buildCar('R'), type: 'drive' },               // Super Mario Kart (SNES)
-    mariokart64: { frames: buildCar('G'), type: 'drive' },             // Mario Kart 64 (N64)
-    starfox: { frames: buildShip('W'), type: 'fly' },                  // Star Fox (SNES)
-    starfox64: { frames: buildShip('G'), type: 'fly' },                // Star Fox 64 (N64)
-    pilotwings: { frames: buildShip('N'), type: 'fly' }                // Pilotwings (N64)
+    mario: { frames: buildMario(), type: 'walk' },              // Super Mario Bros (NES)
+    luigi: { frames: buildLuigi(), type: 'walk' },              // Super Mario Bros (NES)
+    peach: { frames: buildPeach(), type: 'walk' },              // Super Mario Bros (NES/SNES)
+    bowser: { frames: buildBowser(), type: 'walk' },            // Super Mario Bros (NES/SNES)
+    yoshi: { frames: buildYoshi(), type: 'walk' },              // Super Mario World (SNES)
+    link: { frames: buildLink(), type: 'walk' },                // The Legend of Zelda (NES/SNES)
+    samus: { frames: buildSamus(), type: 'walk' },              // Metroid (NES/SNES)
+    donkeykong: { frames: buildDonkeyKong(), type: 'walk' },    // Donkey Kong (NES)
+    kirby: { frames: buildKirby(), type: 'hop' },               // Kirby (NES/SNES/N64)
+    pikachu: { frames: buildSpark(), type: 'walk' },            // Pokemon (Game Boy/N64)
+    megaman: { frames: buildMegaman(), type: 'walk' },          // Mega Man (NES)
+    sonic: { frames: buildSonic(), type: 'walk' },              // Sonic the Hedgehog (Master System)
+    wario: { frames: buildWario(), type: 'walk' },              // Wario Land (Game Boy)
+    alexkidd: { frames: buildAlexKidd(), type: 'walk' },        // Alex Kidd in Miracle World (Master System)
+    starfox: { frames: buildShip('W'), type: 'fly' },           // Star Fox (SNES)
+    fzero: { frames: buildCar('B'), type: 'drive' }             // F-Zero - Blue Falcon (SNES)
   };
-
-  HUMANOID_DEFS.forEach(function (def) {
-    SPRITES[def[0]] = { frames: buildHumanoid(def[1], def[2], def[3]), type: def[4] };
-  });
 
   var SPRITE_KEYS = Object.keys(SPRITES);
 
@@ -298,10 +377,9 @@
     };
   }
 
-  // Densidade proporcional a largura da tela: mais personagens em telas
-  // largas, com um minimo/maximo para nao poluir nem ficar vazio demais.
-  var HERO_SPACING_PX = 55;
-  var numHeroes = Math.min(28, Math.max(12, Math.round(canvas.width / HERO_SPACING_PX)));
+  // Densidade proporcional a largura da tela, com limite para nao poluir.
+  var HERO_SPACING_PX = 70;
+  var numHeroes = Math.min(18, Math.max(8, Math.round(canvas.width / HERO_SPACING_PX)));
   var heroes = [];
   for (var h = 0; h < numHeroes; h++) {
     heroes.push(spawnHero((h / numHeroes) * (canvas.width + 200) - 100));
