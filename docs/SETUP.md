@@ -2,9 +2,15 @@
 
 Passos manuais para colocar o Codex Munin (MVP) no ar.
 
-## 1. Criar a planilha (Google Sheets)
+> **Status atual**: a planilha e o projeto Apps Script já foram criados manualmente pelo usuário:
+> - Google Sheets: `1-H5lMr3q_u9M1CYaqMCikZZRtP3ke4yVtwj7tuatp-0`
+> - Apps Script: `1vQMqYIbWpfKcZwvSi0TH6oZjbqnwRvgfUUFEOp0qLZeJyzlfPQRWhfMB`
+>
+> **Ainda não implantado/deployado** — siga os passos abaixo para configurar as abas, fazer o `clasp push` e só então decidir quando publicar como Web App.
 
-Crie uma nova planilha no Google Drive (ex: "Codex Munin - Skill Catalog DB") com duas abas:
+## 1. Preparar a planilha (Google Sheets)
+
+Na planilha já criada, adicione duas abas:
 
 ### Aba `Skills_Catalog`
 Cabeçalho na linha 1 (nessa ordem exata):
@@ -27,17 +33,15 @@ DevOps & Release
 Architecture & Workflows
 ```
 
-Copie o **ID da planilha** a partir da URL (`.../spreadsheets/d/{ID}/edit`).
-
-## 2. Instalar o clasp e criar o projeto Apps Script
+## 2. Instalar o clasp e conectar ao projeto Apps Script existente
 
 ```bash
 npm install
 npx clasp login
-npx clasp create --type webapp --title "Codex Munin" --rootDir ./src
+npx clasp clone 1vQMqYIbWpfKcZwvSi0TH6oZjbqnwRvgfUUFEOp0qLZeJyzlfPQRWhfMB --rootDir ./src
 ```
 
-Isso gera um `.clasp.json` local (não versionado) com o `scriptId` do projeto.
+> Como o projeto Apps Script já existe, use `clasp clone` (não `clasp create`) para não criar um segundo script. Isso gera um `.clasp.json` local (não versionado) apontando para o `scriptId` acima — cuidado para não sobrescrever os arquivos locais em `src/` já implementados neste repositório; confirme o conteúdo antes de rodar `clasp push`.
 
 ## 3. Configurar Script Properties
 
@@ -45,7 +49,7 @@ Abra o projeto no editor (`npx clasp open`) → **Project Settings** → **Scrip
 
 | Propriedade | Valor |
 |---|---|
-| `SPREADSHEET_ID` | ID copiado no passo 1 |
+| `SPREADSHEET_ID` | `1-H5lMr3q_u9M1CYaqMCikZZRtP3ke4yVtwj7tuatp-0` |
 | `GITHUB_TOKEN` (opcional) | Personal Access Token do GitHub com escopo `repo`, necessário apenas para registrar repositórios **privados** |
 
 ## 4. Enviar o código
@@ -54,9 +58,11 @@ Abra o projeto no editor (`npx clasp open`) → **Project Settings** → **Scrip
 npx clasp push
 ```
 
-## 5. Publicar como Web App
+## 5. Publicar como Web App (aguardar sinal verde)
 
-No editor: **Deploy** → **New deployment** → tipo **Web app**:
+> ⚠️ Não publicar ainda — aguardar confirmação explícita antes de fazer o deploy, mesmo após `clasp push`.
+
+Quando autorizado, no editor: **Deploy** → **New deployment** → tipo **Web app**:
 - Execute as: **Me**
 - Who has access: **Anyone within [seu domínio Google Workspace]**
 
