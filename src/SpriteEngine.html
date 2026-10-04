@@ -62,22 +62,102 @@
     return img;
   });
 
-  // Personagens derivados dos 27 tiles do pack: cada um usa 2-3 frames reais
-  // (boca abrindo/fechando, propulsor piscando) para uma animacao de verdade,
-  // nao so um balanco vertical. 'walk' anda no chao, 'fly' sobrevoa o ceu.
+  // Soldados estilo "run and gun" (homenagem original, desenhada em blocos de
+  // pixel via canvas - nenhum sprite/bitmap de jogo real e copiado) com
+  // sequencias de acao de verdade: correr, parar e atirar, agachar e atirar,
+  // pular e arremessar granada, escolhidas aleatoriamente por soldado.
+  var SOLDIER_UNIT = 3; // tamanho de cada "pixel grosso" do soldado, em px
+
+  var SOLDIER_PALETTES = [
+    { helmet: '#3a4a2a', vest: '#55672f', pants: '#2e3b22', skin: '#d9a066', boot: '#1b1b1b', gun: '#4a4a4a', pack: '#44532a' },
+    { helmet: '#4a3a2a', vest: '#8a6a3a', pants: '#5a4530', skin: '#d9a066', boot: '#1b1b1b', gun: '#4a4a4a', pack: '#6b5230' },
+    { helmet: '#2a2a2e', vest: '#3a3a40', pants: '#1f1f24', skin: '#c98a60', boot: '#000000', gun: '#5a5a5a', pack: '#2e2e34' }
+  ];
+
+  var SOLDIER_ACTIONS = ['run', 'run', 'run', 'shoot', 'crouch_shoot', 'jump', 'grenade'];
+
+  function pickSoldierAction() {
+    var action = SOLDIER_ACTIONS[Math.floor(Math.random() * SOLDIER_ACTIONS.length)];
+    var duration = action === 'run' ? 70 + Math.random() * 90 :
+      action === 'jump' ? 18 + Math.random() * 10 :
+      40 + Math.random() * 40;
+    return { action: action, ticksLeft: Math.round(duration), totalTicks: Math.round(duration), tick: 0 };
+  }
+
+  /**
+   * Desenha um soldado em blocos de pixel (x,y = pes no chao). Pose/frame
+   * variam conforme a acao atual, dando movimento real de pernas/braco/arma
+   * em vez de so um balanco vertical.
+   */
+  function drawSoldier(ctx, x, y, palette, action, frame) {
+    var u = SOLDIER_UNIT;
+    function block(gx, gy, gw, gh, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(Math.round(x + gx * u), Math.round(y + gy * u), Math.ceil(gw * u), Math.ceil(gh * u));
+    }
+
+    var legOffset = 0, armForward = 0, crouch = 0, muzzle = false;
+
+    if (action === 'run') {
+      legOffset = [0, 1.5, 0, -1.5][frame % 4];
+    } else if (action === 'shoot') {
+      muzzle = frame === 1;
+    } else if (action === 'crouch_shoot') {
+      crouch = 2;
+      muzzle = frame === 1;
+    } else if (action === 'jump') {
+      crouch = -1.5;
+      legOffset = 1;
+    } else if (action === 'grenade') {
+      armForward = [-1, 0, 2][frame] || 0;
+    }
+
+    var headY = -14 + crouch;
+    var torsoY = -11 + crouch;
+    var legY = -5 + crouch;
+
+    block(-1, torsoY + 1, 2, 4, palette.pack);
+    block(0, legY, 2, 5, palette.pants);
+    block(2 + legOffset, legY, 2, 5, palette.pants);
+    block(0, legY + 4, 2, 1, palette.boot);
+    block(2 + legOffset, legY + 4, 2, 1, palette.boot);
+    block(0, torsoY, 4, 6, palette.vest);
+    block(1, headY, 2, 2, palette.skin);
+    block(0, headY - 1, 4, 2, palette.helmet);
+
+    var gunLen = action === 'crouch_shoot' ? 5 : 6;
+    var gunY = torsoY + 2;
+    var gunX = 4 + armForward;
+    block(gunX, gunY, gunLen, 1, palette.gun);
+
+    if (action === 'grenade' && frame === 2) {
+      ctx.fillStyle = '#6b7a3a';
+      ctx.beginPath();
+      ctx.arc(Math.round(x + (gunX + gunLen + 3) * u), Math.round(y + (gunY - 1) * u), u * 0.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    if (muzzle) {
+      ctx.fillStyle = '#ffe98a';
+      ctx.beginPath();
+      ctx.arc(Math.round(x + (gunX + gunLen) * u), Math.round(y + (gunY + 0.5) * u), u * 1.3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // Personagens derivados dos 27 tiles Kenney (ceu: foguete/UFO/nave/alien
+  // sobrevoando ao fundo) + soldados procedurais (chao, protagonistas do banner).
   var CHARACTERS = [
-    { key: 'astroGreen', frames: [0, 1], type: 'walk' },
-    { key: 'astroBlue', frames: [2, 3], type: 'walk' },
-    { key: 'astroPink', frames: [4, 5], type: 'walk' },
-    { key: 'astroYellow', frames: [6, 7], type: 'walk' },
-    { key: 'moonMascot', frames: [8, 8], type: 'walk' },
-    { key: 'astroBrown', frames: [9, 10], type: 'walk' },
-    { key: 'crateBot', frames: [11, 12], type: 'walk' },
-    { key: 'trophy', frames: [13, 14], type: 'walk' },
     { key: 'rocket', frames: [15, 16, 17], type: 'fly' },
     { key: 'ufo', frames: [18, 19, 20], type: 'fly' },
     { key: 'bigship', frames: [21, 22, 23], type: 'fly' },
-    { key: 'alienIcon', frames: [24, 25, 26], type: 'fly' }
+    { key: 'alienIcon', frames: [24, 25, 26], type: 'fly' },
+    { key: 'soldierGreen', type: 'soldier', palette: SOLDIER_PALETTES[0] },
+    { key: 'soldierGreen2', type: 'soldier', palette: SOLDIER_PALETTES[0] },
+    { key: 'soldierTan', type: 'soldier', palette: SOLDIER_PALETTES[1] },
+    { key: 'soldierTan2', type: 'soldier', palette: SOLDIER_PALETTES[1] },
+    { key: 'soldierBlack', type: 'soldier', palette: SOLDIER_PALETTES[2] },
+    { key: 'soldierBlack2', type: 'soldier', palette: SOLDIER_PALETTES[2] }
   ];
 
   function randomCharacter() {
@@ -85,12 +165,14 @@
   }
 
   function spawnHero(x) {
+    var character = randomCharacter();
     return {
       x: x,
       speed: 0.45 + Math.random() * 0.35,
-      character: randomCharacter(),
+      character: character,
       tick: Math.floor(Math.random() * 60),
-      bob: Math.random() * Math.PI * 2
+      bob: Math.random() * Math.PI * 2,
+      soldierState: character.type === 'soldier' ? pickSoldierAction() : null
     };
   }
 
@@ -132,9 +214,42 @@
     ctx.fillRect(0, GROUND_Y + 4, canvas.width, 2);
 
     heroes.forEach(function (h) {
-      h.x += h.speed;
       h.tick++;
 
+      if (h.character.type === 'soldier') {
+        var st = h.soldierState;
+        st.tick++;
+        st.ticksLeft--;
+        if (st.ticksLeft <= 0) {
+          h.soldierState = st = pickSoldierAction();
+        }
+
+        var frame;
+        if (st.action === 'run') {
+          frame = Math.floor(st.tick / 6) % 4;
+          h.x += h.speed * 1.4;
+        } else if (st.action === 'jump') {
+          frame = 0;
+          h.x += h.speed * 0.6;
+        } else if (st.action === 'grenade') {
+          frame = Math.min(2, Math.floor(st.tick / 15));
+        } else {
+          frame = Math.floor(st.tick / 10) % 2;
+        }
+
+        var jumpArc = st.action === 'jump' ? -Math.sin((1 - st.ticksLeft / st.totalTicks) * Math.PI) * 14 : 0;
+        drawSoldier(ctx, h.x, GROUND_Y + jumpArc, h.character.palette, st.action, frame);
+
+        if (h.x > canvas.width) {
+          h.x = -30;
+          h.character = randomCharacter();
+          h.soldierState = h.character.type === 'soldier' ? pickSoldierAction() : null;
+          h.tick = 0;
+        }
+        return;
+      }
+
+      h.x += h.speed;
       var frames = h.character.frames;
       var frameIndex = Math.floor(h.tick / 14) % frames.length;
       var img = tileImages[frames[frameIndex]];
@@ -154,6 +269,7 @@
       if (h.x > canvas.width) {
         h.x = -DISPLAY_SIZE;
         h.character = randomCharacter();
+        h.soldierState = h.character.type === 'soldier' ? pickSoldierAction() : null;
         h.tick = 0;
       }
     });
