@@ -16,6 +16,9 @@
     --muted: #b7b9d8;
     --radius-s: 6px;
     --radius-m: 10px;
+    --font-heading: 'Pixelify Sans', monospace;
+    --font-body: 'Space Mono', monospace;
+    --font-display: 'Press Start 2P', monospace;
   }
 
   /* Temas alem do "dark" acima sao aplicados em tempo real via JS
@@ -31,7 +34,7 @@
       radial-gradient(1000px 500px at 100% 0%, rgba(46, 255, 160, 0.08), transparent 55%),
       var(--bg-deep);
     color: var(--text-main);
-    font-family: 'Space Mono', monospace;
+    font-family: var(--font-body);
     font-size: 17px;
     -webkit-font-smoothing: antialiased;
     transition: background 0.15s ease, color 0.15s ease;
@@ -42,7 +45,7 @@
   }
 
   h1, h2, h3, .pixel-font, button, .badge {
-    font-family: 'Pixelify Sans', monospace;
+    font-family: var(--font-heading);
     font-weight: 700;
     letter-spacing: 0.5px;
   }
@@ -51,7 +54,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-family: 'Pixelify Sans', monospace;
+    font-family: var(--font-heading);
     font-size: 12px;
     font-weight: 700;
     padding: 9px 12px;
@@ -75,7 +78,7 @@
 
   .theme-select {
     width: 100%;
-    font-family: 'Space Mono', monospace;
+    font-family: var(--font-body);
     font-size: 15px;
     padding: 8px 10px;
     margin-bottom: 16px;
@@ -110,7 +113,7 @@
   }
 
   .module-nav-item {
-    font-family: 'Pixelify Sans', monospace;
+    font-family: var(--font-heading);
     font-size: 11px;
     font-weight: 700;
     padding: 9px 12px;
@@ -152,7 +155,7 @@
     border-radius: 4px;
     box-shadow: 0 0 0 3px #0a1152, 5px 6px 0px rgba(0, 0, 0, 0.6);
     padding: 10px 12px;
-    font-family: 'Space Mono', monospace;
+    font-family: var(--font-body);
     font-size: 13px;
     line-height: 1.5;
     font-weight: 400;
@@ -211,7 +214,7 @@
   .module-form input[type="text"],
   .module-form select,
   .module-form textarea {
-    font-family: 'Space Mono', monospace;
+    font-family: var(--font-body);
     font-size: 17px;
     padding: 9px 11px;
     background: var(--bg-card);
@@ -244,7 +247,7 @@
   }
 
   .module-item h3 {
-    font-family: 'Pixelify Sans', monospace;
+    font-family: var(--font-heading);
     font-size: 16px;
     color: var(--gold);
     margin: 0 0 6px 0;
@@ -339,7 +342,7 @@
   .sidebar-nav li.active {
     background: linear-gradient(180deg, var(--gold-glow), var(--gold));
     color: #231a00;
-    font-family: 'Press Start 2P', monospace;
+    font-family: var(--font-display);
     font-size: 9px;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2) inset, 2px 3px 0px #000, 0 0 12px rgba(255, 216, 74, 0.35);
   }
@@ -356,7 +359,7 @@
 
   .sidebar-tag-search {
     width: 100%;
-    font-family: 'Space Mono', monospace;
+    font-family: var(--font-body);
     font-size: 16px;
     padding: 7px 9px;
     margin-bottom: 8px;
@@ -426,7 +429,7 @@
 
   .search-row input[type="text"],
   .search-row select {
-    font-family: 'Space Mono', monospace;
+    font-family: var(--font-body);
     font-size: 18px;
     padding: 9px 12px;
     background: var(--bg-card);
@@ -477,7 +480,7 @@
   }
 
   .pixel-button {
-    font-family: 'Press Start 2P', monospace;
+    font-family: var(--font-display);
     font-size: 11px;
     padding: 11px 16px;
     background: linear-gradient(180deg, var(--gold-glow), var(--gold));
@@ -567,7 +570,7 @@
   }
 
   .skill-card h3 {
-    font-family: 'Pixelify Sans', monospace;
+    font-family: var(--font-heading);
     font-size: 19px;
     line-height: 1.4;
     margin: 4px 0 0 0;
@@ -598,7 +601,7 @@
     align-self: flex-start;
     font-size: 11px;
     font-weight: 700;
-    font-family: 'Pixelify Sans', monospace;
+    font-family: var(--font-heading);
     padding: 4px 9px;
     border-radius: 999px;
     border: 1px solid var(--border-ink);
@@ -660,7 +663,7 @@
     text-align: center;
     color: var(--muted);
     padding: 40px;
-    font-family: 'Press Start 2P', monospace;
+    font-family: var(--font-display);
     font-size: 12px;
   }
 
@@ -706,14 +709,14 @@
 
   .form-field label {
     font-size: 11px;
-    font-family: 'Press Start 2P', monospace;
+    font-family: var(--font-display);
     color: var(--muted);
   }
 
   .form-field input[type="text"],
   .form-field textarea,
   .form-field select {
-    font-family: 'Space Mono', monospace;
+    font-family: var(--font-body);
     font-size: 18px;
     padding: 9px;
     background: var(--bg-card);
@@ -740,7 +743,7 @@
     background: #050608;
     color: var(--terminal-green);
     padding: 10px;
-    font-family: 'Space Mono', monospace;
+    font-family: var(--font-body);
     font-size: 14px;
     word-break: break-all;
     border: 2px dashed var(--terminal-green);
@@ -752,7 +755,7 @@
     bottom: 20px;
     right: 20px;
     padding: 12px 16px;
-    font-family: 'Press Start 2P', monospace;
+    font-family: var(--font-display);
     font-size: 11px;
     border: 2px solid var(--border-ink);
     border-radius: var(--radius-s);
