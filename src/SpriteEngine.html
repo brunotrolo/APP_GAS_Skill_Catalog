@@ -1,195 +1,225 @@
 <script>
 (function () {
-  var canvas = document.getElementById('retroBanner');
+  var canvas = document.getElementById('hiBitBanner');
   var ctx = canvas.getContext('2d');
-  ctx.imageSmoothingEnabled = false;
 
-  // O CSS exibe o canvas em 100% da largura da pagina, mas o atributo width
-  // do HTML define a resolucao interna de desenho. Sem sincronizar os dois,
-  // o navegador estica a imagem (distorcendo os sprites horizontalmente).
-  // Ajusta a resolucao interna para bater 1:1 com a largura real exibida.
-  function resizeCanvasToDisplaySize_() {
-    var displayWidth = canvas.clientWidth;
-    if (displayWidth > 0 && canvas.width !== displayWidth) {
-      canvas.width = displayWidth;
-      ctx.imageSmoothingEnabled = false;
-    }
+  // --- 1. Canvas em alta densidade (4K / Retina) -----------------------
+  // O HTML define o tamanho em pixels CSS (480x96), mas a resolucao interna
+  // de desenho (canvas.width/height) precisa ser multiplicada pelo
+  // devicePixelRatio para a tela nao borrar os sprites em monitores de
+  // alta densidade. Desenhamos sempre em unidades CSS (via ctx.setTransform)
+  // e deixamos o canvas fisico maior por baixo dos panos.
+  var cssWidth = 480;
+  var cssHeight = 96;
+
+  function fitCanvasToDpr_() {
+    var displayWidth = canvas.clientWidth || cssWidth;
+    cssWidth = displayWidth;
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(cssWidth * dpr);
+    canvas.height = Math.round(cssHeight * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.imageSmoothingEnabled = false;
   }
-  resizeCanvasToDisplaySize_();
-  window.addEventListener('resize', resizeCanvasToDisplaySize_);
 
-  var TILE_SRC_SIZE = 24;
-  var SCALE = 3; // 24px -> 72px, upscale nitido (nearest-neighbor) para visual "pixel art moderno"
-
-  // Sprites do pack "Pixel Platformer" by Kenney (kenney.nl), licenca CC0
-  // (dominio publico, sem necessidade de atribuicao). Embutidos como data URI
-  // porque o Google Apps Script (HtmlService) nao serve arquivos estaticos de
-  // pasta. Cada tile e 24x24px; carregados como Image() e desenhados via
-  // drawImage com suavizacao desligada, pra manter o pixel nitido ao ampliar.
-  var TILE_DATA_URIS = [
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAANJleQ0pfhva7////WtKMNGVHvt7xFlk/CQAAAAF0Uk5TAEDm2GYAAACESURBVBjTbdAxDsIwDAXQTGXuwgF6BSROgOQTODMIxV0ZrPr62P7xUMSf8mQr+klrP7HMPOvDQ6mLUgyUPgHCmgasEHtqh3h2o4RkgENuHtmBd+BeYE9hBPpfbLwVDMirjbCWDbybDxjdTq1P72kLWj8BXDAh6/W1yvwQ4T64sIw+cusLm7JKEh9ouLwAAAAASUVORK5CYII=",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAANJleQ0pfhva7////WtKMNGVHvt7xFlk/CQAAAAF0Uk5TAEDm2GYAAAB/SURBVBjTbc+9CYBADAXgVLqBA7iC4ARCJoi1IsbWIpj1zY8pDnzFwUfC8QIAoBGIqCwWDPWCPhC8HZhr4tCC74k+bLkUAxxJPDxZ+EocjrlAlsLpWH8x0ljQRHytmGvRwLrZgLJb07q5B7psvSV2/2D4QAPzTgW/oMDb9zR5AYBQSul8Tz3JAAAAAElFTkSuQmCC",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAAeKbeQ0pf1er/////Ql5/msT3vt7xUqksxwAAAAF0Uk5TAEDm2GYAAACCSURBVBjTdZA9CoAwDEa7iLODF/AK4g2ErIqknqCdHSK5vvlpRQXf1Ec+wpeG8IGN8qZZALOWQAcEhwqcKOykwoAGaY5OHAXcwWRTmapkoUpUSbcMv/KMDTIqwi4M1sBj1qAF1gVs3V6tX/eExi9dXHxBEez6tcPyIZhTzFWamKKlLpm8SFfOJyH7AAAAAElFTkSuQmCC",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAAeKbeQ0pf1er/////msT3Ql5/vt7xtfn8bQAAAAF0Uk5TAEDm2GYAAACCSURBVBjTdc9BCoQwDAXQrPQGHsArDHgCISeoa0VMt7MI5vqTn7aDXfgXhUdC+SEisghFTFcPh0ZlDJS/AN/iyQoYS0Sxp7d8PJI5cAJLQ/I0XMD2x/yK59rsoworMI4GZS0ajGz4wKJb17q7h4Zy6V5w4IOpIk0iR2rAbQ2y16fLD49zSOvf5t5lAAAAAElFTkSuQmCC",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAA7ISlQ0pf/8va/////5q6h0lcvt7xn0q8JwAAAAF0Uk5TAEDm2GYAAACISURBVBjTbdA9DsIwDAXgTGXuwgF6BSROUOQL4MxUyO7KYNXXxz/xUMSb8imW9ZLWfqKRcZbVAqGLgF8IfByQY+LQgs+JHmzZFQIcSRx8s/CeeDvuBbQUCFfEXnguj7/QHIvVCuQLejSwbrggZrdT69N72pStX4lcMMDzdZt5fAhjJyxM1CmmvqSDSjTPEqAUAAAAAElFTkSuQmCC",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAA7ISlQ0pf/8va/////5q6h0lcvt7xn0q8JwAAAAF0Uk5TAEDm2GYAAACFSURBVBjTbc89CoRADAXgVHoDD+AVFjyBSy5grBUxtlsEc/3NjykGfMXAx4TwAgCgEYiozBYM9YL+IfhzYI6JQws+J3qz5VIMcCRx88fCV+JwTAWyFE6aidbCMn5foTkWqxVPX7BGA+tGI1F2a1o390CXrbfE7guGBzQw71TwCwq8PU+TP4rbSwt9sddlAAAAAElFTkSuQmCC",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAAQ0pf15kF/uSB////9LQbbz5Dvt7xQDZ6gQAAAAF0Uk5TAEDm2GYAAACESURBVBjThdA9CsMwDAVgT+mcK3joBQo9QUAnkOfQImXNIKzrRz/2kC59kz8kzLNL+YlGxlk2C4QeAj4QOB2Qa+LQCd8T7Ww5FAIcSXR+WfhIfB3vCbRMkKP9g9KKK7a4WiEn0cC62QCz26317T1lydZ7Ii8Y4Pr8VB4fwtgIJxZqFFsXwc9KeJwJ+bIAAAAASUVORK5CYII=",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAA15kFQ0pf/uSB////9LQbbz5Dvt7xDSpIxAAAAAF0Uk5TAEDm2GYAAAB/SURBVBjThc+9CYBADAXgVLqBA7iC4ARCJoi1IsbWIpj1zY8prvIVBx8JxwsAgEYgorJYMNQL+kDwdmCuiUMLvif6sOVSDHAk8fBk4StxOOYCWQqnY/2DniONtMbXijmJBtbNBpTdmtbNPdBl6y2x+wfDBxqYdyr4BQXevqfJC7wUS08QztUPAAAAAElFTkSuQmCC",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABJQTFRFAAAA////dHqQ3OHnlZqxQ0pfj3fqTAAAAAF0Uk5TAEDm2GYAAACJSURBVBjTVVDBEcMgDOPDADyyAHSCQBdoxJ9e0f6rxMbQHHpZJ50s2zkF6f7wZHtIr+0Rel2SmGJcRjILZgYvJYXmygW48vD5n8zC3k2FRUQiEwZOiSASdA9OGKm9diNMUV1RbRKAbwgHNEBagiEQo6unpVk5vnT+zG5arsyi2wnbcfvZ+0PWq26acDCuysUYqwAAAABJRU5ErkJggg==",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAA7qFgQ0pf//bi////n1pS9Myhvt7xdAsuNQAAAAF0Uk5TAEDm2GYAAACBSURBVBjThdAxCoAwDAXQLuLs4AV6BfEGQlZFEk/Qzg6RXN8kbQdF8E99NJSfhvCKeOqZFw24ega7YDgNcKHmYIMAetjm+MJJgwc4dsPckDUNZEj/iDF+QsqYgDegHBXeoAexG/Fuj9aPfUJXNl0LymsVOIzbgPVDMCfKDR0l8qkblkhIV/lgAvAAAAAASUVORK5CYII=",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAA7qFgQ0pf//bi////9Myhn1pSvt7xvuI4HgAAAAF0Uk5TAEDm2GYAAAB+SURBVBjThc/BCYAwDAXQnHQDB+gKghMImaCeFTFePQSzvvmpPRQE/6HwSAo/REQWoYjp7OFQr4yB8gXwLZ5TAWOJKPb0ltEjJwd2YKrInooDWP6RUvqElTXjaHDk5IgGPRsmFt2a1s091JVL14INf4YXeRDZcgVuq5D1fZo8jNxI62pd0QcAAAAASUVORK5CYII=",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABJQTFRFAAAA////y4Fe/uSB9LQbbz5DuJLEvwAAAAF0Uk5TAEDm2GYAAABESURBVBjTY2AgFoRCAYjNCuMEgDjBxmBgiskJcQEDVwhHCcRWwsZBUebiGuIagp2DoswlNBRJj6BgCGn2IHsBxXNEAQD8rCyy8NxEYAAAAABJRU5ErkJggg==",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABJQTFRFAAAAy4Fe/////uSB9LQbbz5D7N5EzgAAAAF0Uk5TAEDm2GYAAABTSURBVBjTY2AgFoRCAYjNCuMEgDjBxmBgiskJcQEDVwhHEMQWxMZBUeYSGuIaCue4hriGuGBVFqSkpIrQo6QE1yMCknGEcUBaHLEYgOwFFM8RBQCbzywIlKpD5AAAAABJRU5ErkJggg==",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAAA9QTFRFAAAAy4Fe/uSB9LQbbz5DCYK37QAAAAF0Uk5TAEDm2GYAAABSSURBVBjTY2CgBnBxcHGAsVlcgAAu4QSEMCkXJRUlFThH2dgYwTE2MTbBwTFG4jgbG8NNY3ERFHFBuAChioHF2dDYBcFxcXbB6jYWoKtdyPUxADjBERVebL/mAAAAAElFTkSuQmCC",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAAA9QTFRFAAAAy4Fe/uSB9LQbbz5DCYK37QAAAAF0Uk5TAEDm2GYAAABRSURBVBjTY2CgBmBxcUFwXFxcHBASKipwKRYnFSU4x8XZ2BiuzsXYxNgEB8cYiYOsh8VFUARhqwtCFQOLs6ExwlJnF2cXJHe6IHEckJ1NGgAAHFIP1W6obIUAAAAASUVORK5CYII=",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAAdHqQ3UQs3OHnlZqx/Gg7fjElQ0pfINnsXgAAAAF0Uk5TAEDm2GYAAABkSURBVBjTY2CgPigvQLDZy8uROMVInPJiJHXlLubYOWnlguJlCRA2W5qLsYlbGlQiNTQ0VCkNIpWmCuKoEeKUGxebGxtDDS93KXF3cXGHcoxdXIwRnHIQgnIgAOqgcvYCIAIyAMp7JHUPMKRYAAAAAElFTkSuQmCC",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAAdHqQ3UQs3OHnlZqx/Gg7fjElQ0pfINnsXgAAAAF0Uk5TAEDm2GYAAABmSURBVBjTY2CgCigvQLDZy8uROMVInPJiJHXlLubYOWnlguJlCRA2W5qLsYlbGlQiNTQ0VCkNIpWmCuKoEeKUGxebGxtDDS93KXF3cXGHcUAAxjEuByEsHKBvysvhzi5nLwAiIAMAuPkm2f1RtUsAAAAASUVORK5CYII=",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAAdHqQ3UQs3OHn/Gg7fjEllZqxQ0pfydfpIAAAAAF0Uk5TAEDm2GYAAABWSURBVBjTY2CgMWAvR+KUlxcgccwLkFSZI9SxlyVj57CGFwqWh0I5oWHJxmmhARCJUBcXFydViBRrEIijRIjDXpZmnJZmDDGcvdgsLdksDRunHALQOAAKCyB1YcSIrQAAAABJRU5ErkJggg==",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAA////lZqx3OHnFJDDLMX2Q0pf2sUTPQAAAAF0Uk5TAEDm2GYAAABQSURBVBjTY2AYdIAtDQSgHDA7LQEqERgqGuIGkWJLCRQUDXGBcUJDQ4ngJJsZJxsbQzlJakpJSkowGSMlZSM4xywNiNKQXANzD1tCGhABGQBypBwtRDaFEgAAAABJRU5ErkJggg==",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAA////3OHnFJDDlZqxLMX2Q0pf3t9WmgAAAAF0Uk5TAEDm2GYAAABOSURBVBjTY2AYDIAtDQSgHDA7LQEqERgqGmwGkWJLDhQUDTaGcUJDQ4ngJKkpJSkpQTkpbi4pLi4wjgsIwJWlAREWDtQ5MIcmpAERkAEA5nweWb6YIE0AAAAASUVORK5CYII=",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAA////3OHnFJDDlZqxLMX2Q0pf3t9WmgAAAAF0Uk5TAEDm2GYAAAA/SURBVBjTY2AY3IAtDQSgHDA7LQEqERgqGmwGkWJLDhQUDTaGcUJDQ4ngpLgoubgoQTlJKi5OKi7YOBBL0TkA/Cca5xMdMBsAAAAASUVORK5CYII=",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAA////3OHnlZqxLMX2FJDDQ0pfA+xphwAAAAF0Uk5TAEDm2GYAAABwSURBVBjTjdBNCoAgEIbhWbkXOoFBB0hoH9gNsrUUzf2P0OfkX9Gid8Dh2alEP+MSkaoIxKfTGOf9xsQ+w9/QDWbdVUhfWKWERUooAcYwJgZYy5jYG6YHRpNwYE8Zcn05gQFrT2h6vhSfQPH1QQW6AGiCSseb47LcAAAAAElFTkSuQmCC",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAA////3OHnlZqxLMX2FJDDQ0pfA+xphwAAAAF0Uk5TAEDm2GYAAABtSURBVBjTfdDBCYAwDIXhnHovOEEEB7ATCHUD47kIZv8RfI21FVH/QMt3a0P0ndaIXEMi3aPHRJFVSeWCnPA3TL5rsN6wWAWzVVADmBWTA0JQTO4X3OMeucCeb+cTA66t4P7T+m2XbCOUV5GAA11FTiolutkHAAAAAElFTkSuQmCC",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAA////3OHnLMX2lZqxFJDDQ0pflObjkgAAAAF0Uk5TAEDm2GYAAABiSURBVBjTY2AgB6TBAQMDG4KTwJCWaiwIhMahoWFpDGmhME4ohCOIxDEUFEZwwAAbJxgMoBxTMIBy4ADIUYIDIMcFDtA5SipA2kkJykkB0m4wDtj5YBLIUQNSSVAOEkDxKQAqf0eGBflJawAAAABJRU5ErkJggg==",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAA3/b1n1pS9Kxm3OHny4FelZqxbz5DQ0pfVzg3AAAAAAF0Uk5TAEDm2GYAAAB1SURBVBjTY2AgD3R0QDAIcEA4DRCJNhAnAyLVkdYBJUCqoByQOo4Wl47y8g4XD0xOW5qysbFRWgaEkwLiuEE4HW6qoaFBKRCLOtpURUWDoPZwtIM4FRAXMLSXhoaGV0Adyl4OBAUwZ4M4SJ7gaEBwODhI8T8A84IrsRgQFZAAAAAASUVORK5CYII=",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAA////n1pS9KxmlZqx3OHny4Febz5DQ0pfIZjQwQAAAAF0Uk5TAEDm2GYAAABdSURBVBjTY2CgE+gAgfJyMIXGcQ0JUTY2NnJ1DQFyWmGciA4Gjo6WCLW0tKRW144GsAlqYmJJIC0g89pBnAqQBBCwl6WlpRdArWIvBwIYhwHEQXIGRwOCw8FBtncAcNQnFfE2YYMAAAAASUVORK5CYII=",
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAABGdBTUEAALGPC/xhBQAAABtQTFRFAAAA////n1pS9Kxm3OHny4FelZqxbz5DQ0pfpTePCAAAAAF0Uk5TAEDm2GYAAABtSURBVBjTY2CgKWgvB4IKCJsDwmkAczralI2NjTI6wBIdbiBOSgdIiqMtRTU0NMgtA8JJUxUVDUqDcFrcQZwSDyinNDQ0HMrpSAcZXQY2gKEjDcRJ64Da09HB0QGxB6iugwOIIS5g6OiAYLIAAKqZKM15jypjAAAAAElFTkSuQmCC"
-  ];
-
-  var tileImages = TILE_DATA_URIS.map(function (uri) {
-    var img = new Image();
-    img.src = uri;
-    return img;
+  fitCanvasToDpr_();
+  var resizeTimer = null;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(fitCanvasToDpr_, 150);
   });
 
-  // Soldados estilo "run and gun" (homenagem original, desenhada em blocos de
-  // pixel via canvas - nenhum sprite/bitmap de jogo real e copiado) com
-  // sequencias de acao de verdade: correr, parar e atirar, agachar e atirar,
-  // pular e arremessar granada, escolhidas aleatoriamente por soldado.
-  var SOLDIER_UNIT = 3; // tamanho de cada "pixel grosso" do soldado, em px
+  // --- 2. Assets Hi-Bit via jsDelivr --------------------------------
+  // O Google Apps Script (HtmlService) nao serve arquivos estaticos de uma
+  // pasta do repositorio em tempo de execucao - so os arquivos .gs/.html
+  // enviados via clasp existem no app publicado. Por isso os spritesheets
+  // reais (PNG) ficam versionados em assets/sprites/ neste mesmo
+  // repositorio GitHub e sao carregados pelo cliente via jsDelivr, que serve
+  // o conteudo do GitHub com cabecalhos de CORS corretos para uso em canvas.
+  //
+  // ASSET_REF e fixado em um SHA de commit (nao em "main") porque o jsDelivr
+  // trata URLs com SHA como imutaveis e as mantem em cache para sempre -
+  // ou seja, um novo SHA e sempre um cache-miss automatico, sem precisar de
+  // purge manual de CDN. Sempre que assets/sprites/ mudar, atualize este
+  // valor para o novo SHA do commit correspondente.
+  var ASSET_REPO = 'brunotrolo/APP_GAS_Skill_Catalog';
+  var ASSET_REF = 'main'; // TODO: trocar para o SHA do commit que adiciona os PNGs reais em assets/sprites/
 
-  var SOLDIER_PALETTES = [
-    { helmet: '#3a4a2a', vest: '#55672f', pants: '#2e3b22', skin: '#d9a066', boot: '#1b1b1b', gun: '#4a4a4a', pack: '#44532a' },
-    { helmet: '#4a3a2a', vest: '#8a6a3a', pants: '#5a4530', skin: '#d9a066', boot: '#1b1b1b', gun: '#4a4a4a', pack: '#6b5230' },
-    { helmet: '#2a2a2e', vest: '#3a3a40', pants: '#1f1f24', skin: '#c98a60', boot: '#000000', gun: '#5a5a5a', pack: '#2e2e34' }
+  function spriteUrl_(relPath) {
+    return 'https://cdn.jsdelivr.net/gh/' + ASSET_REPO + '@' + ASSET_REF + '/assets/sprites/' + relPath;
+  }
+
+  function loadImageSafe_(src) {
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.__failed = false;
+    img.onerror = function () { img.__failed = true; };
+    img.src = src;
+    return img;
+  }
+
+  // --- 3. Catalogo de entidades (spritesheets reais, Hi-Bit) ------------
+  // Cada entrada descreve um spritesheet de ciclo de animacao (corrida, voo,
+  // etc). "lane: ground" corre sobre a linha de chao do banner; "lane: air"
+  // oscila em trajetoria senoidal (amplitude/period) como as naves/avioes.
+  // Ate os PNGs reais serem adicionados em assets/sprites/ (ver
+  // assets/sprites/LICENSES.md para o passo a passo de sourcing CC0), essas
+  // entradas falham silenciosamente ao carregar e o motor usa o tipo de
+  // emergencia "fallback" abaixo para o banner nunca ficar vazio.
+  var ENTITY_CONFIGS = [
+    {
+      id: 'platformer_hero_run',
+      category: 'PLATFORMER',
+      src: spriteUrl_('platformer/hero-run.png'),
+      frameWidth: 32, frameHeight: 32, totalFrames: 6, fps: 10,
+      scale: 2, lane: 'ground', speed: 42
+    },
+    {
+      id: 'gunner_soldier_run',
+      category: 'GUNNER',
+      src: spriteUrl_('gunner/soldier-run.png'),
+      frameWidth: 32, frameHeight: 32, totalFrames: 8, fps: 12,
+      scale: 2, lane: 'ground', speed: 55
+    },
+    {
+      id: 'racer_car_drive',
+      category: 'RACER',
+      src: spriteUrl_('racer/car-drive.png'),
+      frameWidth: 32, frameHeight: 16, totalFrames: 4, fps: 10,
+      scale: 2.5, lane: 'ground', speed: 90
+    },
+    {
+      id: 'spaceship_fighter_fly',
+      category: 'SPACESHIP',
+      src: spriteUrl_('spaceship/fighter-fly.png'),
+      frameWidth: 24, frameHeight: 24, totalFrames: 4, fps: 8,
+      scale: 2.5, lane: 'air', speed: 70, amplitude: 14, period: 2.5
+    },
+    // Tipo de emergencia: homenagem original desenhada em blocos de pixel via
+    // canvas (nenhum bitmap/sprite de jogo real e copiado), usado enquanto os
+    // spritesheets reais acima ainda nao existem ou falham ao carregar.
+    {
+      id: 'fallback_runner',
+      category: 'GUNNER',
+      fallback: true,
+      frameWidth: 12, frameHeight: 18, totalFrames: 4, fps: 8,
+      scale: 3, lane: 'ground', speed: 48
+    }
   ];
 
-  var SOLDIER_ACTIONS = ['run', 'run', 'run', 'shoot', 'crouch_shoot', 'jump', 'grenade'];
+  var REAL_CONFIGS = ENTITY_CONFIGS.filter(function (c) { return !c.fallback; });
+  var FALLBACK_CONFIG = ENTITY_CONFIGS.filter(function (c) { return c.fallback; })[0];
 
-  function pickSoldierAction() {
-    var action = SOLDIER_ACTIONS[Math.floor(Math.random() * SOLDIER_ACTIONS.length)];
-    var duration = action === 'run' ? 70 + Math.random() * 90 :
-      action === 'jump' ? 18 + Math.random() * 10 :
-      40 + Math.random() * 40;
-    return { action: action, ticksLeft: Math.round(duration), totalTicks: Math.round(duration), tick: 0 };
+  REAL_CONFIGS.forEach(function (c) { c.image = loadImageSafe_(c.src); });
+
+  // Da um tempo para o load/erro das imagens reais resolver; depois disso,
+  // se nenhuma carregou com sucesso, o spawn passa a priorizar o fallback
+  // para o banner nunca parecer vazio durante a janela de sourcing dos
+  // assets (ver assets/sprites/LICENSES.md).
+  var realAssetsReady = false;
+  setTimeout(function () {
+    realAssetsReady = REAL_CONFIGS.some(function (c) {
+      return c.image.complete && c.image.naturalWidth > 0 && !c.image.__failed;
+    });
+  }, 1500);
+
+  function pickEntityConfig_() {
+    var usableReal = REAL_CONFIGS.filter(function (c) {
+      return !c.image.__failed && (c.image.complete ? c.image.naturalWidth > 0 : true);
+    });
+    if (realAssetsReady && usableReal.length > 0) {
+      return usableReal[Math.floor(Math.random() * usableReal.length)];
+    }
+    if (usableReal.length > 0 && Math.random() < 0.5) {
+      return usableReal[Math.floor(Math.random() * usableReal.length)];
+    }
+    return FALLBACK_CONFIG;
   }
 
-  /**
-   * Desenha um soldado em blocos de pixel (x,y = pes no chao). Pose/frame
-   * variam conforme a acao atual, dando movimento real de pernas/braco/arma
-   * em vez de so um balanco vertical.
-   */
-  function drawSoldier(ctx, x, y, palette, action, frame) {
-    var u = SOLDIER_UNIT;
-    function block(gx, gy, gw, gh, color) {
-      ctx.fillStyle = color;
-      ctx.fillRect(Math.round(x + gx * u), Math.round(y + gy * u), Math.ceil(gw * u), Math.ceil(gh * u));
+  // --- 4. Entidade (instancia em cena) -----------------------------------
+  var GROUND_Y = 80; // o banner mantem 96px de altura total
+
+  function Entity(config) {
+    this.config = config;
+    this.direction = Math.random() < 0.5 ? 1 : -1;
+    var dw = config.frameWidth * config.scale;
+    this.x = this.direction === 1 ? -dw : cssWidth + dw;
+    this.frame = 0;
+    this.frameTimer = 0;
+    this.airBaseY = 10 + Math.random() * 30;
+    this.airPhase = Math.random() * Math.PI * 2;
+  }
+
+  Entity.prototype.update = function (dtSec) {
+    this.x += this.config.speed * this.direction * dtSec;
+    this.frameTimer += dtSec;
+    var frameDur = 1 / this.config.fps;
+    if (this.frameTimer >= frameDur) {
+      this.frameTimer -= frameDur;
+      this.frame = (this.frame + 1) % this.config.totalFrames;
+    }
+  };
+
+  Entity.prototype.isOffscreen = function () {
+    var margin = this.config.frameWidth * this.config.scale + 20;
+    return this.x < -margin || this.x > cssWidth + margin;
+  };
+
+  Entity.prototype.draw = function (ctx) {
+    var cfg = this.config;
+    var dw = cfg.frameWidth * cfg.scale;
+    var dh = cfg.frameHeight * cfg.scale;
+    var dy = cfg.lane === 'air'
+      ? this.airBaseY + Math.sin((performance.now() / 1000 / cfg.period) * Math.PI * 2 + this.airPhase) * cfg.amplitude
+      : GROUND_Y - dh;
+
+    if (cfg.fallback) {
+      drawFallbackRunner_(ctx, this.x, dy, dw, dh, this.frame, this.direction);
+      return;
     }
 
-    var legOffset = 0, armForward = 0, crouch = 0, muzzle = false;
+    var img = cfg.image;
+    if (!img || img.__failed || !img.complete || img.naturalWidth === 0) return;
 
-    if (action === 'run') {
-      legOffset = [0, 1.5, 0, -1.5][frame % 4];
-    } else if (action === 'shoot') {
-      muzzle = frame === 1;
-    } else if (action === 'crouch_shoot') {
-      crouch = 2;
-      muzzle = frame === 1;
-    } else if (action === 'jump') {
-      crouch = -1.5;
-      legOffset = 1;
-    } else if (action === 'grenade') {
-      armForward = [-1, 0, 2][frame] || 0;
+    var sx = this.frame * cfg.frameWidth;
+    ctx.save();
+    if (this.direction === -1) {
+      ctx.translate(this.x + dw, dy);
+      ctx.scale(-1, 1);
+      ctx.drawImage(img, sx, 0, cfg.frameWidth, cfg.frameHeight, 0, 0, dw, dh);
+    } else {
+      ctx.drawImage(img, sx, 0, cfg.frameWidth, cfg.frameHeight, this.x, dy, dw, dh);
     }
+    ctx.restore();
+  };
 
-    var headY = -14 + crouch;
-    var torsoY = -11 + crouch;
-    var legY = -5 + crouch;
-
-    block(-1, torsoY + 1, 2, 4, palette.pack);
-    block(0, legY, 2, 5, palette.pants);
-    block(2 + legOffset, legY, 2, 5, palette.pants);
-    block(0, legY + 4, 2, 1, palette.boot);
-    block(2 + legOffset, legY + 4, 2, 1, palette.boot);
-    block(0, torsoY, 4, 6, palette.vest);
-    block(1, headY, 2, 2, palette.skin);
-    block(0, headY - 1, 4, 2, palette.helmet);
-
-    var gunLen = action === 'crouch_shoot' ? 5 : 6;
-    var gunY = torsoY + 2;
-    var gunX = 4 + armForward;
-    block(gunX, gunY, gunLen, 1, palette.gun);
-
-    if (action === 'grenade' && frame === 2) {
-      ctx.fillStyle = '#6b7a3a';
-      ctx.beginPath();
-      ctx.arc(Math.round(x + (gunX + gunLen + 3) * u), Math.round(y + (gunY - 1) * u), u * 0.8, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    if (muzzle) {
-      ctx.fillStyle = '#ffe98a';
-      ctx.beginPath();
-      ctx.arc(Math.round(x + (gunX + gunLen) * u), Math.round(y + (gunY + 0.5) * u), u * 1.3, 0, Math.PI * 2);
-      ctx.fill();
-    }
+  // Figura de emergencia em blocos de pixel (sem bitmap externo), so para
+  // garantir que sempre haja algo em cena enquanto os PNGs reais nao estao
+  // disponiveis.
+  function drawFallbackRunner_(ctx, x, y, dw, dh, frame, direction) {
+    var u = dw / 4;
+    var legOffset = [0, 1, 0, -1][frame % 4] * u * 0.3;
+    ctx.save();
+    ctx.translate(x, y);
+    if (direction === -1) { ctx.scale(-1, 1); ctx.translate(-dw, 0); }
+    ctx.fillStyle = '#55672f';
+    ctx.fillRect(u * 0.5, u * 2.2, u * 2, u * 3.2);
+    ctx.fillStyle = '#d9a066';
+    ctx.fillRect(u * 0.9, u * 1.2, u * 1.2, u * 1.2);
+    ctx.fillStyle = '#3a4a2a';
+    ctx.fillRect(u * 0.5, u * 0.8, u * 2, u * 1);
+    ctx.fillStyle = '#2e3b22';
+    ctx.fillRect(u * 0.5, u * 5.2 + legOffset, u * 0.9, u * 1.6);
+    ctx.fillRect(u * 1.6 - legOffset, u * 5.2, u * 0.9, u * 1.6);
+    ctx.restore();
   }
 
-  // Personagens derivados dos 27 tiles Kenney (ceu: foguete/UFO/nave/alien
-  // sobrevoando ao fundo) + soldados procedurais (chao, protagonistas do banner).
-  var CHARACTERS = [
-    { key: 'rocket', frames: [15, 16, 17], type: 'fly' },
-    { key: 'ufo', frames: [18, 19, 20], type: 'fly' },
-    { key: 'bigship', frames: [21, 22, 23], type: 'fly' },
-    { key: 'alienIcon', frames: [24, 25, 26], type: 'fly' },
-    { key: 'soldierGreen', type: 'soldier', palette: SOLDIER_PALETTES[0] },
-    { key: 'soldierGreen2', type: 'soldier', palette: SOLDIER_PALETTES[0] },
-    { key: 'soldierTan', type: 'soldier', palette: SOLDIER_PALETTES[1] },
-    { key: 'soldierTan2', type: 'soldier', palette: SOLDIER_PALETTES[1] },
-    { key: 'soldierBlack', type: 'soldier', palette: SOLDIER_PALETTES[2] },
-    { key: 'soldierBlack2', type: 'soldier', palette: SOLDIER_PALETTES[2] }
-  ];
-
-  function randomCharacter() {
-    return CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
-  }
-
-  function spawnHero(x) {
-    var character = randomCharacter();
-    return {
-      x: x,
-      speed: 0.45 + Math.random() * 0.35,
-      character: character,
-      tick: Math.floor(Math.random() * 60),
-      bob: Math.random() * Math.PI * 2,
-      soldierState: character.type === 'soldier' ? pickSoldierAction() : null
-    };
-  }
-
-  var DISPLAY_SIZE = TILE_SRC_SIZE * SCALE;
-  var HERO_SPACING_PX = 100;
-  var numHeroes = Math.min(14, Math.max(7, Math.round(canvas.width / HERO_SPACING_PX)));
-  var heroes = [];
-  for (var h = 0; h < numHeroes; h++) {
-    heroes.push(spawnHero((h / numHeroes) * (canvas.width + 200) - 100));
-  }
-
-  var bgOffset = 0;
-  var GROUND_Y = 80; // banner mantem 96px de altura total
-
-  // O cenario do banner acompanha o tema selecionado (ver THEMES em
-  // Script.html): le as CSS custom properties atuais em vez de cores fixas,
-  // e re-le quando 'codexThemeChange' dispara (troca de tema em tempo real).
+  // --- 5. Fundo em parallax (procedural, reativo ao tema) ----------------
+  // Nao e realista garantir arte de cenario tileavel e verificada como CC0
+  // para os 4 generos nesta etapa - por isso o fundo continua procedural,
+  // reagindo as variaveis CSS do tema ativo (ver THEME_LIST em
+  // ThemeController.html); so os personagens/veiculos/naves acima usam
+  // spritesheets reais.
   var bannerColors = { sky: '#0a0b16', stars: '#f3f4fc', mountains: '#262a47', ground: '#181a2c', groundLine: '#000000' };
 
   function readBannerColors_() {
@@ -207,20 +237,29 @@
   readBannerColors_();
   document.addEventListener('codexThemeChange', readBannerColors_);
 
-  function render() {
-    ctx.fillStyle = bannerColors.sky;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  var layerOffsets = [0, 0, 0, 0];
 
+  function drawBackground_(dtSec) {
+    layerOffsets[0] += 2 * dtSec;
+    layerOffsets[1] += 10 * dtSec;
+    layerOffsets[2] += 25 * dtSec;
+    layerOffsets[3] += 55 * dtSec;
+
+    // Camada 1: ceu / gradiente profundo (quase estatico)
+    ctx.fillStyle = bannerColors.sky;
+    ctx.fillRect(0, 0, cssWidth, cssHeight);
+
+    // Camada 2: silhuetas distantes (estrelas + montanhas), ~0.2x
     ctx.fillStyle = bannerColors.stars;
     for (var i = 0; i < 20; i++) {
-      var sx = (i * 35 + bgOffset * 0.1) % canvas.width;
+      var sx = (i * 35 + layerOffsets[0]) % cssWidth;
       var sy = 4 + (i * 7) % 45;
       ctx.fillRect(sx, sy, 1, 1);
     }
 
     ctx.fillStyle = bannerColors.mountains;
     for (var m = 0; m < 8; m++) {
-      var mx = (m * 90 - bgOffset * 0.2) % (canvas.width + 90) - 45;
+      var mx = (m * 90 - layerOffsets[1]) % (cssWidth + 90) - 45;
       ctx.beginPath();
       ctx.moveTo(mx, GROUND_Y);
       ctx.lineTo(mx + 45, 36);
@@ -228,76 +267,53 @@
       ctx.fill();
     }
 
+    // Camada 3: linha de chao / pista, ~0.5x
     ctx.fillStyle = bannerColors.ground;
-    ctx.fillRect(0, GROUND_Y, canvas.width, 16);
+    ctx.fillRect(0, GROUND_Y, cssWidth, 16);
     ctx.fillStyle = bannerColors.groundLine;
-    ctx.fillRect(0, GROUND_Y + 4, canvas.width, 2);
-
-    heroes.forEach(function (h) {
-      h.tick++;
-
-      if (h.character.type === 'soldier') {
-        var st = h.soldierState;
-        st.tick++;
-        st.ticksLeft--;
-        if (st.ticksLeft <= 0) {
-          h.soldierState = st = pickSoldierAction();
-        }
-
-        var frame;
-        if (st.action === 'run') {
-          frame = Math.floor(st.tick / 6) % 4;
-          h.x += h.speed * 1.4;
-        } else if (st.action === 'jump') {
-          frame = 0;
-          h.x += h.speed * 0.6;
-        } else if (st.action === 'grenade') {
-          frame = Math.min(2, Math.floor(st.tick / 15));
-        } else {
-          frame = Math.floor(st.tick / 10) % 2;
-        }
-
-        var jumpArc = st.action === 'jump' ? -Math.sin((1 - st.ticksLeft / st.totalTicks) * Math.PI) * 14 : 0;
-        drawSoldier(ctx, h.x, GROUND_Y + jumpArc, h.character.palette, st.action, frame);
-
-        if (h.x > canvas.width) {
-          h.x = -30;
-          h.character = randomCharacter();
-          h.soldierState = h.character.type === 'soldier' ? pickSoldierAction() : null;
-          h.tick = 0;
-        }
-        return;
-      }
-
-      h.x += h.speed;
-      var frames = h.character.frames;
-      var frameIndex = Math.floor(h.tick / 14) % frames.length;
-      var img = tileImages[frames[frameIndex]];
-      var y;
-
-      if (h.character.type === 'fly') {
-        y = 10;
-      } else {
-        h.bob = (h.bob + 0.08) % (Math.PI * 2);
-        y = GROUND_Y - DISPLAY_SIZE + 6 + Math.sin(h.bob) * 3;
-      }
-
-      if (img.complete && img.naturalWidth > 0) {
-        ctx.drawImage(img, Math.floor(h.x), Math.floor(y), DISPLAY_SIZE, DISPLAY_SIZE);
-      }
-
-      if (h.x > canvas.width) {
-        h.x = -DISPLAY_SIZE;
-        h.character = randomCharacter();
-        h.soldierState = h.character.type === 'soldier' ? pickSoldierAction() : null;
-        h.tick = 0;
-      }
-    });
-
-    bgOffset += 0.5;
-    requestAnimationFrame(render);
+    ctx.fillRect(0, GROUND_Y + 4, cssWidth, 2);
   }
 
-  render();
+  function drawForegroundParticles_() {
+    // Camada 4: particulas esparsas de primeiro plano (sensacao de velocidade)
+    ctx.fillStyle = bannerColors.groundLine;
+    for (var p = 0; p < 6; p++) {
+      var px = (p * 80 - layerOffsets[3]) % (cssWidth + 80) - 40;
+      ctx.fillRect(px, GROUND_Y + 2, 10, 1);
+    }
+  }
+
+  // --- 6. Loop principal: spawn, update, despawn -------------------------
+  var MAX_ENTITIES = 6;
+  var entities = [];
+  var nextSpawnAt = 0;
+  var lastTs = null;
+
+  function maybeSpawn_(nowSec) {
+    if (nowSec < nextSpawnAt || entities.length >= MAX_ENTITIES) return;
+    entities.push(new Entity(pickEntityConfig_()));
+    nextSpawnAt = nowSec + 0.8 + Math.random() * 2.2;
+  }
+
+  function tick_(ts) {
+    if (lastTs === null) lastTs = ts;
+    var dtSec = Math.min((ts - lastTs) / 1000, 0.05);
+    lastTs = ts;
+
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
+    drawBackground_(dtSec);
+    maybeSpawn_(ts / 1000);
+
+    entities = entities.filter(function (e) {
+      e.update(dtSec);
+      return !e.isOffscreen();
+    });
+    entities.forEach(function (e) { e.draw(ctx); });
+
+    drawForegroundParticles_();
+    requestAnimationFrame(tick_);
+  }
+
+  requestAnimationFrame(tick_);
 })();
 </script>
