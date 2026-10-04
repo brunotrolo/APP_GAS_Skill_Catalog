@@ -46,6 +46,9 @@ jobs:
           }
           EOF
 
+      - name: Show files clasp will push (debug)
+        run: npx clasp status
+
       - name: Push to Apps Script
         run: npx clasp push --force
 
