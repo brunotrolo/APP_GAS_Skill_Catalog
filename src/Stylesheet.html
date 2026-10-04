@@ -32,6 +32,13 @@
     --chrome-gradient-curadoria: linear-gradient(180deg, #d19bff, var(--purple));
     --info: #6ad1ff;
     --warn: #ff9f5a;
+    --cat-1: #ffd84a;
+    --cat-2: #2effa0;
+    --cat-3: #ff5d6c;
+    --cat-4: #6ad1ff;
+    --cat-5: #b06aed;
+    --cat-6: #ff9f5a;
+    --on-cat: #231a00;
     --gold-glow-rgb: 255, 216, 74;
     --terminal-green-rgb: 46, 255, 160;
     --ambient-glow: radial-gradient(1200px 600px at 15% -10%, rgba(176, 106, 237, 0.12), transparent 60%), radial-gradient(1000px 500px at 100% 0%, rgba(46, 255, 160, 0.08), transparent 55%);
@@ -307,10 +314,10 @@
     margin-bottom: 8px;
   }
 
-  .quadrant-badge.q-adopt { background: var(--terminal-green); color: var(--on-accent); }
-  .quadrant-badge.q-trial { background: var(--info); color: var(--on-accent); }
-  .quadrant-badge.q-assess { background: var(--gold); color: var(--on-accent); }
-  .quadrant-badge.q-hold { background: var(--danger); color: var(--on-accent); }
+  .quadrant-badge.q-adopt { background: var(--cat-1); color: var(--on-cat); }
+  .quadrant-badge.q-trial { background: var(--cat-2); color: var(--on-cat); }
+  .quadrant-badge.q-assess { background: var(--cat-3); color: var(--on-cat); }
+  .quadrant-badge.q-hold { background: var(--cat-4); color: var(--on-cat); }
 
   /* ---- Layout (sidebar + conteudo) ---- */
   .app-layout {
@@ -489,7 +496,7 @@
     background: var(--bg-card);
     border: var(--border-width) solid var(--border-ink);
     border-radius: 999px;
-    color: var(--terminal-green);
+    color: var(--gold);
     padding: 4px 10px;
     font-size: 11px;
     box-shadow: var(--shadow-chunky);
@@ -501,9 +508,9 @@
   }
 
   .tag-pill.active {
-    background: var(--terminal-green);
+    background: var(--gold);
     color: var(--on-accent);
-    box-shadow: var(--shadow-chunky), 0 0 10px rgba(var(--terminal-green-rgb), 0.4);
+    box-shadow: var(--shadow-chunky), 0 0 10px rgba(var(--gold-glow-rgb), 0.4);
   }
 
   .pixel-button {
@@ -636,12 +643,12 @@
     overflow-wrap: break-word;
   }
 
-  .categoria-badge.cat-1 { background: var(--gold); color: var(--on-accent); }
-  .categoria-badge.cat-2 { background: var(--terminal-green); color: var(--on-accent); }
-  .categoria-badge.cat-3 { background: var(--danger); color: var(--on-accent); }
-  .categoria-badge.cat-4 { background: var(--info); color: var(--on-accent); }
-  .categoria-badge.cat-5 { background: var(--purple); color: var(--on-accent); }
-  .categoria-badge.cat-6 { background: var(--warn); color: var(--on-accent); }
+  .categoria-badge.cat-1 { background: var(--cat-1); color: var(--on-cat); }
+  .categoria-badge.cat-2 { background: var(--cat-2); color: var(--on-cat); }
+  .categoria-badge.cat-3 { background: var(--cat-3); color: var(--on-cat); }
+  .categoria-badge.cat-4 { background: var(--cat-4); color: var(--on-cat); }
+  .categoria-badge.cat-5 { background: var(--cat-5); color: var(--on-cat); }
+  .categoria-badge.cat-6 { background: var(--cat-6); color: var(--on-cat); }
   .categoria-badge.cat-default { background: var(--bg-panel); color: var(--text-main); }
 
   .skill-card .tags {
@@ -768,7 +775,7 @@
 
   .preview-box {
     background: #050608;
-    color: var(--terminal-green);
+    color: var(--gold);
     padding: 10px;
     font-family: var(--font-body);
     font-size: 14px;
