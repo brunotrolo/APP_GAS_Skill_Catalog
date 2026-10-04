@@ -40,8 +40,9 @@
 
   // ---- Helpers geometricos para montar sprites 16x16 por codigo, em vez de
   // matrizes de texto manuais (menos repeticao, zero risco de linha com
-  // tamanho errado). Homenagens estilizadas a classicos do 8-bit/16-bit,
-  // nao reproducoes dos sprites originais.
+  // tamanho errado). Homenagens estilizadas a classicos de Nintendo
+  // (NES/SNES/N64/Game Boy) e Master System, nao reproducoes dos sprites
+  // originais.
   function newGrid() {
     var grid = [];
     for (var y = 0; y < SPRITE_SIZE; y++) {
@@ -76,7 +77,7 @@
    * Gera um boneco humanoide generico com 2 frames de caminhada (pernas
    * juntas / pernas abertas). A identidade de cada personagem vem da
    * combinacao de cores, nao da silhueta (mantem o codigo pequeno e sem
-   * repeticao para as 11 "classes" humanoides do banner).
+   * repeticao para as dezenas de "classes" humanoides do banner).
    */
   function buildHumanoid(headColor, bodyColor, legColor) {
     var base = newGrid();
@@ -110,45 +111,16 @@
     return [frameA, frameB];
   }
 
-  function buildPacman() {
-    var frameClosed = newGrid();
-    fillCircle(frameClosed, 8, 8, 7, 'Y');
+  /** Personagem "bolha" redonda com animacao de pulo (achatado / esticado). */
+  function buildBlob(color) {
+    var frameSquash = newGrid();
+    fillCircle(frameSquash, 8, 10, 6, color);
 
-    var frameOpen = newGrid();
-    for (var y = 0; y < SPRITE_SIZE; y++) {
-      for (var x = 0; x < SPRITE_SIZE; x++) {
-        var dx = x - 8 + 0.5;
-        var dy = y - 8 + 0.5;
-        if (dx * dx + dy * dy <= 49 && !(dx > 0 && Math.abs(dy) < dx * 0.8)) {
-          frameOpen[y][x] = 'Y';
-        }
-      }
-    }
+    var frameStretch = newGrid();
+    fillCircle(frameStretch, 8, 7, 5, color);
+    fillRect(frameStretch, 6, 12, 4, 2, color);
 
-    return [frameOpen, frameClosed];
-  }
-
-  function buildInvader() {
-    var rows = [
-      "..K..........K.",
-      "...K........K..",
-      "..KKKKKKKKKKK..",
-      ".KK.KK.KK.KK.K.",
-      "KKKKKKKKKKKKKKK",
-      "KK.KKKKKKKKK.KK",
-      "KK.K.......K.KK",
-      "...KK.....KK..."
-    ];
-    var frameA = newGrid();
-    for (var y = 0; y < rows.length; y++) {
-      for (var x = 0; x < rows[y].length; x++) {
-        if (rows[y][x] === 'K') frameA[y + 3][x] = 'G';
-      }
-    }
-    var frameB = cloneGrid(frameA);
-    fillRect(frameB, 1, 11, 2, 2, 'G');
-    fillRect(frameB, 13, 11, 2, 2, 'G');
-    return [frameA, frameB];
+    return [frameSquash, frameStretch];
   }
 
   function buildTetrisBlock() {
@@ -167,22 +139,6 @@
     return [frameA, frameB];
   }
 
-  function buildFrog() {
-    var frameTucked = newGrid();
-    fillCircle(frameTucked, 8, 9, 5, 'G');
-    fillRect(frameTucked, 5, 5, 2, 2, 'G');
-    fillRect(frameTucked, 9, 5, 2, 2, 'G');
-
-    var frameExtended = newGrid();
-    fillCircle(frameExtended, 8, 8, 5, 'G');
-    fillRect(frameExtended, 5, 5, 2, 2, 'G');
-    fillRect(frameExtended, 9, 5, 2, 2, 'G');
-    fillRect(frameExtended, 1, 11, 3, 2, 'G');
-    fillRect(frameExtended, 12, 11, 3, 2, 'G');
-
-    return [frameTucked, frameExtended];
-  }
-
   function buildShip(primaryColor) {
     var base = newGrid();
     fillRect(base, 7, 1, 2, 3, primaryColor);
@@ -199,9 +155,9 @@
     return [frameA, frameB];
   }
 
-  function buildCar() {
+  function buildCar(bodyColor) {
     var base = newGrid();
-    fillRect(base, 3, 6, 10, 4, 'R');
+    fillRect(base, 3, 6, 10, 4, bodyColor);
     fillRect(base, 6, 4, 5, 3, 'C');
     var frameA = cloneGrid(base);
     fillCircle(frameA, 5, 11, 2, 'K');
@@ -229,33 +185,76 @@
     return [frameA, frameB];
   }
 
-  // Homenagens estilizadas a 20 classicos do 8/16-bit (personagem/veiculo
-  // principal + animacao caracteristica de cada um) - nao sao copias dos
-  // assets originais. type define o comportamento de movimento no banner:
-  // 'walk'/'hop' andam no chao com balanco vertical, 'drive' roda no chao
-  // sem balanco (rodas giram), 'fly' sobrevoa a parte alta do cenario.
+  // Homenagens estilizadas a 50 classicos de Nintendo (NES/Nintendinho,
+  // SNES, N64, Game Boy) e Master System - nao sao copias dos sprites
+  // originais. Cada entrada define o tipo de movimento no banner: 'walk'
+  // anda no chao com balanco vertical, 'fly' sobrevoa a parte alta do
+  // cenario, 'drive' roda no chao sem balanco (rodas giram), 'hop' pula
+  // com efeito de achatar/esticar.
+  var HUMANOID_DEFS = [
+    // --- NES / Nintendinho ---
+    ['mario', 'S', 'R', 'B', 'walk'],
+    ['luigi', 'S', 'G', 'B', 'walk'],
+    ['link', 'S', 'G', 'D', 'walk'],
+    ['samus', 'O', 'O', 'K', 'walk'],
+    ['megaman', 'B', 'B', 'W', 'walk'],
+    ['simon', 'S', 'D', 'W', 'walk'],
+    ['commando', 'S', 'G', 'G', 'walk'],
+    ['donkeykong', 'D', 'D', 'K', 'walk'],
+    ['duckhunt', 'W', 'D', 'K', 'walk'],
+    ['littlemac', 'S', 'R', 'K', 'walk'],
+    ['iceclimber', 'S', 'C', 'B', 'walk'],
+    ['balloonfighter', 'S', 'R', 'W', 'fly'],
+    ['kidicarus', 'S', 'W', 'G', 'fly'],
+    // --- SNES ---
+    ['marioworld', 'S', 'R', 'W', 'walk'],
+    ['zelda_alttp', 'S', 'G', 'P', 'walk'],
+    ['supermetroid', 'O', 'O', 'W', 'walk'],
+    ['ryu', 'S', 'W', 'K', 'walk'],
+    ['dkc', 'D', 'D', 'R', 'walk'],
+    ['chrono', 'S', 'R', 'K', 'walk'],
+    ['ff6', 'S', 'B', 'C', 'walk'],
+    ['castlevania4', 'S', 'D', 'K', 'walk'],
+    ['metaknight', 'P', 'P', 'K', 'walk'],
+    ['megamanx', 'B', 'C', 'W', 'walk'],
+    ['ness', 'S', 'Y', 'B', 'walk'],
+    // --- N64 ---
+    ['mario64', 'S', 'R', 'B', 'walk'],
+    ['ocarina', 'S', 'G', 'D', 'walk'],
+    ['goldeneye', 'S', 'K', 'K', 'walk'],
+    ['banjokazooie', 'D', 'O', 'Y', 'walk'],
+    ['dk64', 'D', 'D', 'B', 'walk'],
+    ['smashbros', 'S', 'R', 'W', 'walk'],
+    // --- Game Boy ---
+    ['warioland', 'Y', 'Y', 'P', 'walk'],
+    ['metroid2', 'O', 'K', 'O', 'walk'],
+    // --- Master System ---
+    ['sonicms', 'B', 'B', 'R', 'walk'],
+    ['alexkidd', 'S', 'R', 'K', 'walk'],
+    ['phantasystar', 'S', 'P', 'W', 'walk'],
+    ['wonderboy', 'S', 'Y', 'G', 'walk'],
+    ['shinobi', 'K', 'K', 'R', 'walk'],
+    ['goldenaxe', 'S', 'D', 'K', 'walk']
+  ];
+
   var SPRITES = {
-    plumber:   { frames: buildHumanoid('S', 'R', 'B'), type: 'walk' },   // Super Mario Bros
-    elf:       { frames: buildHumanoid('S', 'G', 'D'), type: 'walk' },   // The Legend of Zelda
-    spark:     { frames: buildSpark(),                 type: 'walk' },  // Pokemon
-    valkyrie:  { frames: buildHumanoid('S', 'P', 'D'), type: 'walk' },   // D&D / Odin (Norse RPG)
-    pacman:    { frames: buildPacman(),                type: 'walk' },  // Pac-Man
-    invader:   { frames: buildInvader(),               type: 'walk' },  // Space Invaders
-    galaga:    { frames: buildShip('R'),               type: 'fly' },   // Galaga
-    kong:      { frames: buildHumanoid('D', 'D', 'K'), type: 'walk' },  // Donkey Kong
-    sonic:     { frames: buildHumanoid('B', 'B', 'R'), type: 'walk' },  // Sonic the Hedgehog
-    megaman:   { frames: buildHumanoid('B', 'B', 'W'), type: 'walk' },  // Mega Man
-    fighter:   { frames: buildHumanoid('S', 'W', 'K'), type: 'walk' },  // Street Fighter
-    tetris:    { frames: buildTetrisBlock(),           type: 'fly' },   // Tetris (cai do alto)
-    commando:  { frames: buildHumanoid('S', 'G', 'G'), type: 'walk' },  // Contra
-    hunter:    { frames: buildHumanoid('O', 'O', 'K'), type: 'walk' },  // Metroid
-    vhunter:   { frames: buildHumanoid('S', 'D', 'W'), type: 'walk' },  // Castlevania
-    knight:    { frames: buildHumanoid('S', 'B', 'C'), type: 'walk' },  // Final Fantasy
-    outrun:    { frames: buildCar(),                   type: 'drive' },// Out Run
-    asteroids: { frames: buildShip('W'),                type: 'fly' },  // Asteroids
-    frogger:   { frames: buildFrog(),                  type: 'hop' },  // Frogger
-    excitebike:{ frames: buildBike(),                  type: 'drive' } // Excitebike
+    pokemonstadium: { frames: buildSpark(), type: 'walk' },          // Pokemon (N64/Game Boy)
+    tetris: { frames: buildTetrisBlock(), type: 'fly' },              // Tetris (Game Boy)
+    excitebike: { frames: buildBike(), type: 'drive' },                // Excitebike (NES)
+    kirby64: { frames: buildBlob('P'), type: 'hop' },                  // Kirby 64 (N64)
+    kirbydreamland: { frames: buildBlob('P'), type: 'hop' },           // Kirby's Dream Land (Game Boy)
+    fzero: { frames: buildCar('C'), type: 'drive' },                   // F-Zero (SNES)
+    fzerox: { frames: buildCar('P'), type: 'drive' },                  // F-Zero X (N64)
+    mariokart: { frames: buildCar('R'), type: 'drive' },               // Super Mario Kart (SNES)
+    mariokart64: { frames: buildCar('G'), type: 'drive' },             // Mario Kart 64 (N64)
+    starfox: { frames: buildShip('W'), type: 'fly' },                  // Star Fox (SNES)
+    starfox64: { frames: buildShip('G'), type: 'fly' },                // Star Fox 64 (N64)
+    pilotwings: { frames: buildShip('N'), type: 'fly' }                // Pilotwings (N64)
   };
+
+  HUMANOID_DEFS.forEach(function (def) {
+    SPRITES[def[0]] = { frames: buildHumanoid(def[1], def[2], def[3]), type: def[4] };
+  });
 
   var SPRITE_KEYS = Object.keys(SPRITES);
 
@@ -299,9 +298,14 @@
     };
   }
 
-  var heroes = [
-    spawnHero(30), spawnHero(160), spawnHero(300), spawnHero(440), spawnHero(560)
-  ];
+  // Densidade proporcional a largura da tela: mais personagens em telas
+  // largas, com um minimo/maximo para nao poluir nem ficar vazio demais.
+  var HERO_SPACING_PX = 55;
+  var numHeroes = Math.min(28, Math.max(12, Math.round(canvas.width / HERO_SPACING_PX)));
+  var heroes = [];
+  for (var h = 0; h < numHeroes; h++) {
+    heroes.push(spawnHero((h / numHeroes) * (canvas.width + 200) - 100));
+  }
 
   var bgOffset = 0;
 
