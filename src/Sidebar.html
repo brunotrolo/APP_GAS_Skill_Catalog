@@ -1,6 +1,10 @@
 <aside class="sidebar pixel-panel">
-  <button type="button" class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙 MODO ESCURO</button>
-  <select id="themeSelect" class="theme-select" onchange="applyTheme(this.value)"></select>
+  <div class="theme-controls">
+    <label class="theme-controls-label">TEMA</label>
+    <select id="themeSelect" class="theme-select" onchange="applyTheme(this.value, currentThemeType)"></select>
+    <label class="theme-controls-label">TIPO</label>
+    <button type="button" class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙 ESCURO</button>
+  </div>
 
   <h2>NAVEGAR</h2>
   <ul class="sidebar-nav" id="tipoNav">
