@@ -13,6 +13,11 @@ animado (correr/parado/golpe de machado) cruzando a cena.
 | `hero/idle.png` | "Viking - 2D Pixel Art Character Pack" por ByteBox, itch.io — https://bytebox.itch.io/viking-character-2d (arquivo original `sidrug_idle.png`) | Gratuito p/ uso pessoal e comercial. **Nao** pode ser revendido/redistribuido/reempacotado como produto autonomo nem subido para outras lojas de assets (ver "Licenca" abaixo) |
 | `hero/run.png` | Idem acima (arquivo original `sidrug_run.png`) | Idem acima |
 | `hero/attack.png` | Idem acima (arquivo original `sidrug_attack1.png`) | Idem acima |
+| `hero/attack2.png` | Idem acima (arquivo original `sidrug_attack2.png`) | Idem acima |
+| `hero/attack3.png` | Idem acima (arquivo original `sidrug_attack3.png`) | Idem acima |
+| `hero/jump.png` | Idem acima (arquivo original `sidrug_jump_and_fall.png`) | Idem acima |
+| `hero/hit.png` | Idem acima (arquivo original `sidrug_hit.png`) | Idem acima |
+| `hero/appear.png` | Idem acima (arquivo original `sidrug_appear.png`) | Idem acima |
 
 ## Nota sobre a licenca do heroi (nao-CC0)
 

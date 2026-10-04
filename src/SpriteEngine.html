@@ -94,59 +94,97 @@
   // assets/sprites/LICENSES.md). Frames 48x48, viradas para a direita.
   var HERO_FRAME = 48;
   var HERO_ANIMS = {
+    appear: { img: loadImageSafe_(spriteUrl_('hero/appear.png')), frames: 6, fps: 10 },
     run: { img: loadImageSafe_(spriteUrl_('hero/run.png')), frames: 8, fps: 10 },
     idle: { img: loadImageSafe_(spriteUrl_('hero/idle.png')), frames: 11, fps: 8 },
-    attack: { img: loadImageSafe_(spriteUrl_('hero/attack.png')), frames: 8, fps: 14 }
+    attack1: { img: loadImageSafe_(spriteUrl_('hero/attack.png')), frames: 8, fps: 14 },
+    attack2: { img: loadImageSafe_(spriteUrl_('hero/attack2.png')), frames: 5, fps: 14 },
+    attack3: { img: loadImageSafe_(spriteUrl_('hero/attack3.png')), frames: 5, fps: 14 },
+    jump: { img: loadImageSafe_(spriteUrl_('hero/jump.png')), frames: 4, fps: 8 },
+    hit: { img: loadImageSafe_(spriteUrl_('hero/hit.png')), frames: 2, fps: 8 }
   };
   var HERO_SCALE = 2.3;
   var HERO_RUN_SPEED = 46; // px/s
-  var HERO_STOP_X = 190; // onde o heroi para para o golpe, antes da arvore
-  var HERO_IDLE_SECONDS = 1.1;
+  var HERO_FAST_SPEED = 95; // px/s - "correr rapido" / fuga comica
+  var HERO_STOP_X = 190; // onde o heroi para pra fazer a sequencia de golpes
+
+  // Sequencia de "numeros" do heroi - roda em loop continuo. Cada passo
+  // toca uma animacao real do pack ate completar N ciclos (ou ate alcancar
+  // um x alvo, pra passos que andam), depois avanca pro proximo. Isso cobre
+  // as variacoes pedidas: golpes (attack1/2/3 - "acertar o machado"), correr
+  // rapido (fast run), pulo (jump), e dois numeros comicos usando efeitos
+  // proceduais simples (sem asset novo): soltar uma fumacinha e sair
+  // correndo, e perseguir um esquilo desenhado em vetor.
+  var HERO_SEQUENCE = [
+    { anim: 'appear', loops: 1 },
+    { anim: 'run', moveTo: HERO_STOP_X, speed: HERO_RUN_SPEED },
+    { anim: 'idle', loops: 2 },
+    { anim: 'attack1', loops: 1 },
+    { anim: 'attack2', loops: 1 },
+    { anim: 'attack3', loops: 1 },
+    { anim: 'jump', loops: 1, jumpArc: true },
+    { anim: 'attack1', loops: 1 }, // golpe ao cair, emenda com o pulo
+    { anim: 'idle', loops: 1, fartPuff: true }, // solta um pum...
+    { anim: 'run', moveTo: null, speed: HERO_FAST_SPEED, squirrel: true }, // ...e sai correndo atras do esquilo
+    { anim: 'hit', loops: 1 }
+  ];
+
+  var HERO_ENTER_X = 24; // posicao visivel, perto da borda esquerda, onde o "appear" acontece
 
   var hero = {
-    x: -HERO_FRAME * HERO_SCALE,
-    state: 'run',
+    x: HERO_ENTER_X,
+    step: 0,
     frame: 0,
     frameTimer: 0,
-    idleTimer: 0,
-    hasPerformed: false // evita repetir o golpe em loop enquanto atravessa o ponto de parada
+    loopsDone: 0,
+    squirrelX: 0
   };
 
+  function currentStep_() {
+    return HERO_SEQUENCE[hero.step];
+  }
+
+  function advanceStep_() {
+    hero.step = (hero.step + 1) % HERO_SEQUENCE.length;
+    hero.frame = 0;
+    hero.frameTimer = 0;
+    hero.loopsDone = 0;
+    if (HERO_SEQUENCE[hero.step].anim === 'appear') {
+      hero.x = HERO_ENTER_X; // reinicio do ciclo - "surge" de novo perto da borda esquerda
+    }
+    if (HERO_SEQUENCE[hero.step].squirrel) {
+      hero.squirrelX = hero.x + HERO_FRAME * HERO_SCALE * 0.6;
+    }
+  }
+
   function updateHero_(dt) {
-    var anim = HERO_ANIMS[hero.state];
+    var step = currentStep_();
+    var anim = HERO_ANIMS[step.anim];
     hero.frameTimer += dt;
     var frameDur = 1 / anim.fps;
+    var cycleDone = false;
     if (hero.frameTimer >= frameDur) {
       hero.frameTimer -= frameDur;
       hero.frame++;
       if (hero.frame >= anim.frames) {
         hero.frame = 0;
-        if (hero.state === 'attack') hero.state = 'run';
+        hero.loopsDone++;
+        cycleDone = true;
       }
     }
 
-    if (hero.state === 'run') {
-      hero.x += HERO_RUN_SPEED * dt;
-      if (!hero.hasPerformed && hero.x >= HERO_STOP_X) {
-        hero.hasPerformed = true;
-        hero.state = 'idle';
-        hero.frame = 0;
-        hero.frameTimer = 0;
-        hero.idleTimer = 0;
-      }
-      if (hero.x > cssWidth + HERO_FRAME * HERO_SCALE) {
-        hero.x = -HERO_FRAME * HERO_SCALE;
-        hero.hasPerformed = false;
-      }
-    } else if (hero.state === 'idle') {
-      hero.idleTimer += dt;
-      if (hero.idleTimer >= HERO_IDLE_SECONDS) {
-        hero.state = 'attack';
-        hero.frame = 0;
-        hero.frameTimer = 0;
-      }
+    if (step.speed) {
+      hero.x += step.speed * dt;
+      if (step.squirrel) hero.squirrelX += step.speed * 1.15 * dt; // esquilo sempre um passo a frente
     }
-    // 'attack' avanca sozinho via contagem de frames acima.
+
+    var targetReached = step.moveTo != null && hero.x >= step.moveTo;
+    var ranOffscreen = step.moveTo === null && hero.x > cssWidth + HERO_FRAME * HERO_SCALE;
+    var loopsReached = step.loops && hero.loopsDone >= step.loops && cycleDone;
+
+    if (targetReached || ranOffscreen || loopsReached) {
+      advanceStep_();
+    }
   }
 
   // O sprite de 48x48 tem uma margem vazia (transparente) no topo do frame -
@@ -157,15 +195,59 @@
   var HERO_CROP_TOP = 9;
   var HERO_CROP_H = HERO_FRAME - HERO_CROP_TOP;
 
-  function drawHero_() {
-    var anim = HERO_ANIMS[hero.state];
+  function drawSquirrel_(x, y) {
+    // Esquilo em vetor simples (sem asset) - so pro numero comico de
+    // "sair correndo atras do esquilo".
+    ctx.save();
+    ctx.fillStyle = '#8a5a2e';
+    ctx.beginPath();
+    ctx.ellipse(x, y, 5, 3.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(x + 7, y - 6, 4, 5, 0.6, 0, Math.PI * 2); // cauda arqueada
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawFartPuff_(x, y, t) {
+    // Nuvenzinha comica (so formas proceduais) pro numero de "solta um pum
+    // e sai correndo" - nenhum asset, 3 circulos translucidos crescendo.
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = '#cdeccb';
+    for (var i = 0; i < 3; i++) {
+      var r = 3 + i * 2 + Math.sin(t * 6 + i) * 1;
+      ctx.beginPath();
+      ctx.arc(x - i * 5, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawHero_(t) {
+    var step = currentStep_();
+    var anim = HERO_ANIMS[step.anim];
     var img = anim.img;
-    if (img.__failed || !img.complete || img.naturalWidth === 0) return;
+
     var dw = HERO_FRAME * HERO_SCALE;
     var dh = HERO_CROP_H * HERO_SCALE;
-    var sx = hero.frame * HERO_FRAME;
     var feetY = GROUND_Y + 6; // pes afundam de leve na faixa de chao (fundo solido, imperceptivel)
     var dy = Math.max(2, feetY - dh);
+
+    if (step.jumpArc) {
+      var progress = (hero.loopsDone + hero.frame / anim.frames) / step.loops;
+      dy -= Math.sin(Math.min(progress, 1) * Math.PI) * 22;
+    }
+
+    if (step.squirrel) {
+      drawSquirrel_(hero.squirrelX, GROUND_Y - 4);
+    }
+    if (step.fartPuff) {
+      drawFartPuff_(hero.x - 4, feetY - dh * 0.55, t);
+    }
+
+    if (img.__failed || !img.complete || img.naturalWidth === 0) return;
+    var sx = hero.frame * HERO_FRAME;
     ctx.drawImage(img, sx, HERO_CROP_TOP, HERO_FRAME, HERO_CROP_H, Math.round(hero.x), Math.round(dy), dw, dh);
   }
 
@@ -370,7 +452,7 @@
     drawGround_();
     drawRaven_(huginn, 316, 16, 24);
     drawRaven_(muninn, 364, 21, 20);
-    drawHero_();
+    drawHero_(t);
 
     requestAnimationFrame(tick_);
   }
