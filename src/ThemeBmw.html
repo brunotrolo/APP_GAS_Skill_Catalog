@@ -1,12 +1,21 @@
 <style>
-  /* De docs/themes/DESIGN-bmw-m.md. Brand = m-red #e22718 / m-blue-light
-       #0066b1 / electric-blue #0653b6 / warning #f4b400 / success #0fa336 -
-       100% literais do arquivo, iguais nos dois modos. O arquivo so descreve
-       um canvas quase preto; o modo claro abaixo usa Surface/Text neutros
-       inferidos (unica excecao a regra de "so cores do arquivo", e so para
-       Surface/Text, nunca para Brand). Forma: rounded.none (0px) e o raio
-       dominante em botoes/cards/inputs, 1px, sem sombra, titulos em
-       UPPERCASE - identico nos dois modos. */
+  /* De docs/themes/DESIGN-bmw-m.md. Brand = m-red #e22718 ("the signature
+       M-power red", citado como identidade da marca no overview/colors/
+       Do's&Don'ts do arquivo) / m-blue-light #0066b1 / electric-blue #0653b6
+       / warning #f4b400 / success #0fa336 - 100% literais do arquivo, iguais
+       nos dois modos. chrome-gradient-success usa --terminal-green (success
+       #0fa336) porque, ao contrario de Apple/OpenCode, o arquivo da BMW tem
+       um token "success" literal e dedicado - mais fiel que forcar o Brand
+       vermelho no botao de download. Fonte: BMWTypeNextLatin nao esta
+       disponivel via Google Fonts; o proprio arquivo recomenda Inter como
+       substituto mais proximo ("Note on Font Substitutes"), com a mesma
+       pilha de fallback descrita na secao Font Family - nunca Arial
+       Black/Helvetica (inventados, nao citados em lugar nenhum do arquivo).
+       O arquivo so descreve um canvas quase preto; o modo claro abaixo usa
+       Surface/Text neutros inferidos (unica excecao a regra de "so cores do
+       arquivo", e so para Surface/Text, nunca para Brand). Forma:
+       rounded.none (0px) e o raio dominante em botoes/cards/inputs, 1px, sem
+       sombra, titulos em UPPERCASE - identico nos dois modos. */
   :root[data-theme-family="bmw"][data-theme="dark"] {
     --cat-1: #e22718;
     --cat-2: #0066b1;
@@ -31,9 +40,9 @@
     --warn: #f4b400;
     --gold-glow-rgb: 226, 39, 24;
     --terminal-green-rgb: 15, 163, 54;
-    --font-heading: 'Arial Black', Arial, sans-serif;
-    --font-body: Helvetica, Arial, sans-serif;
-    --font-display: 'Arial Black', Arial, sans-serif;
+    --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --radius-s: 0px;
     --radius-m: 0px;
     --border-width: 1px;
@@ -74,9 +83,9 @@
     --warn: #f4b400;
     --gold-glow-rgb: 226, 39, 24;
     --terminal-green-rgb: 15, 163, 54;
-    --font-heading: 'Arial Black', Arial, sans-serif;
-    --font-body: Helvetica, Arial, sans-serif;
-    --font-display: 'Arial Black', Arial, sans-serif;
+    --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --radius-s: 0px;
     --radius-m: 0px;
     --border-width: 1px;
