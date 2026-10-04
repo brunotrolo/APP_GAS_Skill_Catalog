@@ -1,0 +1,114 @@
+<style>
+  /* De docs/themes/DESIGN-nintendo-2001.md. O arquivo estratifica o
+       calor em papeis bem separados: Nintendo Red e so logo ("never a
+       surface fill outside the logo plate"), nav-gold e so palavras de
+       nav, amber e "utility energy" (literalmente o bg de button-primary)
+       e signal e "the commit action" (bg de button-submit, "if something
+       advances you, it is orange"). Brand (--gold) segue a regra padrao
+       (literal button-primary.backgroundColor) = Amber #ecab37, com
+       --gold-glow = nav-gold #e48600 (literalmente o proprio
+       button-primary-pressed). --info guarda Signal #f68d1f e
+       --chrome-gradient-success usa --info em vez de --gold - mesmo
+       padrao do Meta/PlayStation: o botao "BAIXAR .ZIP" e a acao de
+       commit/avanco do app, o papel exato do Signal Orange, nao do
+       Amber generico de utilidades. cat-1..6 evita Nintendo Red (restrito
+       a logo) e reusa a familia fria (teal/games-red/lavender/indigo/
+       periwinkle) - paleta "accent tint" das heros, legitima para
+       swatches. --danger usa error (literal, "reuse the brand red" - a
+       unica excecao documentada ao uso do vermelho fora do logo).
+       radius-pill NAO e pill: o proprio arquivo diz "roundness only
+       where it signals a physical control" - esrb-badge, o badge de
+       texto mais proximo do nosso, usa os mesmos 2px de botoes, nao
+       rounded.full. --heading-transform: uppercase + tracking 0.5px -
+       "every structural label is uppercase Arial Bold... the silkscreen-
+       legend voice". --shadow-chunky: none (Don't explicito "no soft
+       blurred drop-shadow... not Material elevation"). Fonte: Arial, web-
+       safe, sem substituto necessario. */
+  :root[data-theme-family="nintendo"][data-theme="dark"] {
+    --cat-1: #206479;
+    --cat-2: #a7282b;
+    --cat-3: #acace7;
+    --cat-4: #3d4f97;
+    --cat-5: #60619c;
+    --cat-6: #8ba1d4;
+    --on-cat: #ffffff;
+    --bg-deep: #21242e;
+    --bg-panel: #60619c;
+    --bg-card: #3d4f97;
+    --bg-card-hover: #8ba1d4;
+    --border-ink: #5a5f8c;
+    --text-main: #ffffff;
+    --gold: #ecab37;
+    --gold-glow: #e48600;
+    --purple: #3d4f97;
+    --terminal-green: #206479;
+    --danger: #e60012;
+    --muted: #9fbee7;
+    --info: #f68d1f;
+    --warn: #a7282b;
+    --gold-glow-rgb: 228, 134, 0;
+    --terminal-green-rgb: 32, 100, 121;
+    --font-heading: Arial, Helvetica, sans-serif;
+    --font-body: Arial, Helvetica, sans-serif;
+    --font-display: 'Arial Black', Arial, Helvetica, sans-serif;
+    --radius-s: 2px;
+    --radius-m: 6px;
+    --radius-pill: 2px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0.5px;
+    --heading-transform: uppercase;
+    --on-accent: #21242e;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--info);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="nintendo"][data-theme="light"] {
+    --cat-1: #206479;
+    --cat-2: #a7282b;
+    --cat-3: #acace7;
+    --cat-4: #3d4f97;
+    --cat-5: #60619c;
+    --cat-6: #8ba1d4;
+    --on-cat: #ffffff;
+    --bg-deep: #7a8aba;
+    --bg-panel: #dedede;
+    --bg-card: #ffffff;
+    --bg-card-hover: #9fbee7;
+    --border-ink: #3d4f97;
+    --text-main: #21242e;
+    --gold: #ecab37;
+    --gold-glow: #e48600;
+    --purple: #3d4f97;
+    --terminal-green: #206479;
+    --danger: #e60012;
+    --muted: #3d4f97;
+    --info: #f68d1f;
+    --warn: #a7282b;
+    --gold-glow-rgb: 228, 134, 0;
+    --terminal-green-rgb: 32, 100, 121;
+    --font-heading: Arial, Helvetica, sans-serif;
+    --font-body: Arial, Helvetica, sans-serif;
+    --font-display: 'Arial Black', Arial, Helvetica, sans-serif;
+    --radius-s: 2px;
+    --radius-m: 6px;
+    --radius-pill: 2px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: 0.5px;
+    --heading-transform: uppercase;
+    --on-accent: #21242e;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--info);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>

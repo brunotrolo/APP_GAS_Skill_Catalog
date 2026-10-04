@@ -1,0 +1,111 @@
+<style>
+  /* De docs/themes/DESIGN-binance.md. Brand = Binance Yellow #fcd535,
+       literal bg do button-primary, igual nos DOIS modos ja documentados
+       no proprio arquivo (nao extrapolado - "the same button appears
+       identically on canvas-dark and canvas-light"). --on-accent fica
+       #181a20 (ink) nos dois modos - Don't explicito "Don't invert
+       button-primary's text color... black on yellow is the system's
+       signature". cat-1..6 e --terminal-green/--danger EVITAM trading-up/
+       trading-down de proposito - Don't duplo explicito: "never repurpose
+       them for success/error generic states" e "never as a card/badge
+       background, only text" - violaria os dois se usados na ladder.
+       Com so amarelo+turquesa+azul de hue real disponivel, a ladder
+       completa com cinzas (muted/muted-strong/border-strong). --purple
+       usa accent-turquoise (unico secundario real, "single-product
+       accent" mas nao proibido como as cores de trading). --info usa o
+       token "info" literal (nao e trading, e um semantico generico de
+       verdade). Forma: rounded.md (6px) em botoes, rounded.xl (12px) em
+       cards, rounded.lg (8px) em --radius-pill - trust-badge, o badge
+       mais proximo do nosso no arquivo, usa 8px, nao o pill reservado a
+       poucos CTAs "top-of-page". --shadow-chunky: none ("does not use
+       heavy drop shadows... flat surfaces with color-block separation").
+       Fonte: BinanceNova/BinancePlex sao licenciadas; substituto literal
+       do proprio arquivo para BinanceNova e Inter. */
+  :root[data-theme-family="binance"][data-theme="dark"] {
+    --cat-1: #fcd535;
+    --cat-2: #2dbdb6;
+    --cat-3: #3b82f6;
+    --cat-4: #707a8a;
+    --cat-5: #929aa5;
+    --cat-6: #cdd1d6;
+    --on-cat: #181a20;
+    --bg-deep: #0b0e11;
+    --bg-panel: #1e2329;
+    --bg-card: #2b3139;
+    --bg-card-hover: #2b3139;
+    --border-ink: #2b3139;
+    --text-main: #ffffff;
+    --gold: #fcd535;
+    --gold-glow: #f0b90b;
+    --purple: #2dbdb6;
+    --terminal-green: #929aa5;
+    --danger: #707a8a;
+    --muted: #707a8a;
+    --info: #3b82f6;
+    --warn: #f0b90b;
+    --gold-glow-rgb: 240, 185, 11;
+    --terminal-green-rgb: 146, 154, 165;
+    --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --radius-s: 6px;
+    --radius-m: 12px;
+    --radius-pill: 8px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: -0.3px;
+    --heading-transform: none;
+    --on-accent: #181a20;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="binance"][data-theme="light"] {
+    --cat-1: #fcd535;
+    --cat-2: #2dbdb6;
+    --cat-3: #3b82f6;
+    --cat-4: #707a8a;
+    --cat-5: #929aa5;
+    --cat-6: #cdd1d6;
+    --on-cat: #181a20;
+    --bg-deep: #ffffff;
+    --bg-panel: #fafafa;
+    --bg-card: #f5f5f5;
+    --bg-card-hover: #eaecef;
+    --border-ink: #eaecef;
+    --text-main: #181a20;
+    --gold: #fcd535;
+    --gold-glow: #f0b90b;
+    --purple: #2dbdb6;
+    --terminal-green: #929aa5;
+    --danger: #707a8a;
+    --muted: #707a8a;
+    --info: #3b82f6;
+    --warn: #f0b90b;
+    --gold-glow-rgb: 240, 185, 11;
+    --terminal-green-rgb: 146, 154, 165;
+    --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --radius-s: 6px;
+    --radius-m: 12px;
+    --radius-pill: 8px;
+    --border-width: 1px;
+    --shadow-chunky: none;
+    --letter-spacing-heading: -0.3px;
+    --heading-transform: none;
+    --on-accent: #181a20;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>
