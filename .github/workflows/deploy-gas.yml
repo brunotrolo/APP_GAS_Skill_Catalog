@@ -13,6 +13,9 @@ jobs:
   clasp-push:
     runs-on: ubuntu-latest
     steps:
+      - name: Debug inputs
+        run: echo "create_deployment input value is '${{ inputs.create_deployment }}' (type ${{ toJSON(inputs.create_deployment) }})"
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -47,5 +50,5 @@ jobs:
         run: npx clasp push --force
 
       - name: Create/update Web App deployment
-        if: ${{ inputs.create_deployment == 'true' }}
+        if: ${{ inputs.create_deployment == true || inputs.create_deployment == 'true' }}
         run: npx clasp deploy --description "Deploy via GitHub Actions - ${{ github.sha }}"
