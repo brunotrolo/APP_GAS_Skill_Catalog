@@ -98,7 +98,7 @@
     idle: { img: loadImageSafe_(spriteUrl_('hero/idle.png')), frames: 11, fps: 8 },
     attack: { img: loadImageSafe_(spriteUrl_('hero/attack.png')), frames: 8, fps: 14 }
   };
-  var HERO_SCALE = 2.0;
+  var HERO_SCALE = 2.3;
   var HERO_RUN_SPEED = 46; // px/s
   var HERO_STOP_X = 190; // onde o heroi para para o golpe, antes da arvore
   var HERO_IDLE_SECONDS = 1.1;
@@ -149,15 +149,24 @@
     // 'attack' avanca sozinho via contagem de frames acima.
   }
 
+  // O sprite de 48x48 tem uma margem vazia (transparente) no topo do frame -
+  // o personagem ocupa so a faixa inferior (~y9-48 cobre corre/parado/golpe,
+  // incluindo o machado erguido no golpe). Recortar essa margem antes de
+  // escalar permite um personagem maior sem estourar a altura fixa do
+  // banner nem cortar a cabeca/pes.
+  var HERO_CROP_TOP = 9;
+  var HERO_CROP_H = HERO_FRAME - HERO_CROP_TOP;
+
   function drawHero_() {
     var anim = HERO_ANIMS[hero.state];
     var img = anim.img;
     if (img.__failed || !img.complete || img.naturalWidth === 0) return;
     var dw = HERO_FRAME * HERO_SCALE;
-    var dh = HERO_FRAME * HERO_SCALE;
+    var dh = HERO_CROP_H * HERO_SCALE;
     var sx = hero.frame * HERO_FRAME;
-    var dy = Math.max(2, GROUND_Y - dh + 6); // +6 compensa a margem vazia nos pes do sprite; nunca deixa o topo sair do canvas
-    ctx.drawImage(img, sx, 0, HERO_FRAME, HERO_FRAME, Math.round(hero.x), Math.round(dy), dw, dh);
+    var feetY = GROUND_Y + 6; // pes afundam de leve na faixa de chao (fundo solido, imperceptivel)
+    var dy = Math.max(2, feetY - dh);
+    ctx.drawImage(img, sx, HERO_CROP_TOP, HERO_FRAME, HERO_CROP_H, Math.round(hero.x), Math.round(dy), dw, dh);
   }
 
   // --- 4. Elementos proceduais da cena (vetores puros, sem assets) --------
