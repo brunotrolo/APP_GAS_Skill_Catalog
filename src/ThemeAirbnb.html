@@ -1,0 +1,104 @@
+<style>
+  /* De docs/themes/DESIGN-airbnb.md. Brand = Rausch {colors.primary} #ff385c,
+       literalmente o backgroundColor de components.button-primary - unico
+       acento da marca ("single brand voltage"), igual nos dois modos (o
+       arquivo nao documenta variante on-dark). O arquivo e so modo claro
+       ("Airbnb does not have a dark mode on the public web"); o escuro
+       abaixo e Surface/Text extrapolados (nunca Brand), invertendo
+       canvas/ink. --purple usa luxe #460479 (sub-marca Luxe, token literal).
+       cat-1..6 usa as 6 cores com matiz reais do arquivo (primary/
+       primary-active/luxe/plus/legal-link/error) em vez de inventar.
+       --terminal-green reusa body #3f3f3f (neutro, arquivo nao tem verde).
+       Forma: rounded.sm (8px) em botoes, rounded.md (14px) em cards,
+       rounded.full (9999px) em pills/badges - raio pill dedicado para
+       tags/badges. Fonte: Airbnb Cereal VF e Circular sao proprietarias;
+       o proprio arquivo recomenda Inter como substituto ("Note on Font
+       Substitutes"). Elevacao: 1 tier de sombra suave (nao "sem sombra"). */
+  :root[data-theme-family="airbnb"][data-theme="dark"] {
+    --cat-1: #ff385c;
+    --cat-2: #e00b41;
+    --cat-3: #460479;
+    --cat-4: #92174d;
+    --cat-5: #428bff;
+    --cat-6: #c13515;
+    --on-cat: #ffffff;
+    --bg-deep: #1a1a1a;
+    --bg-panel: #242424;
+    --bg-card: #2a2a2a;
+    --bg-card-hover: #333333;
+    --border-ink: #3f3f3f;
+    --text-main: #ffffff;
+    --gold: #ff385c;
+    --gold-glow: #e00b41;
+    --purple: #460479;
+    --terminal-green: #3f3f3f;
+    --danger: #c13515;
+    --muted: #929292;
+    --info: #428bff;
+    --warn: #e00b41;
+    --gold-glow-rgb: 224, 11, 65;
+    --terminal-green-rgb: 63, 63, 63;
+    --font-heading: 'Inter', -apple-system, system-ui, Roboto, 'Helvetica Neue', sans-serif;
+    --font-body: 'Inter', -apple-system, system-ui, Roboto, 'Helvetica Neue', sans-serif;
+    --font-display: 'Inter', -apple-system, system-ui, Roboto, 'Helvetica Neue', sans-serif;
+    --radius-s: 8px;
+    --radius-m: 14px;
+    --radius-pill: 9999px;
+    --border-width: 1px;
+    --shadow-chunky: 0 4px 8px rgba(0, 0, 0, 0.3);
+    --letter-spacing-heading: 0px;
+    --heading-transform: none;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+
+  :root[data-theme-family="airbnb"][data-theme="light"] {
+    --cat-1: #ff385c;
+    --cat-2: #e00b41;
+    --cat-3: #460479;
+    --cat-4: #92174d;
+    --cat-5: #428bff;
+    --cat-6: #c13515;
+    --on-cat: #ffffff;
+    --bg-deep: #ffffff;
+    --bg-panel: #f7f7f7;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f2f2f2;
+    --border-ink: #dddddd;
+    --text-main: #222222;
+    --gold: #ff385c;
+    --gold-glow: #e00b41;
+    --purple: #460479;
+    --terminal-green: #3f3f3f;
+    --danger: #c13515;
+    --muted: #6a6a6a;
+    --info: #428bff;
+    --warn: #e00b41;
+    --gold-glow-rgb: 224, 11, 65;
+    --terminal-green-rgb: 63, 63, 63;
+    --font-heading: 'Inter', -apple-system, system-ui, Roboto, 'Helvetica Neue', sans-serif;
+    --font-body: 'Inter', -apple-system, system-ui, Roboto, 'Helvetica Neue', sans-serif;
+    --font-display: 'Inter', -apple-system, system-ui, Roboto, 'Helvetica Neue', sans-serif;
+    --radius-s: 8px;
+    --radius-m: 14px;
+    --radius-pill: 9999px;
+    --border-width: 1px;
+    --shadow-chunky: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --letter-spacing-heading: 0px;
+    --heading-transform: none;
+    --on-accent: #ffffff;
+    --chrome-gradient: var(--bg-card);
+    --chrome-gradient-accent: var(--gold);
+    --chrome-gradient-card: var(--bg-card);
+    --chrome-gradient-panel: var(--bg-panel);
+    --chrome-gradient-success: var(--gold);
+    --chrome-gradient-curadoria: var(--purple);
+    --ambient-glow: none;
+  }
+</style>
