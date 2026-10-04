@@ -223,41 +223,85 @@
     });
   }
 
+  var CATEGORY_COLORS = {
+    'Product & Upstream': 'cat-1',
+    'Software Engineering': 'cat-2',
+    'Debugging & Troubleshooting': 'cat-3',
+    'Quality & Test Automation': 'cat-4',
+    'DevOps & Release': 'cat-5',
+    'Architecture & Workflows': 'cat-6'
+  };
+
   function buildCardElement(skill) {
     var card = document.createElement('div');
     card.className = 'skill-card';
 
     var badgeClass = skill.tipo === 'INTERNA' ? 'interna' : 'curadoria';
     var badgeLabel = skill.tipo === 'INTERNA' ? 'INTERNA - ODIN' : 'CURADORIA';
+    var categoriaClass = CATEGORY_COLORS[skill.categoria_primaria] || 'cat-default';
 
     var tagsHtml = (skill.tags || '')
       .split(',')
       .map(function (t) { return t.trim(); })
       .filter(Boolean)
-      .map(function (t) { return '<span>#' + escapeHtml(t) + '</span>'; })
+      .map(function (t) { return '<span data-tag="' + escapeHtml(t) + '">#' + escapeHtml(t) + '</span>'; })
       .join('');
+
+    var clones = Number(skill.clones) || 0;
 
     card.innerHTML =
       '<span class="badge ' + badgeClass + '">' + badgeLabel + '</span>' +
       '<h3>' + escapeHtml(skill.nome) + '</h3>' +
       '<div class="meta">por ' + escapeHtml(skill.autor) + '</div>' +
-      '<div class="categoria">' + escapeHtml(skill.categoria_primaria || '') + '</div>' +
+      '<span class="categoria-badge ' + categoriaClass + '">' + escapeHtml(skill.categoria_primaria || '') + '</span>' +
       '<div class="resumo">' + escapeHtml(skill.resumo || '') + '</div>' +
       '<div class="tags">' + tagsHtml + '</div>' +
+      '<div class="meta clone-count">⬇️ <span data-clone-count>' + clones + '</span> clone(s)/download(s)</div>' +
       '<div class="actions">' +
-      '  <a class="pixel-button success" href="' + escapeHtml(skill.zip_url) + '" target="_blank">BAIXAR .ZIP</a>' +
+      '  <a class="pixel-button success" href="' + escapeHtml(skill.zip_url) + '" target="_blank" data-clone="zip">BAIXAR .ZIP</a>' +
       '  <button class="pixel-button secondary" data-clone="bash">GIT BASH</button>' +
       '  <button class="pixel-button secondary" data-clone="powershell">POWERSHELL</button>' +
       '</div>';
 
+    card.querySelectorAll('.tags span[data-tag]').forEach(function (pillEl) {
+      pillEl.onclick = function () {
+        var tag = pillEl.dataset.tag;
+        if (activeTags.has(tag)) {
+          activeTags.delete(tag);
+        } else {
+          activeTags.add(tag);
+        }
+        renderTagPills();
+        applyFilters();
+      };
+    });
+
+    card.querySelector('[data-clone="zip"]').addEventListener('click', function () {
+      trackSkillClone(skill, card);
+    });
     card.querySelector('[data-clone="bash"]').onclick = function () {
       copyToClipboard(skill.clone_bash);
+      trackSkillClone(skill, card);
     };
     card.querySelector('[data-clone="powershell"]').onclick = function () {
       copyToClipboard(skill.clone_powershell);
+      trackSkillClone(skill, card);
     };
 
     return card;
+  }
+
+  function trackSkillClone(skill, card) {
+    google.script.run
+      .withSuccessHandler(function (result) {
+        if (result && result.success) {
+          skill.clones = result.data;
+          var counter = card.querySelector('[data-clone-count]');
+          if (counter) counter.textContent = result.data;
+        }
+      })
+      .withFailureHandler(function () { /* contagem e best-effort, falha silenciosa */ })
+      .registerSkillClone(skill.id);
   }
 
   function escapeHtml(str) {

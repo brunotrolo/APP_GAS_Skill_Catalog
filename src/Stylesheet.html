@@ -403,12 +403,26 @@
     word-break: break-word;
   }
 
-  .skill-card .categoria {
-    font-size: 14px;
+  .categoria-badge {
+    display: inline-block;
+    align-self: flex-start;
+    font-size: 11px;
     font-weight: 700;
-    color: var(--terminal-green);
+    font-family: 'Pixelify Sans', monospace;
+    padding: 4px 9px;
+    border-radius: 999px;
+    border: 1px solid var(--border-ink);
+    max-width: 100%;
     overflow-wrap: break-word;
   }
+
+  .categoria-badge.cat-1 { background: #ffd84a; color: #231a00; }
+  .categoria-badge.cat-2 { background: #2effa0; color: #042016; }
+  .categoria-badge.cat-3 { background: #ff5d6c; color: #2b0005; }
+  .categoria-badge.cat-4 { background: #6ad1ff; color: #00222f; }
+  .categoria-badge.cat-5 { background: #b06aed; color: #1f0033; }
+  .categoria-badge.cat-6 { background: #ff9f5a; color: #311300; }
+  .categoria-badge.cat-default { background: var(--bg-panel); color: var(--text-main); }
 
   .skill-card .tags {
     display: flex;
@@ -425,6 +439,16 @@
     padding: 3px 10px;
     max-width: 100%;
     overflow-wrap: break-word;
+    cursor: pointer;
+  }
+
+  .skill-card .tags span:hover {
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+
+  .skill-card .clone-count {
+    font-size: 13px;
   }
 
   .skill-card .actions {
