@@ -108,12 +108,12 @@
   var HERO_FAST_SPEED = 95; // px/s - "correr rapido" / fuga comica
   var HERO_STOP_X = 190; // onde o heroi para pra fazer a sequencia de golpes
 
-  // Numeros do heroi. A entrada (surgir + correr ate o ponto) e a saida
-  // (pum comico + corrida atras do esquilo + hit) sao fixas, mas a ORDEM
-  // dos golpes/acoes do meio e sorteada de novo a cada volta - embaralhar
-  // em vez de usar sempre a mesma sequencia e o que o usuario pediu.
-  // "Unidades" podem ter mais de um passo (ex: pular e so depois golpear
-  // ao cair sempre juntos, nessa ordem).
+  // Numeros do heroi. So reordenar os golpes nao bastava - 3 golpes de
+  // machado parecidos em sequencia parecem "sempre a mesma coisa" mesmo
+  // com a ordem trocada. Agora cada volta sorteia: QUANTAS e QUAIS acoes
+  // entram (nem sempre as 5), a ORDEM delas, e se a saida comica (pum +
+  // corrida atras do esquilo) acontece ou se o heroi so sai correndo
+  // direto - bem mais variedade perceptivel de fato.
   var HERO_INTRO = [
     { anim: 'appear', loops: 1 },
     { anim: 'run', moveTo: HERO_STOP_X, speed: HERO_RUN_SPEED }
@@ -125,10 +125,12 @@
     [{ anim: 'attack3', loops: 1 }],
     [{ anim: 'jump', loops: 1, jumpArc: true }, { anim: 'attack1', loops: 1 }] // pula e golpeia ao cair
   ];
-  var HERO_OUTRO = [
+  var HERO_OUTRO_COMIC = [
     { anim: 'idle', loops: 1, fartPuff: true }, // solta um pum...
-    { anim: 'run', moveTo: null, speed: HERO_FAST_SPEED, squirrel: true }, // ...e sai correndo atras do esquilo
-    { anim: 'hit', loops: 1 }
+    { anim: 'run', moveTo: null, speed: HERO_FAST_SPEED, squirrel: true } // ...e sai correndo atras do esquilo
+  ];
+  var HERO_OUTRO_PLAIN = [
+    { anim: 'run', moveTo: null, speed: HERO_FAST_SPEED }
   ];
 
   function shuffled_(arr) {
@@ -141,10 +143,13 @@
   }
 
   function buildSequence_() {
-    var units = shuffled_(HERO_ACTION_UNITS);
+    var shuffledUnits = shuffled_(HERO_ACTION_UNITS);
+    var howMany = 2 + Math.floor(Math.random() * (HERO_ACTION_UNITS.length - 1)); // 2 a 5 acoes
+    var units = shuffledUnits.slice(0, howMany);
     var seq = HERO_INTRO.slice();
     units.forEach(function (unit) { seq.push.apply(seq, unit); });
-    seq.push.apply(seq, HERO_OUTRO);
+    seq.push.apply(seq, Math.random() < 0.6 ? HERO_OUTRO_COMIC : HERO_OUTRO_PLAIN);
+    if (Math.random() < 0.5) seq.push({ anim: 'hit', loops: 1 });
     return seq;
   }
 
