@@ -108,31 +108,51 @@
   var HERO_FAST_SPEED = 95; // px/s - "correr rapido" / fuga comica
   var HERO_STOP_X = 190; // onde o heroi para pra fazer a sequencia de golpes
 
-  // Sequencia de "numeros" do heroi - roda em loop continuo. Cada passo
-  // toca uma animacao real do pack ate completar N ciclos (ou ate alcancar
-  // um x alvo, pra passos que andam), depois avanca pro proximo. Isso cobre
-  // as variacoes pedidas: golpes (attack1/2/3 - "acertar o machado"), correr
-  // rapido (fast run), pulo (jump), e dois numeros comicos usando efeitos
-  // proceduais simples (sem asset novo): soltar uma fumacinha e sair
-  // correndo, e perseguir um esquilo desenhado em vetor.
-  var HERO_SEQUENCE = [
+  // Numeros do heroi. A entrada (surgir + correr ate o ponto) e a saida
+  // (pum comico + corrida atras do esquilo + hit) sao fixas, mas a ORDEM
+  // dos golpes/acoes do meio e sorteada de novo a cada volta - embaralhar
+  // em vez de usar sempre a mesma sequencia e o que o usuario pediu.
+  // "Unidades" podem ter mais de um passo (ex: pular e so depois golpear
+  // ao cair sempre juntos, nessa ordem).
+  var HERO_INTRO = [
     { anim: 'appear', loops: 1 },
-    { anim: 'run', moveTo: HERO_STOP_X, speed: HERO_RUN_SPEED },
-    { anim: 'idle', loops: 2 },
-    { anim: 'attack1', loops: 1 },
-    { anim: 'attack2', loops: 1 },
-    { anim: 'attack3', loops: 1 },
-    { anim: 'jump', loops: 1, jumpArc: true },
-    { anim: 'attack1', loops: 1 }, // golpe ao cair, emenda com o pulo
+    { anim: 'run', moveTo: HERO_STOP_X, speed: HERO_RUN_SPEED }
+  ];
+  var HERO_ACTION_UNITS = [
+    [{ anim: 'idle', loops: 2 }],
+    [{ anim: 'attack1', loops: 1 }],
+    [{ anim: 'attack2', loops: 1 }],
+    [{ anim: 'attack3', loops: 1 }],
+    [{ anim: 'jump', loops: 1, jumpArc: true }, { anim: 'attack1', loops: 1 }] // pula e golpeia ao cair
+  ];
+  var HERO_OUTRO = [
     { anim: 'idle', loops: 1, fartPuff: true }, // solta um pum...
     { anim: 'run', moveTo: null, speed: HERO_FAST_SPEED, squirrel: true }, // ...e sai correndo atras do esquilo
     { anim: 'hit', loops: 1 }
   ];
 
+  function shuffled_(arr) {
+    var copy = arr.slice();
+    for (var i = copy.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = copy[i]; copy[i] = copy[j]; copy[j] = tmp;
+    }
+    return copy;
+  }
+
+  function buildSequence_() {
+    var units = shuffled_(HERO_ACTION_UNITS);
+    var seq = HERO_INTRO.slice();
+    units.forEach(function (unit) { seq.push.apply(seq, unit); });
+    seq.push.apply(seq, HERO_OUTRO);
+    return seq;
+  }
+
   var HERO_ENTER_X = 24; // posicao visivel, perto da borda esquerda, onde o "appear" acontece
 
   var hero = {
     x: HERO_ENTER_X,
+    sequence: buildSequence_(),
     step: 0,
     frame: 0,
     frameTimer: 0,
@@ -141,18 +161,22 @@
   };
 
   function currentStep_() {
-    return HERO_SEQUENCE[hero.step];
+    return hero.sequence[hero.step];
   }
 
   function advanceStep_() {
-    hero.step = (hero.step + 1) % HERO_SEQUENCE.length;
+    hero.step++;
+    if (hero.step >= hero.sequence.length) {
+      hero.step = 0;
+      hero.sequence = buildSequence_(); // nova ordem sorteada pra proxima volta
+    }
     hero.frame = 0;
     hero.frameTimer = 0;
     hero.loopsDone = 0;
-    if (HERO_SEQUENCE[hero.step].anim === 'appear') {
+    if (hero.sequence[hero.step].anim === 'appear') {
       hero.x = HERO_ENTER_X; // reinicio do ciclo - "surge" de novo perto da borda esquerda
     }
-    if (HERO_SEQUENCE[hero.step].squirrel) {
+    if (hero.sequence[hero.step].squirrel) {
       hero.squirrelX = hero.x + HERO_FRAME * HERO_SCALE * 0.6;
     }
   }
