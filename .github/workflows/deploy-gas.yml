@@ -52,6 +52,13 @@ jobs:
       - name: Push to Apps Script
         run: npx clasp push --force
 
+      - name: Diagnostic - List deployments and versions
+        run: |
+          echo "===== clasp deployments ====="
+          npx clasp deployments
+          echo "===== clasp versions ====="
+          npx clasp versions
+
       - name: Create/update Web App deployment
         if: ${{ inputs.create_deployment == true || inputs.create_deployment == 'true' }}
         run: npx clasp deploy --description "Deploy via GitHub Actions - ${{ github.sha }}"
