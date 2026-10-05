@@ -118,12 +118,28 @@
     { anim: 'appear', loops: 1 },
     { anim: 'run', moveTo: HERO_STOP_X, speed: HERO_RUN_SPEED }
   ];
+  // As 5 primeiras unidades usam so a animacao real pura. As 10 seguintes
+  // sao "numeros" novos criados a partir dos mesmos sprites reais (nao ha
+  // mais animacoes no pack licenciado) combinados com efeitos proceduais
+  // originais (sem asset, sem licenca nova) - rotacao, escala, brilho,
+  // rastro - pra multiplicar a variedade percebida sem repetir "golpe de
+  // machado" disfarcado de outro jeito.
   var HERO_ACTION_UNITS = [
     [{ anim: 'idle', loops: 2 }],
     [{ anim: 'attack1', loops: 1 }],
     [{ anim: 'attack2', loops: 1 }],
     [{ anim: 'attack3', loops: 1 }],
-    [{ anim: 'jump', loops: 1, jumpArc: true }, { anim: 'attack1', loops: 1 }] // pula e golpeia ao cair
+    [{ anim: 'jump', loops: 1, jumpArc: true }, { anim: 'attack1', loops: 1 }], // pula e golpeia ao cair
+    [{ anim: 'jump', loops: 1, rollSpin: true }], // rolamento (giro completo no ar)
+    [{ anim: 'idle', loops: 1, shieldBlock: true }], // se defende com o machado erguido
+    [{ anim: 'idle', loops: 2, taunt: true }], // provoca (espelha de um lado pro outro + brilho)
+    [{ anim: 'idle', loops: 1, crouch: true }], // agacha
+    [{ anim: 'run', loops: 1, dashStreak: true }], // investida rapida com rastro de velocidade
+    [{ anim: 'jump', loops: 2, jumpArc: true }], // pulo duplo, mais alto
+    [{ anim: 'attack1', loops: 1, victoryGlow: true }], // pose de vitoria (machado erguido brilhando)
+    [{ anim: 'hit', loops: 1, faintSpin: true }], // tropeca e gira, zonzo
+    [{ anim: 'idle', loops: 1, sneezePuff: true }], // espirra (nuvem branca na frente)
+    [{ anim: 'attack3', loops: 1, powerGlow: true }] // golpe carregado (brilho dourado pulsante)
   ];
   var HERO_OUTRO_COMIC = [
     { anim: 'idle', loops: 1, fartPuff: true }, // solta um pum...
@@ -238,12 +254,12 @@
     ctx.restore();
   }
 
-  function drawFartPuff_(x, y, t) {
-    // Nuvenzinha comica (so formas proceduais) pro numero de "solta um pum
-    // e sai correndo" - nenhum asset, 3 circulos translucidos crescendo.
+  function drawFartPuff_(x, y, t, color) {
+    // Nuvenzinha comica (so formas proceduais) - usada tanto no "pum" quanto
+    // no espirro (cor diferente), nenhum asset novo.
     ctx.save();
     ctx.globalAlpha = 0.5;
-    ctx.fillStyle = '#cdeccb';
+    ctx.fillStyle = color || '#cdeccb';
     for (var i = 0; i < 3; i++) {
       var r = 3 + i * 2 + Math.sin(t * 6 + i) * 1;
       ctx.beginPath();
@@ -253,6 +269,47 @@
     ctx.restore();
   }
 
+  function drawSparkle_(x, y, t) {
+    ctx.save();
+    ctx.strokeStyle = colors.gold;
+    ctx.lineWidth = 1.5;
+    ctx.globalAlpha = 0.6 + 0.4 * Math.sin(t * 10);
+    var r = 4 + Math.sin(t * 8) * 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x - r, y); ctx.lineTo(x + r, y);
+    ctx.moveTo(x, y - r); ctx.lineTo(x, y + r);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawShield_(x, y, dw, dh) {
+    ctx.save();
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle = colors.stars;
+    ctx.beginPath();
+    ctx.ellipse(x + dw * 0.75, y + dh * 0.45, dw * 0.22, dh * 0.3, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawDashStreak_(x, y, dw, dh) {
+    ctx.save();
+    ctx.strokeStyle = colors.stars;
+    ctx.lineWidth = 2;
+    for (var i = 0; i < 3; i++) {
+      ctx.globalAlpha = 0.35 - i * 0.1;
+      ctx.beginPath();
+      ctx.moveTo(x - 4 - i * 7, y + dh * 0.4);
+      ctx.lineTo(x - 14 - i * 7, y + dh * 0.4);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // Alguns "numeros" extras do heroi reaproveitam os mesmos sprites reais
+  // (nao existem mais animacoes no pack licenciado) com efeitos proceduais
+  // originais por cima - rotacao, brilho, rastro, espelhamento - pra dar
+  // ainda mais variedade sem precisar de arte nova.
   function drawHero_(t) {
     var step = currentStep_();
     var anim = HERO_ANIMS[step.anim];
@@ -262,22 +319,50 @@
     var dh = HERO_CROP_H * HERO_SCALE;
     var feetY = GROUND_Y + 6; // pes afundam de leve na faixa de chao (fundo solido, imperceptivel)
     var dy = Math.max(2, feetY - dh);
+    var progress = step.loops ? (hero.loopsDone + hero.frame / anim.frames) / step.loops : 0;
 
     if (step.jumpArc) {
-      var progress = (hero.loopsDone + hero.frame / anim.frames) / step.loops;
       dy -= Math.sin(Math.min(progress, 1) * Math.PI) * 22;
     }
+    if (step.crouch) {
+      var squash = dh * 0.25;
+      dh -= squash;
+      dy += squash;
+    }
 
-    if (step.squirrel) {
-      drawSquirrel_(hero.squirrelX, GROUND_Y - 4);
-    }
-    if (step.fartPuff) {
-      drawFartPuff_(hero.x - 4, feetY - dh * 0.55, t);
-    }
+    if (step.squirrel) drawSquirrel_(hero.squirrelX, GROUND_Y - 4);
+    if (step.fartPuff) drawFartPuff_(hero.x - 4, feetY - dh * 0.55, t, '#cdeccb');
+    if (step.sneezePuff) drawFartPuff_(hero.x + dw - 6, feetY - dh * 0.8, t, '#e8e8f0');
+    if (step.shieldBlock) drawShield_(hero.x, dy, dw, dh);
+    if (step.dashStreak) drawDashStreak_(hero.x, dy, dw, dh);
+    if (step.victoryGlow || step.taunt) drawSparkle_(hero.x + dw * 0.5, dy - 6, t);
 
     if (img.__failed || !img.complete || img.naturalWidth === 0) return;
     var sx = hero.frame * HERO_FRAME;
+    var cx = hero.x + dw / 2, cy = dy + dh / 2;
+
+    ctx.save();
+    if (step.powerGlow || step.victoryGlow) {
+      ctx.shadowColor = colors.gold;
+      ctx.shadowBlur = 8 + 4 * Math.sin(t * 6);
+    }
+    if (step.rollSpin) {
+      ctx.translate(cx, cy);
+      ctx.rotate(progress * Math.PI * 2);
+      ctx.translate(-cx, -cy);
+    }
+    if (step.faintSpin) {
+      ctx.translate(cx, cy);
+      ctx.rotate(progress * Math.PI * 0.5);
+      ctx.translate(-cx, -cy);
+    }
+    if (step.taunt && hero.frame % 4 >= 2) {
+      ctx.translate(cx, 0);
+      ctx.scale(-1, 1);
+      ctx.translate(-cx, 0);
+    }
     ctx.drawImage(img, sx, HERO_CROP_TOP, HERO_FRAME, HERO_CROP_H, Math.round(hero.x), Math.round(dy), dw, dh);
+    ctx.restore();
   }
 
   // --- 4. Elementos proceduais da cena (vetores puros, sem assets) --------
